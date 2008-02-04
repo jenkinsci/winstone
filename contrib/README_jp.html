@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="EUC-JP"?>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=euc-jp" />
+  <title>Winstoneサーブレトコンテーナー (日本語)</title>
+  <meta name="description" content="Winstone is a small, fast and functional java servlet v2.4 container in a single 160kb jar file"/>
+  <meta name="keywords" content="servlets, servlet, servlet container, jsp, java, container, ajax, webservices, jdk, jre, winstone, small, fast, reliable, open source, gpl, gcj, jndi, xml"/>
+  <meta name="author" content="Rick Knowles"/>
+  <meta name="language" content="Japanese"/>
+  <meta name="charset" content="EUC-JP"/>
+  <meta name="MSSmartTagsPreventParsing" content="TRUE"/>
+  <meta name="distribution" content="Global"/>
+  <meta name="rating" content="General"/>
+  <meta name="robots" content="Index, Follow"/>
+  <meta name="revisit-after" content="7 Days"/>
+</head>
+<body>
+<center><h1>Winstoneサーブレトコンテーナー v0.8.1</h1></center>
+
+  <center>
+    <a href="http://sourceforge.net/project/showfiles.php?group_id=98922">ダウンロード</a>&#0160;
+    <a href="#license"><b>ライセンスは更新しました</b></a>
+  </center>
+  <hr width="90%" size="1" noshade="noshade"/>
+
+<br/>
+<center>
+  <table border="0" width="90%">
+    <tr>
+      <td>
+  <p>これはWinstoneサーブレトコンテナーのベタリリースです.  プロジェクトのホームページは
+    'http://winstone.sourceforge.net'　です。</p>
+
+  <p>作者: Rick Knowles (問い合わせは下記まで)</p>
+
+  <h2>コンテンツ</h2>
+  <h3>About:</h3>
+  <ul>
+    <li><a href="#whatIs">Winstoneとは ?</a></li>
+    <li><a href="#whyCalled">何で Winstone と言うの?</a></li>
+    <li><a href="#license">ライセンス</a></li>
+    <li><a href="#authorContact">作者への問い合わせ</a></li>
+  </ul>
+  <h3>始めに:</h3>
+  <ul>
+    <li><a href="#using">最初にする事</a></li>
+    <li><a href="#commandLine">コマンドラインオプション</a></li>
+    <li><a href="#configFile">設定ファイル</a></li>
+    <li><a href="#deployChoices">デプロイーの選択</a></li>
+    <li><a href="#caveats">Winstoneにない機能</a></li>
+    <li><a href="#security">セキュリティ上の注意</a></li>
+    <li><a href="#recent">最近追加した機能</a></li>
+  </ul>
+  <h3>使い方のヒント:</h3>
+  <ul>
+    <li><a href="#xerces">XMLパーザーでXercesを使ってる (バージョン2.4)</a></li>
+    <li><a href="#jasper">JSP (ApacheのJasperを使ってる)</a></li>
+    <li><a href="#apache">Apacheに繋がってる</a></li>
+    <li><a href="#authRealms">認証の設定</a></li>
+    <li><a href="#cluster">クラスターの機能</a></li>
+    <li><a href="#controlPort">コントロールポートの機能とプロトコール</a></li>
+    <li><a href="#jndi">JNDIの設定</a></li>
+    <li><a href="#https">HTTPSの設定</a></li>
+    <li><a href="#accessLog">Access logging</a></li>
+    <li><a href="#embedding">Embedding Winstone</a></li>
+  </ul>
+
+<h2><a name="whatIs">Winstoneとは ?</a></h2>
+
+  <p>大きくないサーブレトコンテナーを欲しかったから、Winstoneを作りました。</p>
+
+  <p>全J2EE機能が有るコンテナーを作成するつもりではありませんでした　『JNDI、
+    JavaMail、EJBの機能は必要ではないので、入てないんです。 そんな機能が欲しかったら、
+    別なコンテナーを使ったほうがいいです。たとえば　ResinやJettyやTomcatはそんな事
+    ができます』</p>
+
+  <p>シンプルコンテナーが要るケースがいろいろ有ります。そんなケースにはWinstoneが便利です。</p>
+
+  <p>最初のゴールはこうでした:</p>
+    <ul>
+      <li>1つのウェブ適用に速い安定したコンテナー機能を供給します。</li>
+      <li>配信したJARファイルのサイズは最小限の物にしています『現在 160KB』</li>
+      <li>設定ファイルを減らして、using command line options to 
+        optionally override sensible compiled in defaults. </li>
+      <li>Eventually compile with GCJ to make a 3-4Meg windows exe for local development/deployment 
+        of servlets. This has not happened yet, because of some GCJ class loading problems.</li>
+      <li>Optionally support JSP compilation using Apache's Jasper. (http://jakarta.apache.org)</li>
+    </ul>
+
+<h2><a name="whyCalled">何で Winstone と言うの ?</a></h2>
+
+  <p>The short version (because the long version is way too politically incorrect) is as follows: </p>
+
+  <p>Winstone is the name of a rather large Jamaican man a friend of mine met one night, while 
+    he was out clubbing in the Roppongi area of Tokyo. He (my friend) was a little 
+    liquored up at the time, and when Winstone suggested they head to "this really cool club" 
+    he knew, he didn't think anything was wrong. It wasn't until Winstone led him down a dark 
+    stairwell and dropped his trousers that my friend clued in and ran like hell.</p>
+
+  <p>It was too good a story to let die, so I named this project Winstone so that said friend 
+    will continue to be reminded of it. Heheheh ....</p>
+
+<h2><a name="license">ライセンス</a></h2>
+
+  <p>The Web-App DTD files (everything in the src/javax/servlet/resources and 
+    src/javax/servlet/jsp/resources folders) are covered by the licenses described 
+    at the top of each file (usually as licensed by Sun Microsystems).</p>
+
+  <p>As of v0.8.1, all other files are dual-licensed, under either the Lesser GNU Public 
+    License (LGPL) as described in LICENSE-LGPL.txt, or the Common Development and Distribution 
+    License (CDDL) as decribed in LICENSE-CDDL.txt. Until v0.8, the license used was the GNU Public 
+    License (GPL).</p>
+        
+  <p>The goal of dual-licensing is to make Winstone as attractive as possible to distributors of 
+    commercial webapps, while ensuring everyone benefits from any improvements. The CDDL allows 
+    free distribution with any commercial applications, while distribution with a GPL licensed 
+    webapp is also possible under the LGPL. If you are unclear about which license applies to an
+    application you wish to distribute or sell, please <a href="#authorContact">contact me</a>.</p>
+
+
+<h2><a name="authorContact">作者への問い合わせ</a></h2>
+
+  <p>You can contact me through the Winstone development list at sourceforge 
+    (winstone-devel AT lists DOT sourceforge DOT net).  If you have any general comments or questions 
+    about Winstone please mail me on that list - I'll try to start a faq soon.</p>
+
+  <p>I'm open to help from anyone who's willing to help me meet the above goals for Winstone.
+    Just mail me at the list (winstone-devel AT lists DOT sourceforge DOT net)</p>
+
+<h2><a name="using">最初にする事</a></h2>
+
+  <p>If you want to build from source code, you will need to download and install Apache Maven (v1.x). The
+    following instructions assume you have already installed Maven and have the maven shell script in
+    your path (to get Maven, see http://maven.apache.org/).</p>
+
+  <p>To build Winstone, unpack the tree:</p>
+
+    &nbsp;&nbsp;<code>tar zxf winstone-src-0.8.1.tar.gz</code>
+
+  <p>Then build it:</p>
+
+    &nbsp;&nbsp;<code>cd winstone</code><br/>
+    &nbsp;&nbsp;<code>maven clean jar</code>
+
+  <p>To run it:</p>
+
+    &nbsp;&nbsp;<code>java -jar target/winstone-0.8.1.jar --webroot=&lt;location of webroot&gt; </code> (+ other options)
+
+  <p> - OR - </p>
+
+    &nbsp;&nbsp;<code>java -jar target/winstone-0.8.1.jar --warfile=&lt;location of warfile&gt;</code> (+ other options)
+
+  <p> - OR - </p>
+
+    &nbsp;&nbsp;<code>java -jar target/winstone-0.8.1.jar --webappsDir=&lt;location of webapps directory&gt;</code> (+ other options)
+
+  <p> - OR - </p>
+
+    &nbsp;&nbsp;<code>java -jar target/winstone-0.8.1.jar --hostsDir=&lt;location of hosts directory&gt;</code> (+ other options)
+
+  <p>The winstone.jar file will be in the target directory after the build is complete.</p>
+
+<h2><a name="commandLine">コマンドラインオプション</a></h2>
+
+  <pre>
+Syntax:
+  java -jar winstone-0.8.1.jar [--option=value] [--option=value] etc
+
+Required options: either --webroot OR --warfile OR --webappsDir OR --hostsDir
+   --webroot                = set document root folder.
+   --warfile                = set location of warfile to extract from.
+   --webappsDir             = set directory for multiple webapps to be deployed from
+   --hostsDir               = set directory for name-based virtual hosts to be deployed from
+
+Other options:
+   --javaHome               = Override the JAVA_HOME variable
+   --toolsJar               = The location of tools.jar (default is JAVA_HOME/lib/tools.jar) 
+   --config                 = load configuration properties from here(if supplied).
+   --prefix                 = add this prefix to all URLs. (eg http://host/prefix/etc).
+   --commonLibFolder        = folder for additional jar files. Default is ./lib
+    
+   --logfile                = redirect winstone log messages to this file
+   --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
+   --logThrowingThread      = show the thread that logged the message. Default is false
+   --debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)
+
+   --httpPort               = set the http listening port. -1 to disable, Default is 8080
+   --httpListenAddress      = set the http listening address. Default is all interfaces
+   --httpDoHostnameLookups  = enable host name lookups on http connections. Default is false
+   --httpsPort              = set the https listening port. -1 to disable, Default is disabled
+   --httpsListenAddress     = set the https listening address. Default is all interfaces
+   --httpsDoHostnameLookups = enable host name lookups on https connections. Default is false
+   --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
+   --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
+   --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
+   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default is 8009
+   --ajp13ListenAddress     = set the ajp13 listening address. Default is all interfaces
+   --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
+
+   --handlerCountStartup    = set the no of worker threads to spawn at startup. Default is 5
+   --handlerCountMax        = set the max no of worker threads to allow. Default is 300
+   --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 50
+
+   --directoryListings      = enable directory lists (true/false). Default is true
+   --useJasper              = enable jasper JSP handling (true/false). Default is false
+   --useServletReloading    = enable servlet reloading (true/false). Default is false
+   --preferredClassLoader   = override the preferred webapp class loader.
+   --useInvoker             = enable the servlet invoker (true/false). Default is true
+   --invokerPrefix          = set the invoker prefix. Default is /servlet/
+   --simulateModUniqueId    = simulate the apache mod_unique_id function. Default is false
+   --usage / --help         = show this message
+    
+Cluster options:
+   --useCluster             = enable cluster support (true/false). Default is false
+   --clusterClassName       = Set the cluster class to use. Defaults to SimpleCluster class
+   --clusterNodes           = a comma separated list of node addresses (IP:ControlPort,IP:ControlPort,etc)
+
+JNDI options:
+   --useJNDI                      = enable JNDI support (true/false). Default is false
+   --containerJndiClassName       = Set the container wide JNDI manager class to use. Defaults to ContainerJNDIManager
+   --webappJndiClassName          = Set the web-app JNDI manager class to use. Defaults to WebAppJNDIManager
+   --jndi.resource.&lt;name&gt;         = set the class to be used for the resource marked &lt;name&gt;
+   --jndi.param.&lt;name&gt;.&lt;att&gt;      = set an attribute &lt;att&gt; for the resource marked &lt;name&gt;
+
+Security options:
+   --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
+
+   --argumentsRealm.passwd.&lt;user&gt; = Password for user &lt;user&gt;. (for ArgumentsRealm)
+   --argumentsRealm.roles.&lt;user&gt;  = Roles for user &lt;user&gt; (comma-separated) (for ArgumentsRealm)
+
+   --fileRealm.configFile         = File containing users/passwds/roles. Only valid for the FileRealm realm class
+
+Access logging:
+   --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
+   --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
+   --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
+</pre>
+
+<h2><a name="configFile">設定ファイル</a></h2>
+
+  <p>You don't really need a config file, but sometimes it's handy to be able to use the same settings
+    each time without running through the command history.</p>
+
+  <p>Winstone looks for a config file <code>winstone.properties</code> in the current directory (or in the location 
+    specified with --config) at startup. It loads the properties in this file, overrides them with any
+    supplied command line properties, and then starts itself.</p>
+
+  <p>This is just intended as a handy feature for people who want to cache regular startup options, rather
+    than using batch files.</p>
+        
+<h2><a name="deployChoices">デプロイーの選択</a></h2>
+
+  <p>The <b>simplest way</b> to use winstone is with a single webapp. To do this, just supply the warfile or webroot 
+    directory as an argument:</p>
+    <ul>
+      <li><code>java -jar winstone.jar &lt;webroot or warfile&gt;</code>, (this method auto-detects the type) or</li>
+      <li><code>java -jar winstone.jar --webroot=&lt;webroot&gt;</code>, or</li>
+      <li><code>java -jar winstone.jar --warfile=&lt;warfile&gt;</code></li>
+    </ul>
+  <p>If you need to support <b>multiple webapps</b>, use the <code>--webappsDir</code> switch, to which you pass a 
+    directory that contains multiple warfiles/webroots.</p>
+    <ul>
+      <li><code>java -jar winstone.jar --webappsDir=&lt;dir containing multiple webroots&gt;</code></li>
+    </ul>        
+  <p>The directory becomes the prefix name for that webapp (so hello becomes /hello, etc). The directory named
+    ROOT becomes the no-prefix webapp.</p>
+  <p>So, for example, if you had a directory <i>/usr/local/webapps</i> which contained sub-directories ROOT 
+    and test, if you executed <code>java -jar winstone.jar --webappsDir=/usr/local/webapps</code>, you would 
+    find that the test folder would act as a webroot for requests prefixed with <code>/test</code>, while
+    other requests would go to the webapp in the ROOT folder</p>
+  <p>From v0.8, if you need <b>multiple hosts (sometimes called <i>name-based virtual hosting</i>)</b>, there is a
+    new option <code>--hostsDir</code>. This acts in a similar way to the <code>--webappsDir</code> switch,
+    but it defines an extra level of sub-directories, the top being a per-host directory and the second a 
+    per-webapp directory as with <code>--webappsDir</code>.</p>
+  <p>The directory name becomes the host name: that is, a directory named "www.blah.com" will only serve 
+    requests with the host header www.blah.com, unless it is the default host. If a directory named "default"
+    is found, it becomes the default host. If no default directory is found, the first directory in the list 
+    (alphabetically) becomes the default host.</p>
+    <ul>
+      <li><code>java -jar winstone.jar --hostsDir=&lt;dir containing multiple host directories&gt;</code></li>
+    </ul>        
+
+<h2><a name="caveats">Winstoneにない機能</a></h2>
+
+  <p>As a result of the design goals, there are some things Winstone doesn't do</p>
+  <ul>
+    <li>There are now three connectors supplied with Winstone:
+      <ol>
+        <li>An internal HTTP connector - allows plain HTTP/1.1 connections only</li>
+        <li>An internal HTTPS connector - allows HTTP/1.1 connections over SSL</li>
+        <li>An AJP13 connector - allows connection to Apache/IIS/iPlanet, etc</li>
+      </ol>
+      While there is an internal HTTPS/SSL connector included, I recommend using 
+      Apache 2.0 with the AJP13 connector (instructions below). It has way more configuration
+      options than Winstone's connector does.</li>
+    <li>HttpSession support is cookie-based only (no URL rewriting). URL rewriting introduces a lot of 
+      unnecessary complex request body processing, and given that browser cookie support is common these
+      days (and no-one I know uses URL rewriting), I plan not to implement this.</li>
+    <li>The messages are all in English only. These have been updated to use resource 
+      bundles, but no translations yet.</li>
+  </ul>
+
+<h2><a name="security">セキュリティ上の注意</a></h2>
+
+  <p>If you enable the controlPort, be aware that there is no password protection at all on this port. 
+    Anyone who can get access to this port can stop or restart the server. I plan to 
+    add some simple authentication to this at some point, but not just yet.</p>
+
+  <p>The controlPort is disabled by default. If you choose not to enable it, the only way to shut
+    Winstone down is to kill the process (either by Ctrl-C or kill command).</p>
+
+<h2><a name="recent">最近追加した機能</a></h2>
+
+  <p>New features in v0.8:</p>
+
+  <ul>
+    <li>Expanded the features of the JDBC connection pool to include <b>keep-alive</b> queries
+      and block-and-retry behaviour when the pool has been exhausted.</li>
+    <li>Added filter match caching (performance improvement)</li>
+    <li><b>Name-based virtual hosting</b>. Using the <code>--hostsDir</code> switch, you can define a 
+      directory that contains directories named by hostname, each of which acts like a <code>--webappsDir</code>. 
+      See <a href="#deployChoices">above</a> for more details.</li>
+    <li><b>Access logging</b>. Disabled by default, but enabled with the switch 
+      <code>--accessLoggerClassName=winstone.accesslog.SimpleAccessLogger</code>. You can provide your
+      own logging implementation, but the simple access logger contains Apache Combined/Common format
+      logging and Resin format logging, so it should suffice for most cases. See 
+        <a href="#accessLog">below</a> for more details.</li>
+    <li><b>Better embedding support</b>. You can now embed warfiles and properties file inside the
+      winstone jar itself, for an all-in-one application jar. See <a href="#embedding">below</a> 
+      for more details.</li>
+    <li>Tested with WebDAV applications. Winstone has now been tested/debugged with Jakarta Slide and 
+      Davenport WebDAV applications, and works correctly (previous versions had some obscure bugs 
+      that caused WebDAV to fail)</li>
+  </ul>
+        
+  <p>New features in v0.7:</p>
+
+  <ul>
+    <li>Updated build process to use Apache Maven (see <a href="http://maven.apache.org">
+      http://maven.apache.org</a>. Build instructions have been updated to match.</li>
+    <li>Source code has been reformatted - a fair bit easier to read now</li>
+    <li>Multiple webapp support has been added. There's no auto-deploy features yet,
+      but that will come soon. Use the --webappsDir=&lt;webapps directory&gt; to declare
+      a folder that will have any directories auto-mounted and any warfiles auto-deployed.
+      (I originally said this was not going to be included, but changed my mind when I
+      realised it could be done with only 10K additional jarfile size).</li>
+    <li>Fixed the bugs in the exception handling and error servlet redirection, as
+      well as in web xml parsing, and more other places that I can possibly list here.
+      If you had some strange bug or incompatibility before, chances are it's been fixed
+      now.</li>
+    <li>Passed the Sun JSR-154 Servlet Test Compatibility Kit (TCK) tests.</li>
+    <li>I also ran the JSR-152 JSP TCK on winstone with Apache Jasper support enabled, 
+      and while it didn't pass all tests, the tests it failed were the same ones the 
+      Tomcat failed, so I notified the Tomcat/Jasper developers of the test failures. 
+      Currently waiting on a response ... in any case I suspect these are actually test 
+      errors rather than implementation errors.</li>
+    <li>Better support for open source JVMs. Martin Cordova has been very helpful in 
+      testing winstone under a wider range of JVMs, as well as providing some really 
+      good feedback on needed features. His tests included JamVM and CacaoVM, as well 
+      as IBM's JDK. Jim Huang also reported that winstone works well under Kaffe.</li>
+    <li>User definable webapp class loader: This is likely to be of interest to the Aspect
+      Oriented Programming crowd. It allows you to write your own class loader class
+      (conforming to the same contructor signature as URLClassLoader), and then
+      to use it in place of the normal web app class loader with --preferredClassLoader. 
+      This allows AspectWerkz style weaving classloaders to be used on webapps where it 
+      wouldn't have been otherwise possible (eg JDKs that don't support the profiler 
+      option, such as 1.4 and before), or anything else you can think of doing with a 
+      custom classloader.</li>
+  </ul>
+
+  <p>New features in v0.6:</p>
+
+  <ul>
+    <li>Updated to <b>Servlet 2.4</b> specification compliance, although I haven't yet
+      run Sun's Test Compatibility Kit on it - I'm still waiting for that. It works
+      with all of the v2.4 webapps I've tried. The only caveat is that you will need
+      Apache Xerces in the system classpath to make it work (see below).</li>
+    <li>Updated to <b>JSP 2.0</b> specification compliance. This is the main cause
+      for the blowout in size of the larger jar file, but it does result in much 
+      simpler set up for Jasper (see below).</li>
+    <li>Added a <b>command-line tool</b> for accessing control port options, such as 
+      <b>shutdown</b> and <b>restart</b>. Restart is new to this version, and causes 
+      a shutdown and redeploy from scratch.</li>
+    <li>Added a <b>lib folder</b> for additional jars. This defaults to "lib" under the 
+      current directory, with any jar or zip files in this folder being added to the 
+      webapp classpath.</li>
+    <li>Extensively tested with the <b>Apache Struts and JSTL frameworks</b>. This highlighted
+      a number of bugs related to internationalisation I wouldn't have found otherwise.</li>
+    <li>Many minor features such as <b>range downloads</b> on static resources, a <b>logfile</b>
+      directive for writing log messages to a file, and many MANY performance enhancements and 
+      bugfixes. See the TODO.txt file in the source distribution for a full list.</li>
+    <li><b>Update: June 28, 2004</b> - Added <b>HTTPS</b> support to version v0.6.4</li>
+  </ul>
+
+  <p>New features in v0.5:</p>
+
+  <ul>
+    <li>Implemented <b>DIGEST</b> and <b>CERT</b> authentication methods. The CERT type is largely untested 
+      (due to lack of A: access to certificates and B: knowledge of browser configuration for client 
+      certificates) - if anyone wants to help with testing this, I'd appreciate it.</li>
+    <li>Implemented simple <b>clustering</b> (ie sharing of sessions between multiple Winstone instances).
+      See below for cluster configuration details.</li>
+    <li>Implemented optional <b>JNDI</b> support. This is just a memory-based Context intended for storing 
+      lookups on <code>&lt;env-entry&gt;</code> and <code>&lt;resource-ref&gt;</code> references, but 
+      it also includes a pooling JDBC DataSource object .... it's funny how you don't realise how important some
+      things are until you go without them ....</li>
+    <li>The control port has been modified to be more useful. See below for usage instructions.</li>
+    <li>The distribution jar is now available in two forms:
+      <ol>
+        <li><b>Complete version</b> (winstone.jar): This contains the complete winstone feature-set, 
+          including AJP13 Apache connectors, Authentication/Realm support and Clustering support.</li>
+        <li><b>Lite version</b> (winstone-lite.jar): This is the core winstone feature-set only,
+          ie commonly used servlet features, as fast and reliable as possible, with unnecessary options 
+          removed.</li>
+      </ol>
+    </li>
+  </ul>
+
+  <p>New features in v0.4:</p>
+
+  <ul>
+    <li>Implemented the <b>&lt;error-page&gt;</b> directive</li>
+    <li>Added object pools for request/response objects for performance reasons</li>
+    <li>The handler pools are now controllable via startup properties</li>
+    <li><b>Servlet reloading</b> is now supported (optionally - include 
+      <code>--useServletReloading=true</code> at startup)</li>
+    <li>The initial <b>Authentication Model</b> is in place (see below for help). There are two base 
+      classes that make it work: <code>AuthenticationRealm</code> and <code>AuthenticationHandler</code>. 
+      Currently Argument-based and File-based realms (ie user/password details supplied via command-line args 
+      or XML files) and HTTP BASIC and FORM authentication are implemented, but the others (DIGEST and 
+     CERT authentication forms) will come soon.</li>
+  </ul>
+
+  <p>New features in v0.3:</p>
+
+  <ul>
+    <li>The request handler threads now use <b>monitors</b>, which allows them to exist beyond a single
+      request/response cycle. The benefit here is performance - it removes a serious bottleneck.</li>
+    <li><b>WAR files</b> are now supported via the --warfile attribute. If you specify a warfile in this 
+      manner, it will be automatically extracted by the container to a temp directory, overwriting
+      only files that are older than the archive date.</li>
+    <li><b>Servlet attribute, session, and context listeners</b> (Servlet spec v2.3) are now fully supported. 
+      The HttpSessionActivationListener class will be fully supported once the session transfer
+      is implemented.</li>
+    <li><b>Servlet Filters</b> (Servlet spec v2.3) are now fully supported.</li>
+    <li>There is now an <b>AJP13 connector</b>, which means Winstone will now work behind Apache/IIS/etc
+      using Tomcat's mod_jk. Try it out and see ... there's a section below on using the mod_jk connector.</li>
+  </ul>
+
+<h2><a name="xerces">XMLパーザーでXercesを使ってる (バージョン2.4)</a></h2>
+
+  <p>As part of the upgrade in the servlet specification, the v2.4 incarnation of the
+    web.xml file is validated using XML Schema Documents (XSD) as opposed to Document Type
+    Definitions (DTD). While I still have no idea why such a change was necessary - especially 
+    given that DTD validation seems to be more than enough in this case - I did implement it. 
+    Perhaps the people on the specification committee might want to give a thought to container 
+    size next time round, as this one change multiplies the size of the distribution by five.</p>
+
+  <p>Anyway, to use Xerces, you'll need to download the latest Xerces-J parser from 
+    <a href="http://xml.apache.org/xerces2-j/">here</a>, and copy xercesImpl.jar and xml-apis.jar
+    into a folder somewhere (name it "endorsed"). Putting them in the winstone/lib folder will not work,
+    because they must be in the system endorsed classpath to override the JDK internal XML parser.</p>
+
+  <p>Then add <code>-Djava.endorsed.dirs=&lt;endorsed dir name&gt;</code> as a JVM arg to your 
+    command line for starting winstone, eg:</p>
+    <pre>&nbsp;&nbsp;java -Djava.endorsed.dirs=/jdk/endorsed -jar winstone.jar --webroot=...</pre>
+  
+
+<h2><a name="jasper">JSP (ApacheのJasperを使ってる)</a></h2>
+
+  <p>Winstone supports JSPs using Apache's Jasper JSP compiler. Thanks to a rather clever 
+    design by the Jasper team, this was much less work than I expected - well done Jasper guys.</p>
+
+  <p>Required steps:</p>
+  <ol>
+    <li>Add --useJasper to your startup command line, since
+      JSPs are disabled by default</li>
+
+    <li>
+      <p>Both the v1.1 and v2.0 versions of Jasper are supported. In order to turn on JSP compilation
+        in Winstone, you'll need to place the following jar files into the lib folder under the 
+        current directory (or the folder identified by the --commonLibFolder directive).</p>
+      <ul>
+        <li><b>jasper-compiler.jar, jasper-runtime.jar, ant.jar</b> - 
+           Not supplied with Winstone. You can get this from the standard Tomcat binary download location. 
+           Just download the latest Tomcat, and copy these three files into the lib folder 
+           for Winstone. They will be in the tomcat_home/common/lib folder.</li>
+
+        <li><b>commons-logging-api.jar, commons-el.jar (Jasper 2 only)</b> - 
+           These are required if you are using Jasper 2.0. You can get them from the 
+           tomcat binary distribution or separately from the link below.</li>
+      </ul>
+    <p>All of these are available from the <a href="http://jakarta.apache.org/site/binindex.cgi">Jakarta download site</a></p>
+    </li>
+    <li>
+      <p>You'll also need <b>tools.jar</b>, and this is handled a little differently. 
+      The ant javac compile task needs this to turn the generated .java files into 
+      .class files at runtime. You should already have this in the &lt;java_home&gt;/lib folder 
+      of your jdk.</p>
+
+      <p>There are two new startup arguments for Winstone --javaHome and --toolsJar. You 
+      should only need to set --javaHome to make Jasper work properly. Your startup might
+      look like this:</p>
+      
+      <pre>&nbsp;&nbsp;java -jar winstone.jar --useJasper \
+                         --javaHome=c:\java\jdk1.4.2 \
+                         --webroot=...</pre>
+      <p>Additionally, you can specify the exact location of the toolsJar file like this:</p>
+      <pre>&nbsp;&nbsp;java -jar winstone.jar --useJasper \
+                         --javaHome=c:\java\jdk1.4.2 \
+                         --toolsJar=c:\tools.jar \
+                         --webroot=...</pre>
+    </li>
+  </ol>
+
+<h2><a name="apache">Apacheに繋がってる</a></h2>
+
+  <p>These instructions are for beginners: if you know your way around Apache and Tomcat, you'll know what's going on here.</p>
+
+  <p>Download and install Apache for your platform (and obviously Winstone too), then follow these steps:</p>
+
+  <ol>
+    <li>Download mod_jk2.dll/so into the apache modules directory</li>
+    <li>Add the following to the apache conf file (httpd.conf): 
+<pre>
+LoadModule jk2_module modules/mod_jk2.dll
+
+&lt;Location "/&lt;Winstone Prefix&gt;/*"&gt;
+  JkUriSet worker ajp13:localhost:8009 
+&lt;/Location&gt;
+</pre></li>
+    <li>Create a new file called workers2.properties in the apache conf directory, with the following contents
+<pre>
+# only in the beginning. In production comment out
+[logger.apache2]
+level=DEBUG
+
+# Example socket channel, override port and host.
+[channel.socket:localhost:8009]
+port=8009
+host=127.0.0.1
+
+# define the worker
+[ajp13:localhost:8009]
+channel=channel.socket:localhost:8009
+</pre></li>
+    <li>Start up Winstone and Apache and try connecting to the your webapp on the apache port, with the winstone 
+      prefix. If it doesn't work, try looking at the apache error.log file for hints. If you get hex dumps, mail
+      them to the winstone-devel list, together with any stack traces winstone generated.</li>
+  </ol>
+
+  <p>Please note this is not an optimal configuration for production uses. This is provided purely for those
+    who need some help to get started. Read the mod_jk documentation with Tomcat for more detailed info.</p>
+
+<h2><a name="authRealms">認証の設定</a></h2>
+
+  <p>The process here is almost identical to that of Tomcat (I know this because I used the Tomcat examples
+    webapp to develop against). There are two components - the web.xml component and selecting/configuring
+    an AuthenticationRealm class.</p>
+
+  <ul>
+    <li>The web.xml part is the same for all webapps - you include the <code>&lt;security-constraint&gt;</code>
+      and <code>&lt;login-config&gt;</code> elements as required, eg (from the Tomcat examples web.xml):
+<pre>
+&lt;security-constraint&gt;
+  &lt;display-name&gt;Example Security Constraint&lt;/display-name&gt;
+  &lt;web-resource-collection&gt;
+    &lt;web-resource-name&gt;Protected Area&lt;/web-resource-name&gt;
+    &lt;url-pattern&gt;/jsp/security/protected/*&lt;/url-pattern&gt;
+    &lt;http-method&gt;DELETE&lt;/http-method&gt;
+    &lt;http-method&gt;GET&lt;/http-method&gt;
+    &lt;http-method&gt;POST&lt;/http-method&gt;
+    &lt;http-method&gt;PUT&lt;/http-method&gt;
+  &lt;/web-resource-collection&gt;
+  &lt;auth-constraint&gt;
+    &lt;role-name&gt;tomcat&lt;/role-name&gt;
+    &lt;role-name&gt;role1&lt;/role-name&gt;
+  &lt;/auth-constraint&gt;
+&lt;/security-constraint&gt;
+
+&lt;login-config&gt;
+  &lt;auth-method&gt;FORM&lt;/auth-method&gt;
+  &lt;realm-name&gt;Example Form-Based Authentication Area&lt;/realm-name&gt;
+  &lt;form-login-config&gt;
+    &lt;form-login-page&gt;/jsp/security/protected/login.jsp&lt;/form-login-page&gt;
+    &lt;form-error-page&gt;/jsp/security/protected/error.jsp&lt;/form-error-page&gt;
+  &lt;/form-login-config&gt;
+&lt;/login-config&gt;
+</pre></li>
+
+    <li>The AuthenticationRealm part is Winstone specific. Here you currently have three options:
+      <ol>
+        <li><b>ArgumentsRealm:</b> Here you simply add additional command line args for each user's password and
+          role list. Passwords are added with <code>--argumentsRealm.passwd.&lt;username&gt;=&lt;password&gt;</code>, 
+          and roles are added with <code>--argumentsRealm.roles.&lt;username&gt;=&lt;role1&gt;,&lt;role2&gt;</code></li>
+        <li><b>FileRealm:</b> This is the same as the Tomcat <code>tomcat-users.xml</code> file. 
+          Pass in the command line arguments <code>--realmClass=winstone.realm.FileRealm 
+          --fileRealm.configFile=&lt;filename&gt;</code>, and it should work exactly the way Tomcat does by default.</li>
+        <li><b>Write your own:</b> You just have to extend the <code>winstone.AuthenticationRealm</code> class,
+          and override the appropriate methods (as the File and Arguments Realms do), and specify the class name in
+          <code>--realmClass</code>.</li>
+      </ol>
+    </li>
+  </ul>
+
+  <p>This component is left intentionally fairly simple, and relatively extracted. I'm planning to break the realm and
+    authentication stuff into an optional jar later, since not many webapps I've seen use it.</p>
+
+<h2><a name="cluster">クラスターの機能</a></h2>
+  <p>It should be pointed out in the beginning that the Cluster support currently implemented in Winstone
+    is actually just session sharing. If a request comes to a node in the cluster that doesn't recognise the
+    session ID supplied, that node simply asks the others "Do you know this session ?". If one does know it, 
+    it transfers the session to the requesting node, and the requesting node carries on as if it had always
+    had the session in the first place.</p>
+
+  <p>If a specific node in the cluster goes offline, so do all the sessions that it was holding. There is no
+    active "push" of sessions to other nodes, so as far as resilience to failure goes, this cluster is 
+    fairly weak. The clustering provided here is meant to allow a dumb load balancer to redirect requests
+    randomly across a cluster of Winstone instances without requiring it to be "session sticky".</p>
+
+  <p>That said, the configuration is fairly simple. The only information you need is the IP address and control
+    port of at least one other active node in the cluster. Once you have that, add the following options to
+    the command line startup:</p>
+<pre>
+java -jar winstone.jar ...&lt; other options &gt; ... \
+                       --controlPort=&lt;myControlPort&gt; \
+                       --useCluster \
+                       --clusterNodes=&lt;IP1:controlPort1&gt;
+</pre>
+    <p>where IP1 is the IP address of the other node in the cluster, and myControlPort and controlPort1 are the port
+    numbers to use for the control ports of this instance and the other node respectively. Note that it is necessary
+    to actively set the controlPort on this instance, since it is disabled by default.</p>
+
+  <p>You would likewise set up the other instance with reciprocal options (ie changing the IPs and controlPort values
+    appropriately.</p>
+
+  <p>NOTE: There are some additional requirements on your web application for Clustering of sessions to be 
+    successful.</p>
+    <ol>
+      <li>You need to include the <b>&lt;distributable/&gt;</b> element in your web.xml file. This tells Winstone that
+        your webapp is programmed correctly to support clustering. If this is missing, clustering will be disabled.</li>
+      <li>Any objects you add to the session must implement <b>java.io.Serializable</b>. This is required because
+        Winstone serializes the objects in the session over the controlPort to other nodes, and reconstructs the
+        serialized session at the destination. If you try to put a non-serializable object into the session, 
+        Winstone will throw an exception reminding you to make all session objects serializable.</li>
+    </ol>
+
+<h2><a name="controlPort">コントロールポートの機能とプロトコール</a></h2>
+
+  <p>From v0.5, the behaviour of the control port changes slightly. Due to increased usage of the control port
+    by the clustering function, a rudimentary protocol has been added. </p>
+
+  <p>The protocol is very simple. The first byte sent to the server is a flag indicating what type of request
+    is being issued. Beyond that the protocol varies for each request type, but the request type flag options
+    are listed below:</p>
+    <ul>
+      <li><b>0 (ASCII 48)</b> = shutdown</li>
+      <li><b>1 (ASCII 49)</b> = request search for a session</li>
+      <li><b>2 (ASCII 50)</b> = request list of currently connected cluster nodes</li>
+      <li><b>3 (ASCII 51)</b> = cluster node heartbeat</li>
+      <li><b>4 (ASCII 52)</b> = request reload of web application context</li>
+    </ul>
+
+  <p>Obviously, unless you're planning to write your own cluster extensions, the only two you will be interested
+   in are the shutdown and reload options. Luckily there is a wrapper class for accessing these functions, named
+   <code>winstone.tools.WinstoneControl</code>. Try the following to get a usage statement:</p>
+     <pre>&nbsp;&nbsp;java -cp winstone.jar winstone.tools.WinstoneControl</pre>
+  
+
+<h2><a name="jndi">JNDIの設定</a></h2>
+
+  <p>I know that in the introduction I said that Winstone was only going to support the core servlet APIs, but
+    I've since discovered that most people use just a little more than the core servlet API offers. For 
+    example, some people use just a JNDI JavaMail session to send administrator error mails, while others want
+    to offer a simple servlet over SSL (and hence need Apache), still others use just a JNDI DataSource
+    to keep a reference to the connection pool.</p>
+
+  <p>For this reason I've included a really basic optional JNDI service within Winstone. For the moment,
+    it supports simple operations (such as bind, lookup, rebind, etc) and allows you to store references to 
+    environment variables (drawn from the env-entry elements in web.xml and/or command line arguments).</p>
+
+  <p>NOTE: JNDI support is disabled by default. It must be enabled using <code>--useJNDI=true</code></p>
+
+  <p>Configuration can be done in two ways:</p>
+    <ul>
+      <li><b>&lt;env-entry&gt; elements</b> - This is the standard way to add simple objects, such as
+        sql strings or configuration integers/strings. For example:
+<pre>
+  &lt;env-entry&gt;
+    &lt;env-entry-name&gt;test/hello&lt;/env-entry-name&gt;
+    &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
+    &lt;env-entry-value&gt;45&lt;/env-entry-value&gt;
+  &lt;/env-entry&gt;
+</pre></li>
+      <li><b>Command line arguments</b> - This is for more complex objects that require attributes
+        to be created (JDBC DataSources for example). The syntax here involves adding a clause of the
+        kind <code>--jndi.resource.&lt;resName&gt;=&lt;className&gt;</code> for each object to create,
+        followed by <code>--jndi.param.&lt;resName&gt;.&lt;attName&gt;=&lt;attValue&gt;</code> for each
+        attribute required. For example:
+<pre>
+java -jar winstone.jar ...&lt; other options &gt; ... \
+                        --useJNDI=true \
+                        --jndi.resource.test=java.lang.Float \
+                        --jndi.param.test.value=45.56
+</pre></li>
+    </ul>
+  
+ 
+  <p>Additionally, it includes a JDBC DataSource object which can be used as a wrapper around normal JDBC 
+    drivers. This is fairly simple for now, but it meets the requirements I mentioned above. Options are as
+    follows:</p>
+    <ol>
+      <li><b>url (REQUIRED)</b> - JDBC URL (<code>jdbc:mysql://db.widgets.com/db</code>)</li>
+      <li><b>driverClassName (REQUIRED)</b> - JDBC Driver name (eg <code>com.mysql.jdbc.Driver</code>)</li>
+      <li><b>username</b> - username for database authentication</li>
+      <li><b>password</b> - password for database authentication</li>
+      <li><b>maxConnections</b> - Maximum number of connections allowed in the pool. Default is 20</li>
+      <li><b>maxIdle</b> - Maximum number of idle connections allowed in the pool. Default is 10</li>
+      <li><b>startConnections</b> - The number of connections to open the pool with. Deafault is 2</li>
+      <li><b>keepAliveSQL</b> - The sql to execute on keep-alive (or checkBeforeGet) operations. Default is empty</li>
+      <li><b>checkBeforeGet</b> - If true, executes the keepAliveSQL before any connection is returned 
+        from the pool. Default is true if the keepAliveSQL is defined</li>
+      <li><b>keepAlivePeriod</b> - Execute the keepAliveSQL on all unused connection every n minutes. Default is disabled</li>
+      <li><b>killInactivePeriod</b> - Kills excess unused connections every n minutes. Default is disabled</li>
+      <li><b>retryCount</b> - When the pool is maxed out, block and retry n times. Default is 1 retry</li>
+      <li><b>retryPeriod</b> - The period (in ms) over which the retry blocks. Default is 1000ms</li>
+    </ol>
+
+  <p>For example to create a DataSource object at the JNDI location java:/comp/env/jdbc/connPool, use the 
+    following command line (or config file) options:</p>
+<pre>
+java -jar winstone.jar ...&lt; other options &gt; ... \
+                        --useJNDI=true \
+                        --jndi.resource.jdbc/connPool=javax.sql.DataSource \
+                        --jndi.param.jdbc/connPool.url=jdbc:mysql://db.widgets.com/db \
+                        --jndi.param.jdbc/connPool.driverClassName=com.mysql.jdbc.Driver \
+                        --jndi.param.jdbc/connPool.username=foo \
+                        --jndi.param.jdbc/connPool.password=bar
+</pre>
+
+<h2><a name="https">HTTPSの設定</a></h2>
+
+  <p>Somebody asked me to add HTTPS support, using the JDK 1.4 SSL socket classes, and
+    so I decided to give it a try. It was a lot easier than expected - the API was really
+    nice to use. Unfortunately the hard work seems to be in the configuration, rather
+    than the programming.</p>
+    
+  <p>I recommend using a shareware tool called KeyStore Explorer, available 
+    <a href="http://www.lazgosoftware.com/kse/index.html">here</a>. It's much easier than
+    all that messy CLI stuff.</p>  
+    
+  <p>The steps are basically as follows:</p>
+  
+  <ol>
+    <li>Create an empty keystore of type JKS</li>
+    <li>Generate a key pair (Tools -&gt; Generate Key Pair). I chose RSA 2048 bit, and used
+      "MD5 with RSA" for the algorithm. Set a password and remember it.</li>
+    <li>Generate a CSR (right click, Generate CSR).</li>
+    <li>Send the CSR to a Certifying Authority (CA) for processing. I used FreeSSL.com,
+      because it was only US$39 per year.</li>
+    <li>Once you get the approved certificate back, import it into the key store you
+      were using (Tools -&gt; import CA reply). You should now have only a
+      key pair and a certificate. Save the key store, using the same password you used
+      before.</li>
+    <li>Start winstone with the following command:
+      <pre>java -jar winstone.jar --webroot=&lt;webroot&gt;
+                       --httpsPort=443 
+                       --httpsKeyStore=&lt;keystore file&gt; 
+                       --httpsKeyStorePassword=&lt;password&gt;</pre>  
+    </li>
+    <li>Set your hosts file (/etc/hosts or c:/Winnt/system32/drivers/etc/hosts) to 
+      point the name on your certificate to 127.0.0.1), then try to browse to 
+      https://hostname/</li>
+  </ol>
+
+<h2><a name="accessLog">Access Logging</a></h2>
+
+  <p>From v0.8, there's an option to allow access logging. It's disabled by default, but can be enabled 
+    by defining a logging implementation class, with --accessLoggerClassName. The class defined must be 
+    an implementation of the interface winstone.AccessLogger, and is defined container wide, but instantiated
+    once per webapp.</p>
+        
+  <p>The supplied logger is called winstone.accesslog.SimpleAccessLogger. It supports Apache style combined/common
+    format logs, as well as Resin format (which is actually just Apache common style plus a user agent). 
+    Configuration options are:
+  </p>
+  <ul>
+    <li><b>--simpleAccessLogger.format</b>: Either "combined", "common", "resin" or a pattern made up of wildcards. 
+      For example, the combined format string is:
+        <pre>###ip### - ###user### ###time### "###uriLine###" ###status### ###size### "###referer###" "###userAgent###"</pre>
+      but you can re-arrange this to be any pattern of the above wildcards with the --accessLoggerFormat 
+      switch. Defaults to "combined"</li>
+    <li><b>--simpleAccessLogger.file</b>: A pattern for defining the files to log to. The default value is 
+      <code>logs/###host###/###webapp###_access.log</code>, which splits the log files for different webapps
+      and hosts into directories. The wildcards <code>###host###</code> and <code>###webapp###</code> can be 
+      moved around or even omitted. Omitting the wildcard will mean the access logs will be combined into 
+      shared files (since the file name will be the same)</li>
+  </ul>
+  
+  <p>For example, to enable Apache Combined style logging to separate files, use a command line like:</p>
+        <pre>java -jar winstone.jar --hostsDir=&lt;vhostsDir&gt;
+                       --accessLoggerClassName=winstone.accesslog.SimpleAccessLogger</pre>
+  <p>Or to log just the date and URI for all hosts/webapps to a single file, use a command line like:</p>
+        <pre>java -jar winstone.jar --hostsDir=&lt;vhostsDir&gt;
+                       --accessLoggerClassName=winstone.accesslog.SimpleAccessLogger
+                       --simpleAccessLogger.format=###date###\ ###uriLine###
+                       --simpleAccessLogger.file=/mylogs/access_log.txt</pre>
+                       
+<h2><a name="embedding">Embedding Winstone</a></h2>
+  <p>The design of Winstone has always allowed its easy embedding within another application. It's as simple
+    as:</p>
+  <pre> // at startup
+Map args = new HashMap();
+args.put("webroot", "&lt;my webroot dir&gt;"); // or any other command line args, eg port
+Launcher.initLogger(args);
+Launcher winstone = new Launcher(args); // spawns threads, so your application doesn't block
+
+... (your application code)
+
+// before shutdown
+winstone.shutdown(); </pre>
+
+  <p>From v0.8 though, there is also the ability to embed in the opposite direction: that is, to 
+    <b>embed your warfile into the winstone JAR itself</b>. This allows an all-in-one container plus 
+    web-application JAR file to be downloaded, and then unpacked at execution time.</p>
+  <p>To use this, simply unpack the winstone JAR, and place your WAR file inside the unpacked 
+    folder at the top level (with the same parent as the folder named "winstone"). Then rename
+    your WAR file to "embedded.war", and repack the jar as before (make sure to preserve the 
+    META-INF and manifest).</p>
+  <p>Now if you type: <code>"java -jar winstone.jar"</code>, your application should
+    automatically deploy as the ROOT web application. Try <code>http://localhost:8080/</code> to 
+    check it out.</p>
+  <p>If you need to add any default command-line arguments (eg ports or prefixes), you can embed 
+    a properties file in exactly the same way, except that the file must be named 
+    "embedded.properties".</p>
+      </td>
+    </tr>
+  </table>
+  </center>
+  <hr width="90%" size="1" noshade="noshade"/>
+  <center>
+    <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=98922&amp;type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></a>
+    &nbsp;&nbsp;
+    <a href="http://www.jars.com"><img src="http://www.jars.com/images/java_registered.gif" border="0" alt="Jars Registered"/></a>
+    <a href="http://www.java.net"><img src="http://today.java.net/images/javanet_button_170.gif" border="0" alt="Java.net Linked Project"/></a>
+
+  </center>
+</body>
+</html>

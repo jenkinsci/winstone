@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+  <display-name>WinstoneTestWebApp</display-name>
+  <description>Designed as an example web application for winstone, and also as a resource for the automated tests</description>
+	<distributable/>
+
+  <context-param>
+    <param-name>ContextParam</param-name> 
+    <param-value>An example context parameter</param-value> 
+  </context-param>
+    
+  <filter>
+		<filter-name>TimingFilter</filter-name>
+		<filter-class>winstone.testApplication.filters.TimingFilter</filter-class>
+		<init-param>
+			<param-name>dumpRequestParameters</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+  <filter>
+		<filter-name>WriteAfterServletFilter</filter-name>
+		<filter-class>winstone.testApplication.filters.WriteAfterServletFilter</filter-class>
+	</filter>
+  <filter-mapping>        
+		<filter-name>WriteAfterServletFilter</filter-name>       
+		<url-pattern>/TestWriteAfterServlet</url-pattern>    
+	</filter-mapping>
+	
+  <listener>
+		<listener-class>winstone.testApplication.listeners.SessionListener</listener-class>
+  </listener>
+
+	<servlet>
+		<servlet-name>CountRequestsServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.CountRequestsServlet</servlet-class>    
+		<init-param>
+			<param-name>offset</param-name>
+			<param-value>1000</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>UnavailableAtInitServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<init-param>
+			<param-name>errorTime</param-name>
+			<param-value>init</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>UnavailableAtGetServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<init-param>
+			<param-name>errorTime</param-name>
+			<param-value>get</param-value>
+		</init-param>
+	</servlet>
+
+  <!-- testing load on startup of a jsp -->
+	<servlet>
+		<servlet-name>loadOnStartupJSP</servlet-name>
+		<jsp-file>/loadOnStartup.jsp</jsp-file>
+		<!--<load-on-startup>2</load-on-startup>-->
+	</servlet>
+
+  <!-- testing explicit declaration of a hidden jsp -->
+	<servlet>
+		<servlet-name>hiddenJSP</servlet-name>
+		<jsp-file>/WEB-INF/hidden.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CountRequestsServlet</servlet-name>
+		<url-pattern>/CountRequestsServlet</url-pattern>
+	</servlet-mapping>
+	
+	<!-- test that an explicit mapping overrides the default JSP one -->
+	<servlet-mapping>
+		<servlet-name>loadOnStartupJSP</servlet-name>
+		<url-pattern>/loadOnStartup.jsp</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>hiddenJSP</servlet-name>
+		<url-pattern>/hidden.jsp</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>UnavailableAtInitServlet</servlet-name>
+		<url-pattern>/UnavailableAtInitServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>UnavailableAtGetServlet</servlet-name>
+		<url-pattern>/UnavailableAtGetServlet</url-pattern>
+	</servlet-mapping>
+  
+	<servlet-mapping>
+		<servlet-name>CountRequestsServlet</servlet-name>
+		<url-pattern>/TestWriteAfterServlet</url-pattern>
+	</servlet-mapping>
+
+	<!-- Test the welcome file processing order -->
+	<welcome-file-list>
+		<welcome-file>welcome.html</welcome-file>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
+

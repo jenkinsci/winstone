@@ -1,0 +1,128 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.sourceforge.winstone</groupId>
+  <artifactId>winstone</artifactId>
+  <version>0.9.10</version>
+  <packaging>jar</packaging>
+
+  <name>Winstone</name>
+  <url>http://winstone.sourceforge.net/</url>
+  <description>Winstone is a servlet container that was written out of a desire to provide servlet functionality without the bloat that full J2EE compliance introduces.</description>
+
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License version 2.1</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+    </license>
+    <license>
+      <name>COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</name>
+      <url>http://www.sun.com/cddl/cddl.html</url>
+    </license>
+  </licenses>
+
+    <scm>  
+        <connection>scm:cvs:pserver:anonymous@winstone.cvs.sourceforge.net:/cvsroot/winstone</connection>
+        <url>http://winstone.cvs.sourceforge.net/winstone/winstone</url>
+    </scm>
+
+    <build>
+        <sourceDirectory>src/java</sourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>src/conf</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <directory>src/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <testSourceDirectory>src/test</testSourceDirectory>
+
+        <testResources>
+            <testResource>
+                <directory>src/test</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-testwebapp</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy overwrite="true" todir="${project.build.directory}">
+                                    <fileset dir="${basedir}/src" includes="testwebapp/**"/>
+                                </copy>
+                                <copy overwrite="true" todir="${project.build.directory}/testwebapp/WEB-INF/classes">
+                                    <fileset dir="${project.build.testOutputDirectory}" includes="**"/>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*NaughtyTest.java</exclude>
+                        <exclude>winstone/testCase/load/LoadTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <mainClass>winstone.Launcher</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>3.8.1</version>
+          <scope>test</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>httpunit</groupId>
+          <artifactId>httpunit</artifactId>
+          <version>1.6</version>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
+
+</project>
+
