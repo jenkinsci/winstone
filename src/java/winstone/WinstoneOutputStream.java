@@ -94,12 +94,30 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         }
 //        System.out.println("Out: " + this.bufferPosition + " char=" + (char)oneChar);
         this.buffer.write(oneChar);
-        this.bufferPosition++;
+        commit(contentLengthHeader, 1);
+    }
+
+    public void write(byte[] b, int off, int len) throws IOException {
+        if (this.disregardMode || this.closed) {
+            return;
+        }
+        String contentLengthHeader = this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
+        if ((contentLengthHeader != null) &&
+                (this.bytesCommitted+len > Integer.parseInt(contentLengthHeader))) {
+            return;
+        }
+
+        this.buffer.write(b,off,len);
+        commit(contentLengthHeader,len);
+    }
+    
+    private void commit(String contentLengthHeader, int len) throws IOException {
+        this.bufferPosition+= len;
         // if (this.headersWritten)
         if (this.bufferPosition >= this.bufferSize) {
             commit();
-        } else if ((contentLengthHeader != null) && 
-                ((this.bufferPosition + this.bytesCommitted) 
+        } else if ((contentLengthHeader != null) &&
+                ((this.bufferPosition + this.bytesCommitted)
                         >= Integer.parseInt(contentLengthHeader))) {
             commit();
         }
