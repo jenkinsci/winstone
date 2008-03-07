@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
@@ -414,14 +415,10 @@ public class WinstoneRequest implements HttpServletRequest {
             String token = st.nextToken();
             int equalPos = token.indexOf('=');
             try {
-                String decodedNameDefault = decodeURLToken(equalPos == -1 ? token 
-                        : token.substring(0, equalPos));
-                String decodedValueDefault = (equalPos == -1 ? "" 
-                        : decodeURLToken(token.substring(equalPos + 1)));
-                String decodedName = (encoding == null ? decodedNameDefault
-                        : new String(decodedNameDefault.getBytes("8859_1"), encoding));
-                String decodedValue = (encoding == null ? decodedValueDefault
-                        : new String(decodedValueDefault.getBytes("8859_1"), encoding));
+                String decodedName = decodeURLToken(equalPos == -1 ? token
+                        : token.substring(0, equalPos), encoding==null?"UTF-8":encoding );
+                String decodedValue = (equalPos == -1 ? ""
+                        : decodeURLToken(token.substring(equalPos + 1), encoding==null?"UTF-8":encoding));
 
                 Object already = null;
                 if (overwrite) {
@@ -460,30 +457,38 @@ public class WinstoneRequest implements HttpServletRequest {
         }
     }
 
+    public static String decodeURLToken(String in) {
+        try {
+            return decodeURLToken(in,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(); // impossible
+        }
+    }
+
     /**
      * For decoding the URL encoding used on query strings
      */
-    public static String decodeURLToken(String in) {
-        StringBuffer workspace = new StringBuffer();
+    public static String decodeURLToken(String in,String encoding) throws UnsupportedEncodingException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int n = 0; n < in.length(); n++) {
             char thisChar = in.charAt(n);
             if (thisChar == '+')
-                workspace.append(' ');
+                baos.write(' ');
             else if (thisChar == '%') {
                 String token = in.substring(Math.min(n + 1, in.length()), 
                         Math.min(n + 3, in.length())); 
                 try {
                     int decoded = Integer.parseInt(token, 16);
-                    workspace.append((char) decoded);
+                    baos.write(decoded);
                     n += 2;
                 } catch (RuntimeException err) {
                     Logger.log(Logger.WARNING, Launcher.RESOURCES, "WinstoneRequest.InvalidURLTokenChar", token);
-                    workspace.append(thisChar);
+                    baos.write(thisChar);
                 }
             } else
-                workspace.append(thisChar);
+                baos.write(thisChar);
         }
-        return workspace.toString();
+        return new String(baos.toByteArray(),encoding);
     }
     
     public void discardRequestBody() {
