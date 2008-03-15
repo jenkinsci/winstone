@@ -70,7 +70,7 @@ public class HostConfiguration implements Runnable {
                 prefix = "";
             }
             try {
-cp t                this.webapps.put(prefix, initWebApp(prefix, getWebRoot(webroot, warfile), "webapp"));
+                this.webapps.put(prefix, initWebApp(prefix, getWebRoot(webroot, warfile), "webapp"));
             } catch (Throwable err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
             }
