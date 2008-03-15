@@ -221,10 +221,10 @@ public class HostConfiguration implements Runnable {
             } else {
                 File tempFile = File.createTempFile("dummy", "dummy");
                 String userName = System.getProperty("user.name");
-                unzippedDir = new File(tempFile.getParent(), "winstone/" + 
+                unzippedDir = new File(tempFile.getParent(),
                         (userName != null ? WinstoneResourceBundle.globalReplace(userName, 
                                 new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
-                        warfileRef.getName());
+                        "winstone/" + warfileRef.getName());
                 tempFile.delete();
             }
             if (unzippedDir.exists()) {
