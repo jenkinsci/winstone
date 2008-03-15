@@ -240,6 +240,7 @@ public class HostConfiguration implements Runnable {
             }
 
             // Iterate through the files
+            byte buffer[] = new byte[8192];
             JarFile warArchive = new JarFile(warfileRef);
             for (Enumeration e = warArchive.entries(); e.hasMoreElements();) {
                 JarEntry element = (JarEntry) e.nextElement();
@@ -254,7 +255,6 @@ public class HostConfiguration implements Runnable {
                     continue;
                 }
                 outFile.getParentFile().mkdirs();
-                byte buffer[] = new byte[8192];
 
                 // Copy out the extracted file
                 InputStream inContent = warArchive.getInputStream(element);
