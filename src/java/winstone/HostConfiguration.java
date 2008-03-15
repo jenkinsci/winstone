@@ -235,6 +235,15 @@ public class HostConfiguration implements Runnable {
                     Logger.log(Logger.DEBUG, Launcher.RESOURCES,
                             "HostConfig.WebRootExists", unzippedDir.getCanonicalPath());
                 }
+
+                File timestampFile = new File(unzippedDir,".timestamp");
+                if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()-warfileRef.lastModified())>1000) {
+                    // contents of the target directory is inconsistent from the war. 
+                    new FileOutputStream(timestampFile).close();
+                    timestampFile.setLastModified(warfileRef.lastModified());
+                    deleteRecursive(unzippedDir);
+                    unzippedDir.mkdirs();
+                }
             } else {
                 unzippedDir.mkdirs();
             }
@@ -274,7 +283,16 @@ public class HostConfiguration implements Runnable {
             return new File(requestedWebroot);
         }
     }
-    
+
+    private void deleteRecursive(File dir) {
+        File[] children = dir.listFiles();
+        if(children!=null) {
+            for (File child : children)
+                deleteRecursive(child);
+        }
+        dir.delete();
+    }
+
     protected void initMultiWebappDir(String webappsDirName) throws IOException {
         if (webappsDirName == null) {
             webappsDirName = "webapps";
