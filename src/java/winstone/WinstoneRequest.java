@@ -458,21 +458,34 @@ public class WinstoneRequest implements HttpServletRequest {
     }
 
     public static String decodeURLToken(String in) {
-        try {
-            return decodeURLToken(in,"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError(); // impossible
-        }
+        return decodeURLToken(in,true);
     }
 
     /**
      * For decoding the URL encoding used on query strings
      */
     public static String decodeURLToken(String in,String encoding) throws UnsupportedEncodingException {
+        return decodeURLToken(in,encoding,true);
+    }
+
+    public static String decodeURLToken(String in, boolean isQueryString) {
+        try {
+            return decodeURLToken(in,"UTF-8",isQueryString);
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(); // impossible
+        }
+    }
+
+    /**
+     * @param isQueryString
+     *      Decode query string, where '+' is an escape for ' '. Otherwise
+     *      decode as path token, where '+' is not an escape character.
+     */
+    public static String decodeURLToken(String in,String encoding, boolean isQueryString) throws UnsupportedEncodingException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int n = 0; n < in.length(); n++) {
             char thisChar = in.charAt(n);
-            if (thisChar == '+')
+            if (thisChar == '+' && isQueryString)
                 baos.write(' ');
             else if (thisChar == '%') {
                 String token = in.substring(Math.min(n + 1, in.length()), 
@@ -490,6 +503,7 @@ public class WinstoneRequest implements HttpServletRequest {
         }
         return new String(baos.toByteArray(),encoding);
     }
+
     
     public void discardRequestBody() {
         if (getContentLength() > 0) {

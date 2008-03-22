@@ -151,7 +151,7 @@ public class Mapping implements java.util.Comparator {
             if (inputPattern.startsWith(this.urlPattern + '/') || 
                     inputPattern.equals(this.urlPattern)) {
                 if (servletPath != null)
-                    servletPath.append(WinstoneRequest.decodeURLToken(this.urlPattern));
+                    servletPath.append(WinstoneRequest.decodeURLToken(this.urlPattern,false));
                 if (pathInfo != null)
                     pathInfo.append(WinstoneRequest.decodeURLToken(inputPattern.substring(this.urlPattern.length())));
                 return true;
@@ -167,7 +167,7 @@ public class Mapping implements java.util.Comparator {
             if ((this.isPatternFirst && fileName.startsWith(this.urlPattern))
                     || (!this.isPatternFirst && fileName.endsWith(this.urlPattern))) {
                 if (servletPath != null)
-                    servletPath.append(WinstoneRequest.decodeURLToken(inputPattern));
+                    servletPath.append(WinstoneRequest.decodeURLToken(inputPattern,false));
                 return true;
             } else
                 return false;
@@ -175,14 +175,14 @@ public class Mapping implements java.util.Comparator {
         case EXACT_PATTERN:
             if (inputPattern.equals(this.urlPattern)) {
                 if (servletPath != null)
-                    servletPath.append(WinstoneRequest.decodeURLToken(inputPattern));
+                    servletPath.append(WinstoneRequest.decodeURLToken(inputPattern,false));
                 return true;
             } else
                 return false;
 
         case DEFAULT_SERVLET:
             if (servletPath != null)
-                servletPath.append(WinstoneRequest.decodeURLToken(inputPattern));
+                servletPath.append(WinstoneRequest.decodeURLToken(inputPattern,false));
             return true;
 
         default:
