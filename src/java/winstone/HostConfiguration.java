@@ -221,10 +221,10 @@ public class HostConfiguration implements Runnable {
             } else {
                 File tempFile = File.createTempFile("dummy", "dummy");
                 String userName = System.getProperty("user.name");
-                unzippedDir = new File(tempFile.getParent(), "winstone/" + 
+                unzippedDir = new File(tempFile.getParent(),
                         (userName != null ? WinstoneResourceBundle.globalReplace(userName, 
                                 new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
-                        warfileRef.getName());
+                        "winstone/" + warfileRef.getName());
                 tempFile.delete();
             }
             if (unzippedDir.exists()) {
@@ -235,11 +235,21 @@ public class HostConfiguration implements Runnable {
                     Logger.log(Logger.DEBUG, Launcher.RESOURCES,
                             "HostConfig.WebRootExists", unzippedDir.getCanonicalPath());
                 }
-            } else {
-                unzippedDir.mkdirs();
             }
 
+            // check consistency and if out-of-sync, recreate
+            File timestampFile = new File(unzippedDir,".timestamp");
+            if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()-warfileRef.lastModified())>1000) {
+                // contents of the target directory is inconsistent from the war.
+                deleteRecursive(unzippedDir);
+                unzippedDir.mkdirs();
+            } else {
+                // files are up to date
+                return unzippedDir;
+            }
+            
             // Iterate through the files
+            byte buffer[] = new byte[8192];
             JarFile warArchive = new JarFile(warfileRef);
             for (Enumeration e = warArchive.entries(); e.hasMoreElements();) {
                 JarEntry element = (JarEntry) e.nextElement();
@@ -254,7 +264,6 @@ public class HostConfiguration implements Runnable {
                     continue;
                 }
                 outFile.getParentFile().mkdirs();
-                byte buffer[] = new byte[8192];
 
                 // Copy out the extracted file
                 InputStream inContent = warArchive.getInputStream(element);
@@ -268,13 +277,28 @@ public class HostConfiguration implements Runnable {
                 outStream.close();
             }
 
+            // extraction completed
+            new FileOutputStream(timestampFile).close();
+            timestampFile.setLastModified(warfileRef.lastModified());
+
             // Return webroot
             return unzippedDir;
         } else {
             return new File(requestedWebroot);
         }
     }
-    
+
+    private void deleteRecursive(File dir) {
+        File[] children = dir.listFiles();
+        if(children!=null) {
+            for (int i = 0; i < children.length; i++) {
+                File child = children[i];
+                deleteRecursive(child);
+            }
+        }
+        dir.delete();
+    }
+
     protected void initMultiWebappDir(String webappsDirName) throws IOException {
         if (webappsDirName == null) {
             webappsDirName = "webapps";
