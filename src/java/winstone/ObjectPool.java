@@ -34,9 +34,7 @@ public class ObjectPool implements Runnable {
     private int MAX_RESPONSES_IN_POOL = 1000;
     private List unusedRequestHandlerThreads;
     private List usedRequestHandlerThreads;
-    private List usedRequestPool;
     private List unusedRequestPool;
-    private List usedResponsePool;
     private List unusedResponsePool;
     private Object requestHandlerSemaphore = new Boolean(true);
     private Object requestPoolSemaphore = new Boolean(true);
@@ -60,8 +58,6 @@ public class ObjectPool implements Runnable {
         this.usedRequestHandlerThreads = new ArrayList();
 
         // Build the request/response pools
-        this.usedRequestPool = new ArrayList();
-        this.usedResponsePool = new ArrayList();
         this.unusedRequestPool = new ArrayList();
         this.unusedResponsePool = new ArrayList();
 
@@ -162,7 +158,7 @@ public class ObjectPool implements Runnable {
 
             // If we are out (and not over our limit), allocate a new one
             else if (this.usedRequestHandlerThreads.size() < MAX_REQUEST_HANDLERS_IN_POOL) {
-                rh = new RequestHandlerThread(this, 
+                rh = new RequestHandlerThread(this,
                         this.threadIndex++, this.simulateModUniqueId,
                         this.saveSessions);
                 this.usedRequestHandlerThreads.add(rh);
@@ -235,21 +231,14 @@ public class ObjectPool implements Runnable {
             int unused = this.unusedRequestPool.size();
             if (unused > 0) {
                 req = (WinstoneRequest) this.unusedRequestPool.remove(unused - 1);
-                this.usedRequestPool.add(req);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "ObjectPool.UsingRequestFromPool", ""
                                 + this.unusedRequestPool.size());
             }
             // If we are out, allocate a new one
-            else if (this.usedRequestPool.size() < MAX_REQUESTS_IN_POOL) {
-                req = new WinstoneRequest();
-                this.usedRequestPool.add(req);
-                Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "ObjectPool.NewRequestForPool", ""
-                                + this.usedRequestPool.size());
-            } else
-                throw new WinstoneException(Launcher.RESOURCES
-                        .getString("ObjectPool.PoolRequestLimitExceeded"));
+            req = new WinstoneRequest();
+            Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
+                    "ObjectPool.NewRequestForPool");
         }
         return req;
     }
@@ -257,8 +246,8 @@ public class ObjectPool implements Runnable {
     public void releaseRequestToPool(WinstoneRequest req) {
         req.cleanUp();
         synchronized (this.requestPoolSemaphore) {
-            this.usedRequestPool.remove(req);
-            this.unusedRequestPool.add(req);
+            if(this.unusedRequestPool.size() < MAX_REQUESTS_IN_POOL)
+                this.unusedRequestPool.add(req);
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                     "ObjectPool.RequestReleased", ""
                             + this.unusedRequestPool.size());
@@ -275,21 +264,14 @@ public class ObjectPool implements Runnable {
             int unused = this.unusedResponsePool.size();
             if (unused > 0) {
                 rsp = (WinstoneResponse) this.unusedResponsePool.remove(unused - 1);
-                this.usedResponsePool.add(rsp);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "ObjectPool.UsingResponseFromPool", ""
                                 + this.unusedResponsePool.size());
             }
             // If we are out, allocate a new one
-            else if (this.usedResponsePool.size() < MAX_RESPONSES_IN_POOL) {
-                rsp = new WinstoneResponse();
-                this.usedResponsePool.add(rsp);
-                Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "ObjectPool.NewResponseForPool", ""
-                                + this.usedResponsePool.size());
-            } else
-                throw new WinstoneException(Launcher.RESOURCES
-                        .getString("ObjectPool.PoolResponseLimitExceeded"));
+            rsp = new WinstoneResponse();
+            Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
+                    "ObjectPool.NewResponseForPool");
         }
         return rsp;
     }
@@ -297,8 +279,8 @@ public class ObjectPool implements Runnable {
     public void releaseResponseToPool(WinstoneResponse rsp) {
         rsp.cleanUp();
         synchronized (this.responsePoolSemaphore) {
-            this.usedResponsePool.remove(rsp);
-            this.unusedResponsePool.add(rsp);
+            if(this.unusedResponsePool.size() < MAX_RESPONSES_IN_POOL)
+                this.unusedResponsePool.add(rsp);
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                     "ObjectPool.ResponseReleased", ""
                             + this.unusedResponsePool.size());
