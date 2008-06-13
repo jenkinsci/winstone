@@ -71,7 +71,7 @@ public class HostConfiguration implements Runnable {
             }
             try {
                 this.webapps.put(prefix, initWebApp(prefix, getWebRoot(webroot, warfile), "webapp"));
-            } catch (Throwable err) {
+            } catch (IOException err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
             }
         }
