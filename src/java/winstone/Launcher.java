@@ -528,10 +528,15 @@ public class Launcher implements Runnable {
 
     protected static void printUsage() {
         // if the caller overrides the usage, use that instead.
-        String usage = System.getProperty("winstone.usage");
+        String usage = USAGE;
         if(usage==null)
             usage = RESOURCES.getString("Launcher.UsageInstructions",
                 RESOURCES.getString("ServerVersion"));
         System.out.println(usage);
     }
+
+    /**
+     * Overridable usage screen
+     */
+    public static String USAGE;
 }
