@@ -527,7 +527,11 @@ public class Launcher implements Runnable {
     }
 
     protected static void printUsage() {
-        System.out.println(RESOURCES.getString("Launcher.UsageInstructions",
-                RESOURCES.getString("ServerVersion")));
+        // if the caller overrides the usage, use that instead.
+        String usage = System.getProperty("winstone.usage");
+        if(usage==null)
+            usage = RESOURCES.getString("Launcher.UsageInstructions",
+                RESOURCES.getString("ServerVersion"));
+        System.out.println(usage);
     }
 }
