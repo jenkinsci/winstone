@@ -244,6 +244,8 @@ public class RequestHandlerThread implements Runnable {
                 rd.forward(req, rsp);
             }
             // if null returned, assume we were redirected
+        } catch (ClientSocketException err) {
+            // ignore this error. caused by a browser shutting down the connection
         } catch (Throwable err) {
             Logger.log(Logger.WARNING, Launcher.RESOURCES,
                     "RequestHandlerThread.UntrappedError", err);

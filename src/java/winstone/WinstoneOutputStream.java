@@ -39,7 +39,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
      * Constructor
      */
     public WinstoneOutputStream(OutputStream out, boolean bodyOnlyForInclude) {
-        this.outStream = out;
+        this.outStream = new ClientOutputStream(out);
         this.bodyOnly = bodyOnlyForInclude;
         this.bufferSize = DEFAULT_BUFFER_SIZE;
         this.committed = false;

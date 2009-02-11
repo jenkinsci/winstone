@@ -435,7 +435,11 @@ public class WinstoneResponse implements HttpServletResponse {
         if (this.outputWriter != null) {
             this.outputWriter.flush();
         }
-        this.outputStream.flush();
+        try {
+            this.outputStream.flush();
+        } catch (ClientSocketException e) {
+            // ignore this error as it's not interesting enough to log
+        }
     }
 
     public void setBufferSize(int size) {
