@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jvnet.hudson.winstone</groupId>
   <artifactId>winstone</artifactId>
-  <version>0.9.10-hudson-8</version>
+  <version>0.9.10-hudson-9</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
