@@ -247,9 +247,18 @@ public class RequestHandlerThread implements Runnable {
         } catch (ClientSocketException err) {
             // ignore this error. caused by a browser shutting down the connection
         } catch (Throwable err) {
-            Logger.log(Logger.WARNING, Launcher.RESOURCES,
-                    "RequestHandlerThread.UntrappedError", err);
-            rdError = webAppConfig.getErrorDispatcherByClass(err);
+            boolean ignore = false;
+            for(Throwable t=err; t!=null; t=t.getCause()) {
+                if (t instanceof ClientSocketException) {
+                    ignore = true;
+                    break;
+                }
+            }
+            if(!ignore) {
+                Logger.log(Logger.WARNING, Launcher.RESOURCES,
+                        "RequestHandlerThread.UntrappedError", err);
+                rdError = webAppConfig.getErrorDispatcherByClass(err);
+            }
         }
 
         // If there was any kind of error, execute the error dispatcher here
