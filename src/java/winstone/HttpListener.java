@@ -221,10 +221,8 @@ public class HttpListener implements Listener, Runnable {
 
         // Read the header line (because this is the first line of the request,
         // apply keep-alive timeouts to it if we are not the first request)
-        if (!iAmFirst) {
-            socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
-        }
-        
+        socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
+
         byte uriBuffer[] = null;
         try {
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.WaitingForURILine");
