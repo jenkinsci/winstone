@@ -26,36 +26,16 @@ public class ServletException extends java.lang.Exception {
     }
 
     public ServletException(String message, Throwable rootCause) {
-        this(message);
+        super(message,rootCause);
         this.rootCause = rootCause;
     }
 
     public ServletException(Throwable rootCause) {
-        this(rootCause != null ? rootCause.getMessage() : null);
+        super(rootCause);
         this.rootCause = rootCause;
     }
 
     public Throwable getRootCause() {
         return this.rootCause;
-    }
-
-    public void printStackTrace(PrintWriter p) {
-        if (this.rootCause != null)
-            this.rootCause.printStackTrace(p);
-        p.write("\n");
-        super.printStackTrace(p);
-    }
-
-    public void printStackTrace(PrintStream p) {
-        if (this.rootCause != null)
-            this.rootCause.printStackTrace(p);
-        p.println("\n");
-        super.printStackTrace(p);
-    }
-
-    public void printStackTrace() {
-        if (this.rootCause != null)
-            this.rootCause.printStackTrace();
-        super.printStackTrace();
     }
 }
