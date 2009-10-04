@@ -64,8 +64,8 @@ public class WinstoneSession implements HttpSession, Serializable {
      */
     public WinstoneSession(String sessionId) {
         this.sessionId = sessionId;
-        this.sessionData = new HashMap();
-        this.requestsUsingMe = new HashSet();
+        this.sessionData = new Hashtable();
+        this.requestsUsingMe = Collections.synchronizedSet(new HashSet());
         this.createTime = System.currentTimeMillis();
         this.isNew = true;
         this.isInvalidated = false;
@@ -473,7 +473,7 @@ public class WinstoneSession implements HttpSession, Serializable {
 
         // Read the map
         this.sessionData = new Hashtable();
-        this.requestsUsingMe = new HashSet();
+        this.requestsUsingMe = Collections.synchronizedSet(new HashSet());
         int entryCount = in.readInt();
         for (int n = 0; n < entryCount; n++) {
             String key = in.readUTF();
