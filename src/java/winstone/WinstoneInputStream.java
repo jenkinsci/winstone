@@ -7,7 +7,6 @@
 package winstone;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,15 +21,13 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
     private InputStream inData;
     private Integer contentLength;
     private int readSoFar;
-    private ByteArrayOutputStream dump;
-    
+
     /**
      * Constructor
      */
     public WinstoneInputStream(InputStream inData) {
         super();
         this.inData = inData;
-        this.dump = new ByteArrayOutputStream();
     }
 
     public WinstoneInputStream(byte inData[]) {
@@ -49,17 +46,28 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
     public int read() throws IOException {
         if (this.contentLength == null) {
             int data = this.inData.read();
-            this.dump.write(data);
 //            System.out.println("Char: " + (char) data);
             return data;
         } else if (this.contentLength.intValue() > this.readSoFar) {
             this.readSoFar++;
             int data = this.inData.read();
-            this.dump.write(data);
 //            System.out.println("Char: " + (char) data);
             return data;
         } else
             return -1;
+    }
+
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (this.contentLength == null) {
+            return this.inData.read(b,off,len);
+        } else {
+            len = Math.min(len, this.contentLength.intValue()-this.readSoFar);
+            if (len<=0)     return -1;
+            int r = this.inData.read(b,off,len);
+            if (r<0)    return r;   // EOF
+            this.readSoFar += r;
+            return r;
+        }
     }
 
     public void finishRequest() {
