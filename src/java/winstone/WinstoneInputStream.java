@@ -9,6 +9,7 @@ package winstone;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.DataInputStream;
 
 /**
  * The request stream management class.
@@ -69,6 +70,23 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
             return r;
         }
     }
+
+    /**
+     * Reads like {@link DataInputStream#readFully(byte[], int, int)}, except EOF before
+     * fully reading it won't result in an exception.
+     *
+     * @return number of bytes read.
+     */
+    public int readAsMuchAsPossible(byte[] buf, int offset, int len) throws IOException {
+        int total = 0;
+        while (total < len) {
+            int count = read(buf, offset + total, len - total);
+            if (count < 0)  break;
+            total += count;
+        }
+        return total;
+    }
+
 
     public void finishRequest() {
         // this.inData = null;

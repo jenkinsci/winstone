@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.DataInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -399,13 +400,11 @@ public class Ajp13Listener implements Listener, Runnable {
      */
     private int getBodyResponsePacket(InputStream in, byte buffer[], int offset)
             throws IOException {
+        DataInputStream din = new DataInputStream(in);
         // Get the incoming packet flag
         byte headerBuffer[] = new byte[4];
-        int headerBytesRead = in.read(headerBuffer);
-        if (headerBytesRead != 4)
-            throw new WinstoneException(AJP_RESOURCES
-                    .getString("Ajp13Listener.InvalidHeader"));
-        else if ((headerBuffer[0] != 0x12) || (headerBuffer[1] != 0x34))
+        din.readFully(headerBuffer);
+        if ((headerBuffer[0] != 0x12) || (headerBuffer[1] != 0x34))
             throw new WinstoneException(AJP_RESOURCES
                     .getString("Ajp13Listener.InvalidHeader"));
 
@@ -417,16 +416,12 @@ public class Ajp13Listener implements Listener, Runnable {
 
         // Look for packet length
         byte bodyLengthBuffer[] = new byte[2];
-        in.read(bodyLengthBuffer);
+        din.readFully(bodyLengthBuffer);
         int bodyLength = ((bodyLengthBuffer[0] & 0xFF) << 8)
                 + (bodyLengthBuffer[1] & 0xFF);
-        int packetBytesRead = in.read(buffer, offset, bodyLength);
+        din.readFully(buffer, offset, bodyLength);
 
-        if (packetBytesRead < bodyLength)
-            throw new WinstoneException(AJP_RESOURCES
-                    .getString("Ajp13Listener.ShortPacket"));
-        else
-            return packetBytesRead + offset;
+        return bodyLength + offset;
     }
 //
 //    /**

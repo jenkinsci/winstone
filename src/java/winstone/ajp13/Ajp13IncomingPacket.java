@@ -9,6 +9,7 @@ package winstone.ajp13;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.io.DataInputStream;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -51,14 +52,13 @@ public class Ajp13IncomingPacket {
      */
     public Ajp13IncomingPacket(InputStream in, 
             RequestHandlerThread handler) throws IOException {
+        DataInputStream din = new DataInputStream(in);
+
         // Get the incoming packet flag
         byte headerBuffer[] = new byte[4];
-        int headerBytesRead = in.read(headerBuffer);
+        din.readFully(headerBuffer);
         handler.setRequestStartTime();
-        if (headerBytesRead != 4)
-            throw new WinstoneException(Ajp13Listener.AJP_RESOURCES
-                    .getString("Ajp13IncomingPacket.InvalidHeader"));
-        else if ((headerBuffer[0] != 0x12) || (headerBuffer[1] != 0x34))
+        if ((headerBuffer[0] != 0x12) || (headerBuffer[1] != 0x34))
             throw new WinstoneException(Ajp13Listener.AJP_RESOURCES
                     .getString("Ajp13IncomingPacket.InvalidHeader"));
 
@@ -66,11 +66,8 @@ public class Ajp13IncomingPacket {
         packetLength = ((headerBuffer[2] & 0xFF) << 8)
                 + (headerBuffer[3] & 0xFF);
         packetBytes = new byte[packetLength];
-        int packetBytesRead = in.read(packetBytes);
+        din.readFully(packetBytes);
 
-        if (packetBytesRead < packetLength)
-            throw new WinstoneException(Ajp13Listener.AJP_RESOURCES
-                    .getString("Ajp13IncomingPacket.ShortPacket"));
         // Ajp13Listener.packetDump(packetBytes, packetBytesRead);
     }
 
