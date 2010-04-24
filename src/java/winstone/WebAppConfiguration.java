@@ -1291,7 +1291,9 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         WinstoneSession ws = new WinstoneSession(sessionId);
         ws.setWebAppConfiguration(this);
         setSessionListeners(ws);
-        if ((this.sessionTimeout != null) && (this.sessionTimeout.intValue() > 0)) {
+        if (this.sessionTimeout == null) {
+            ws.setMaxInactiveInterval(60*60);   // 60 mins as the default
+        } else if (this.sessionTimeout.intValue() > 0) {
             ws.setMaxInactiveInterval(this.sessionTimeout.intValue() * 60);
         } else {
             ws.setMaxInactiveInterval(-1);
