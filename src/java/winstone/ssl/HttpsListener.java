@@ -6,16 +6,19 @@
  */
 package winstone.ssl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.KeyStore;
+import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.RSAPrivateKeySpec;
+import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -26,6 +29,10 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
+import sun.security.x509.CertAndKeyGen;
+import sun.security.x509.X500Name;
 import winstone.HostGroup;
 import winstone.HttpListener;
 import winstone.Logger;
@@ -34,6 +41,7 @@ import winstone.WebAppConfiguration;
 import winstone.WinstoneException;
 import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;
+import winstone.auth.BasicAuthenticationHandler;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -44,21 +52,107 @@ import winstone.WinstoneResourceBundle;
  */
 public class HttpsListener extends HttpListener {
     private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.ssl.LocalStrings");
-    private String keystore;
-    private String password;
-    private String keyManagerType;
+    private final KeyStore keystore;
+    private final char[] password;
+    private final String keyManagerType;
 
     /**
      * Constructor
      */
     public HttpsListener(Map args, ObjectPool objectPool, HostGroup hostGroup) throws IOException {
         super(args, objectPool, hostGroup);
-        this.keystore = WebAppConfiguration.stringArg(args, getConnectorName()
-                + "KeyStore", "winstone.ks");
-        this.password = WebAppConfiguration.stringArg(args, getConnectorName()
-                + "KeyStorePassword", null);
+
+        try {
+            String opensslCert = WebAppConfiguration.stringArg(args, getConnectorName() + "Certificate",null);
+            String opensslKey =  WebAppConfiguration.stringArg(args, getConnectorName() + "PrivateKey",null);
+            String keyStore =    WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStore", null);
+            String pwd =         WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStorePassword", null);
+
+            if ((opensslCert!=null ^ opensslKey!=null))
+                throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}PrivateKey need to be used together", new Object[]{getConnectorName()}));
+            if (keyStore!=null && opensslKey!=null)
+                throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}KeyStore are mutually exclusive", new Object[]{getConnectorName()}));
+
+            if (keyStore!=null) {
+                // load from Java style JKS
+                File ksFile = new File(keyStore);
+                if (!ksFile.exists() || !ksFile.isFile())
+                    throw new WinstoneException(SSL_RESOURCES.getString(
+                            "HttpsListener.KeyStoreNotFound", ksFile.getPath()));
+
+                this.password = pwd!=null ? pwd.toCharArray() : null;
+
+                keystore = KeyStore.getInstance("JKS");
+                keystore.load(new FileInputStream(ksFile), this.password);
+            } else if (opensslCert!=null) {
+                // load from openssl style key files
+                CertificateFactory cf = CertificateFactory.getInstance("X509");
+                Certificate cert = cf.generateCertificate(new FileInputStream(opensslCert));
+                PrivateKey key = readPEMRSAPrivateKey(new FileReader(opensslKey));
+
+                this.password = "changeit".toCharArray();
+                keystore = KeyStore.getInstance("JKS");
+                keystore.load(null);
+                keystore.setKeyEntry("hudson", key, password, new Certificate[]{cert});
+            } else {
+                // use self-signed certificate
+                this.password = "changeit".toCharArray();
+                System.out.println("Using one-time self-signed certificate");
+
+                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
+                ckg.generate(1024);
+                PrivateKey privKey = ckg.getPrivateKey();
+
+                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
+                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
+
+                keystore = KeyStore.getInstance("JKS");
+                keystore.load(null);
+                keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+            }
+        } catch (GeneralSecurityException e) {
+            throw (IOException)new IOException("Failed to handle keys").initCause(e);
+        }
+
         this.keyManagerType = WebAppConfiguration.stringArg(args, 
                 getConnectorName() + "KeyManagerType", "SunX509");
+    }
+
+    private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
+        // TODO: should have more robust format error handling
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            BufferedReader r = new BufferedReader(reader);
+            String line;
+            boolean in = false;
+            while ((line=r.readLine())!=null) {
+                if (line.startsWith("-----")) {
+                    in = !in;
+                    continue;
+                }
+                if (in) {
+                    char[] inBytes = line.toCharArray();
+                    byte[] outBytes = new byte[(inBytes.length*3)/4];
+                    int length = BasicAuthenticationHandler.decodeBase64(inBytes, outBytes, 0, inBytes.length, 0);
+                    baos.write(outBytes,0,length);
+                }
+            }
+        } finally {
+            reader.close();
+        }
+
+
+        DerInputStream dis = new DerInputStream(baos.toByteArray());
+        DerValue[] seq = dis.getSequence(0);
+
+        // int v = seq[0].getInteger();
+        BigInteger mod = seq[1].getBigInteger();
+        // pubExpo
+        BigInteger privExpo = seq[3].getBigInteger();
+        // p1, p2, exp1, exp2, crtCoef
+
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
     }
 
     /**
@@ -83,7 +177,7 @@ public class HttpsListener extends HttpListener {
      */
     protected ServerSocket getServerSocket() throws IOException {
         // Just to make sure it's set before we start
-        SSLContext context = getSSLContext(this.keystore, this.password);
+        SSLContext context = getSSLContext();
         SSLServerSocketFactory factory = context.getServerSocketFactory();
         SSLServerSocket ss = (SSLServerSocket) (this.listenAddress == null ? factory
                 .createServerSocket(this.listenPort, BACKLOG_COUNT)
@@ -156,36 +250,25 @@ public class HttpsListener extends HttpListener {
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    public SSLContext getSSLContext(String keyStoreName, String password)
+    public SSLContext getSSLContext()
             throws IOException {
         try {
             // Check the key manager factory
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(this.keyManagerType);
             
-            File ksFile = new File(keyStoreName);
-            if (!ksFile.exists() || !ksFile.isFile())
-                throw new WinstoneException(SSL_RESOURCES.getString(
-                        "HttpsListener.KeyStoreNotFound", ksFile.getPath()));
-            InputStream in = new FileInputStream(ksFile);
-            char[] passwordChars = password == null ? null : password.toCharArray();
-            KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(in, passwordChars);
-            kmf.init(ks, passwordChars);
+            kmf.init(keystore, password);
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
-                    "HttpsListener.KeyCount", ks.size() + "");
-            for (Enumeration e = ks.aliases(); e.hasMoreElements();) {
+                    "HttpsListener.KeyCount", keystore.size() + "");
+            for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
                 Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                         "HttpsListener.KeyFound", new String[] { alias,
-                                ks.getCertificate(alias) + "" });
+                                keystore.getCertificate(alias) + "" });
             }
 
             SSLContext context = SSLContext.getInstance("SSL");
             context.init(kmf.getKeyManagers(), null, null);
-            Arrays.fill(passwordChars, 'x');
             return context;
-        } catch (IOException err) {
-            throw err;
         } catch (Throwable err) {
             throw new WinstoneException(SSL_RESOURCES
                     .getString("HttpsListener.ErrorGettingContext"), err);
