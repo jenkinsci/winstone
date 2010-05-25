@@ -17,8 +17,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -55,6 +53,16 @@ public class HttpsListener extends HttpListener {
     private final KeyStore keystore;
     private final char[] password;
     private final String keyManagerType;
+    /**
+     * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
+     * If false, which is the default, don't do so.
+     * Technically speaking, there's the equivalent of "SSLVerifyClient optional", but IE doesn't
+     * recognize it and it always prompt the certificate chooser dialog box, so in practice
+     * it's useless.
+     * <p>
+     * See http://hudson.361315.n4.nabble.com/winstone-container-and-ssl-td383501.html for this failure mode in IE.
+     */
+    private boolean performClientAuth;
 
     /**
      * Constructor
@@ -63,6 +71,7 @@ public class HttpsListener extends HttpListener {
         super(args, objectPool, hostGroup);
 
         try {
+            performClientAuth = WebAppConfiguration.booleanArg(args, getConnectorName() + "VerifyClient",false);
             String opensslCert = WebAppConfiguration.stringArg(args, getConnectorName() + "Certificate",null);
             String opensslKey =  WebAppConfiguration.stringArg(args, getConnectorName() + "PrivateKey",null);
             String keyStore =    WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStore", null);
@@ -184,7 +193,8 @@ public class HttpsListener extends HttpListener {
                 : factory.createServerSocket(this.listenPort, BACKLOG_COUNT,
                         InetAddress.getByName(this.listenAddress)));
         ss.setEnableSessionCreation(true);
-        ss.setWantClientAuth(true);
+        if (performClientAuth)
+            ss.setNeedClientAuth(true);
         return ss;
     }
 
