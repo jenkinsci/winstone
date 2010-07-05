@@ -1810,8 +1810,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         } else if (!path.equals("/") && path.endsWith("/")) {
             path = path.substring(0, path.length() - 1);
         }
-        File res = new File(webRoot, path.substring(1));
-        return (res != null) && res.exists() ? res.toURL() : null;
+        File res = new File(webRoot, URIUtil.canonicalPath(path));
+        return res.exists() ? res.toURL() : null;
     }
 
     public InputStream getResourceAsStream(String path) {
