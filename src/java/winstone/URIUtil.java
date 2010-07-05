@@ -2,6 +2,7 @@ package winstone;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -14,13 +15,14 @@ public class URIUtil {
      * this method preserves the leading and trailing '/'.
      */
     static String canonicalPath(String path) {
-        List<String> r = new ArrayList<String>(Arrays.asList(path.split("/+")));
+        List r = new ArrayList(Arrays.asList(path.split("/+")));
         for (int i=0; i<r.size(); ) {
-            if (r.get(i).length()==0 || r.get(i).equals(".")) {
+            String cur = (String)r.get(i);
+            if (cur.length()==0 || cur.equals(".")) {
                 // empty token occurs for example, "".split("/+") is [""]
                 r.remove(i);
             } else
-            if (r.get(i).equals("..")) {
+            if (cur.equals("..")) {
                 // i==0 means this is a broken URI.
                 r.remove(i);
                 if (i>0) {
@@ -36,7 +38,8 @@ public class URIUtil {
         if (path.startsWith("/"))
             buf.append('/');
         boolean first = true;
-        for (String token : r) {
+        for (Iterator itr = r.iterator(); itr.hasNext();) {
+            String token = (String) itr.next();
             if (!first)     buf.append('/');
             else            first = false;
             buf.append(token);
