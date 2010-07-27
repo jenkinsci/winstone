@@ -1547,7 +1547,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             WinstoneRequest request, WinstoneResponse response)
             throws IOException {
         if (!uriInsideWebapp.equals("") && !uriInsideWebapp.startsWith("/")) {
-            return this.getErrorDispatcherByCode(
+            return this.getErrorDispatcherByCode( uriInsideWebapp,
                     HttpServletResponse.SC_BAD_REQUEST,
                     Launcher.RESOURCES.getString("WebAppConfig.InvalidURI", uriInsideWebapp),
                     null);
@@ -1555,7 +1555,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw, true);
             this.contextStartupError.printStackTrace(pw);
-            return this.getErrorDispatcherByCode(
+            return this.getErrorDispatcherByCode( uriInsideWebapp,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     Launcher.RESOURCES.getString("WebAppConfig.ErrorDuringStartup", sw.toString()), 
                     this.contextStartupError);
@@ -1626,7 +1626,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         }
         
         // If we are here, return a 404
-        return this.getErrorDispatcherByCode(HttpServletResponse.SC_NOT_FOUND,
+        return this.getErrorDispatcherByCode(uriInsideWebapp, HttpServletResponse.SC_NOT_FOUND,
                 Launcher.RESOURCES.getString("StaticResourceServlet.PathNotFound", 
                         uriInsideWebapp), null);
     }
@@ -1681,11 +1681,11 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                 (((ServletException) errPassDown).getRootCause() != null)) {
             errPassDown = ((ServletException) errPassDown).getRootCause();
         }
-        return getErrorDispatcherByCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+        return getErrorDispatcherByCode(null, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 null, errPassDown);
     }
     
-    public RequestDispatcher getErrorDispatcherByCode(
+    public RequestDispatcher getErrorDispatcherByCode( String requestURI,
             int statusCode, String summaryMessage, Throwable exception) {
         // Check for status code match
         String errorURI = (String) getErrorPagesByCode().get("" + statusCode);
@@ -1704,7 +1704,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             RequestDispatcher rd = new RequestDispatcher(this, errorServlet);
             if (rd != null) {
                 rd.setForErrorDispatcher(null, null, null, statusCode, 
-                        summaryMessage, exception, null, this.filterPatternsError);
+                        summaryMessage, exception, requestURI, this.filterPatternsError);
                 return rd;
             }
         }
