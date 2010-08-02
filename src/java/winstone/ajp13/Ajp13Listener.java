@@ -122,12 +122,12 @@ public class Ajp13Listener implements Listener, Runnable {
 
             // Close server socket
             ss.close();
+
+            Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.ShutdownOK");
         } catch (Throwable err) {
             Logger.log(Logger.ERROR, AJP_RESOURCES,
                     "Ajp13Listener.ShutdownError", err);
         }
-
-        Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.ShutdownOK");
     }
 
     /**
