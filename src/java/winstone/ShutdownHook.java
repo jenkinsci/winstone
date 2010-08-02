@@ -20,7 +20,9 @@ public class ShutdownHook extends Thread {
     }
 
     public void run() {
-        if (this.launcher != null)
+        if (this.launcher != null) {
+            Logger.log(Logger.INFO, Launcher.RESOURCES, "ShutdownHook.Initiating");
             this.launcher.shutdown();
+        }
     }
 }
