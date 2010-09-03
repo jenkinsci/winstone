@@ -330,6 +330,8 @@ public class HttpListener implements Listener, Runnable {
         } else {
             fullURI = trimHostName(remainder.substring(0, spacePos).trim());
             String protocol = remainder.substring(spacePos + 1).trim().toUpperCase();
+            if (!protocol.startsWith("HTTP/"))
+                protocol = "HTTP/1.0";  // didn't understand this protocol. this typically means the request line had extra space. assume 1.0
             req.setProtocol(protocol);
             rsp.setProtocol(protocol);
         }
