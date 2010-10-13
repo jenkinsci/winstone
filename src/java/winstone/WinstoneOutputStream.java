@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -137,16 +138,17 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             String reason = Launcher.RESOURCES.getString("WinstoneOutputStream.reasonPhrase." + statusCode);
             String statusLine = this.owner.getProtocol() + " " + statusCode + " " + 
                     (reason == null ? "No reason" : reason);
-            this.outStream.write(statusLine.getBytes("8859_1"));
-            this.outStream.write(CR_LF);
+            OutputStream o = new BufferedOutputStream(outStream);
+            o.write(statusLine.getBytes("8859_1"));
+            o.write(CR_LF);
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                     "WinstoneOutputStream.ResponseStatus", statusLine);
 
             // Write headers and cookies
             for (Iterator i = this.owner.getHeaders().iterator(); i.hasNext();) {
                 String header = (String) i.next();
-                this.outStream.write(header.getBytes("8859_1"));
-                this.outStream.write(CR_LF);
+                o.write(header.getBytes("8859_1"));
+                o.write(CR_LF);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "WinstoneOutputStream.Header", header);
             }
@@ -155,14 +157,14 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
                 for (Iterator i = this.owner.getCookies().iterator(); i.hasNext();) {
                     Cookie cookie = (Cookie) i.next();
                     String cookieText = this.owner.writeCookie(cookie);
-                    this.outStream.write(cookieText.getBytes("8859_1"));
-                    this.outStream.write(CR_LF);
+                    o.write(cookieText.getBytes("8859_1"));
+                    o.write(CR_LF);
                     Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                             "WinstoneOutputStream.Header", cookieText);
                 }
             }
-            this.outStream.write(CR_LF);
-            this.outStream.flush();
+            o.write(CR_LF);
+            o.flush();
             // Logger.log(Logger.FULL_DEBUG,
             // Launcher.RESOURCES.getString("HttpProtocol.OutHeaders") + out.toString());
         }
