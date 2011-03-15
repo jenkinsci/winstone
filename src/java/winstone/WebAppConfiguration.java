@@ -295,16 +295,24 @@ public class WebAppConfiguration implements ServletContext, Comparator {
          
         // init mimeTypes set
         this.mimeTypes = new Hashtable();
-        String allTypes = Launcher.RESOURCES.getString("WebAppConfig.DefaultMimeTypes");
-        StringTokenizer mappingST = new StringTokenizer(allTypes, ":", false);
-        for (; mappingST.hasMoreTokens();) {
-            String mapping = mappingST.nextToken();
-            int delimPos = mapping.indexOf('=');
-            if (delimPos == -1)
-                continue;
-            String extension = mapping.substring(0, delimPos);
-            String mimeType = mapping.substring(delimPos + 1);
-            this.mimeTypes.put(extension.toLowerCase(), mimeType);
+        String[] typeList = new String[] {
+                Launcher.RESOURCES.getString("WebAppConfig.DefaultMimeTypes"),
+                stringArg(startupArgs,"mimeTypes",null)
+        };
+        for (int i=0; i<typeList.length; i++) {
+            String allTypes = typeList[i];
+            if (allTypes==null)     continue;
+
+            StringTokenizer mappingST = new StringTokenizer(allTypes, ":", false);
+            for (; mappingST.hasMoreTokens();) {
+                String mapping = mappingST.nextToken();
+                int delimPos = mapping.indexOf('=');
+                if (delimPos == -1)
+                    continue;
+                String extension = mapping.substring(0, delimPos);
+                String mimeType = mapping.substring(delimPos + 1);
+                this.mimeTypes.put(extension.toLowerCase(), mimeType);
+            }
         }
 
         this.localeEncodingMap = new HashMap();
