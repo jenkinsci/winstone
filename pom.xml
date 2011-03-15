@@ -1,8 +1,8 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jvnet.hudson.winstone</groupId>
+  <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>0.9.10-hudson-24</version>
+  <version>0.9.10-jenkins-25</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -106,20 +106,12 @@
                 </configuration>
             </plugin>
         </plugins>
-      <extensions>
-        <extension>
-          <groupId>org.jvnet.wagon-svn</groupId>
-          <artifactId>wagon-svn</artifactId>
-          <version>1.8</version>
-        </extension>
-      </extensions>
     </build>
 
     <distributionManagement>
     <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>java.net-maven2-repository</id>
-      <url>java-net:/maven2-repository/trunk/repository/</url>
+      <id>maven.jenkins-ci.org</id>
+      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
     </repository>
   </distributionManagement>
 
