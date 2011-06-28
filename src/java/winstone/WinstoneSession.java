@@ -42,7 +42,7 @@ import javax.servlet.http.HttpSessionListener;
  * @version $Id: WinstoneSession.java,v 1.10 2006/08/27 07:19:47 rickknowles Exp $
  */
 public class WinstoneSession implements HttpSession, Serializable {
-    public static final String SESSION_COOKIE_NAME = "JSESSIONID";
+    public static String SESSION_COOKIE_NAME = "JSESSIONID";
 
     private String sessionId;
     private WebAppConfiguration webAppConfig;
