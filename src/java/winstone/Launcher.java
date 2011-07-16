@@ -62,159 +62,165 @@ public class Launcher implements Runnable {
      * available protocol listeners.
      */
     public Launcher(Map args) throws IOException {
-        
-        boolean useJNDI = WebAppConfiguration.booleanArg(args, "useJNDI", false);
-        
-        // Set jndi resource handler if not set (workaround for JamVM bug)
-        if (useJNDI) try {
-            Class ctxFactoryClass = Class.forName("winstone.jndi.java.javaURLContextFactory");
-            if (System.getProperty("java.naming.factory.initial") == null) {
-                System.setProperty("java.naming.factory.initial", ctxFactoryClass.getName());
-            }
-            if (System.getProperty("java.naming.factory.url.pkgs") == null) {
-                System.setProperty("java.naming.factory.url.pkgs", "winstone.jndi");
-            }
-        } catch (ClassNotFoundException err) {}
-        
-        Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
-        
-        this.args = args;
-        this.controlPort = (args.get("controlPort") == null ? DEFAULT_CONTROL_PORT
-                : Integer.parseInt((String) args.get("controlPort")));
+        boolean success=false;
+        try {
+            boolean useJNDI = WebAppConfiguration.booleanArg(args, "useJNDI", false);
 
-        // Check for java home
-        List jars = new ArrayList();
-        List commonLibCLPaths = new ArrayList();
-        String defaultJavaHome = System.getProperty("java.home"); 
-        String javaHome = WebAppConfiguration.stringArg(args, "javaHome", defaultJavaHome);
-        Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome);
-        String toolsJarLocation = WebAppConfiguration.stringArg(args, "toolsJar", null);
-        File toolsJar = null;
-        if (toolsJarLocation == null) {
-            toolsJar = new File(javaHome, "lib/tools.jar");
-
-            // first try - if it doesn't exist, try up one dir since we might have 
-            // the JRE home by mistake
-            if (!toolsJar.exists()) {
-                File javaHome2 = new File(javaHome).getParentFile();
-                File toolsJar2 = new File(javaHome2, "lib/tools.jar");
-                if (toolsJar2.exists()) {
-                    javaHome = javaHome2.getCanonicalPath();
-                    toolsJar = toolsJar2;
+            // Set jndi resource handler if not set (workaround for JamVM bug)
+            if (useJNDI) try {
+                Class ctxFactoryClass = Class.forName("winstone.jndi.java.javaURLContextFactory");
+                if (System.getProperty("java.naming.factory.initial") == null) {
+                    System.setProperty("java.naming.factory.initial", ctxFactoryClass.getName());
                 }
-            }
-        } else {
-            toolsJar = new File(toolsJarLocation);
-        }
-
-        // Add tools jar to classloader path
-        if (toolsJar.exists()) {
-            jars.add(toolsJar.toURL());
-            commonLibCLPaths.add(toolsJar);
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
-                    toolsJar.getName());
-        } else if (WebAppConfiguration.booleanArg(args, "useJasper", false))
-            Logger.log(Logger.WARNING, RESOURCES, "Launcher.ToolsJarNotFound");
-
-        // Set up common lib class loader
-        String commonLibCLFolder = WebAppConfiguration.stringArg(args,
-                "commonLibFolder", "lib");
-        File libFolder = new File(commonLibCLFolder);
-        if (libFolder.exists() && libFolder.isDirectory()) {
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
-                    libFolder.getCanonicalPath());
-            File children[] = libFolder.listFiles();
-            for (int n = 0; n < children.length; n++)
-                if (children[n].getName().endsWith(".jar")
-                        || children[n].getName().endsWith(".zip")) {
-                    jars.add(children[n].toURL());
-                    commonLibCLPaths.add(children[n]);
-                    Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar", 
-                            children[n].getName());
+                if (System.getProperty("java.naming.factory.url.pkgs") == null) {
+                    System.setProperty("java.naming.factory.url.pkgs", "winstone.jndi");
                 }
-        } else {
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
-        }
-        ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]), 
-                getClass().getClassLoader());
-        
-        Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
-                commonLibCL.toString());
-        Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
-                commonLibCLPaths.toString());
-                                        
-        this.objectPool = new ObjectPool(args);
+            } catch (ClassNotFoundException err) {}
 
-        // Optionally set up clustering if enabled and libraries are available
-        String useCluster = (String) args.get("useCluster");
-        boolean switchOnCluster = (useCluster != null)
-                && (useCluster.equalsIgnoreCase("true") || useCluster
-                        .equalsIgnoreCase("yes"));
-        if (switchOnCluster) {
-            if (this.controlPort < 0) {
-                Logger.log(Logger.INFO, RESOURCES,
-                        "Launcher.ClusterOffNoControlPort");
+            Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
+
+            this.args = args;
+            this.controlPort = (args.get("controlPort") == null ? DEFAULT_CONTROL_PORT
+                    : Integer.parseInt((String) args.get("controlPort")));
+
+            // Check for java home
+            List jars = new ArrayList();
+            List commonLibCLPaths = new ArrayList();
+            String defaultJavaHome = System.getProperty("java.home");
+            String javaHome = WebAppConfiguration.stringArg(args, "javaHome", defaultJavaHome);
+            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome);
+            String toolsJarLocation = WebAppConfiguration.stringArg(args, "toolsJar", null);
+            File toolsJar = null;
+            if (toolsJarLocation == null) {
+                toolsJar = new File(javaHome, "lib/tools.jar");
+
+                // first try - if it doesn't exist, try up one dir since we might have
+                // the JRE home by mistake
+                if (!toolsJar.exists()) {
+                    File javaHome2 = new File(javaHome).getParentFile();
+                    File toolsJar2 = new File(javaHome2, "lib/tools.jar");
+                    if (toolsJar2.exists()) {
+                        javaHome = javaHome2.getCanonicalPath();
+                        toolsJar = toolsJar2;
+                    }
+                }
             } else {
-                String clusterClassName = WebAppConfiguration.stringArg(args, "clusterClassName",
-                        CLUSTER_CLASS).trim();
-                try {
-                    Class clusterClass = Class.forName(clusterClassName);
-                    Constructor clusterConstructor = clusterClass
-                            .getConstructor(new Class[] { Map.class, Integer.class });
-                    this.cluster = (Cluster) clusterConstructor
-                            .newInstance(new Object[] { args, new Integer(this.controlPort) });
-                } catch (ClassNotFoundException err) {
-                    Logger.log(Logger.DEBUG, RESOURCES, "Launcher.ClusterNotFound");
-                } catch (Throwable err) {
-                    Logger.log(Logger.WARNING, RESOURCES, "Launcher.ClusterStartupError", err);
+                toolsJar = new File(toolsJarLocation);
+            }
+
+            // Add tools jar to classloader path
+            if (toolsJar.exists()) {
+                jars.add(toolsJar.toURL());
+                commonLibCLPaths.add(toolsJar);
+                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
+                        toolsJar.getName());
+            } else if (WebAppConfiguration.booleanArg(args, "useJasper", false))
+                Logger.log(Logger.WARNING, RESOURCES, "Launcher.ToolsJarNotFound");
+
+            // Set up common lib class loader
+            String commonLibCLFolder = WebAppConfiguration.stringArg(args,
+                    "commonLibFolder", "lib");
+            File libFolder = new File(commonLibCLFolder);
+            if (libFolder.exists() && libFolder.isDirectory()) {
+                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
+                        libFolder.getCanonicalPath());
+                File children[] = libFolder.listFiles();
+                for (int n = 0; n < children.length; n++)
+                    if (children[n].getName().endsWith(".jar")
+                            || children[n].getName().endsWith(".zip")) {
+                        jars.add(children[n].toURL());
+                        commonLibCLPaths.add(children[n]);
+                        Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
+                                children[n].getName());
+                    }
+            } else {
+                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
+            }
+            ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]),
+                    getClass().getClassLoader());
+
+            Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
+                    commonLibCL.toString());
+            Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
+                    commonLibCLPaths.toString());
+
+            this.objectPool = new ObjectPool(args);
+
+            // Optionally set up clustering if enabled and libraries are available
+            String useCluster = (String) args.get("useCluster");
+            boolean switchOnCluster = (useCluster != null)
+                    && (useCluster.equalsIgnoreCase("true") || useCluster
+                            .equalsIgnoreCase("yes"));
+            if (switchOnCluster) {
+                if (this.controlPort < 0) {
+                    Logger.log(Logger.INFO, RESOURCES,
+                            "Launcher.ClusterOffNoControlPort");
+                } else {
+                    String clusterClassName = WebAppConfiguration.stringArg(args, "clusterClassName",
+                            CLUSTER_CLASS).trim();
+                    try {
+                        Class clusterClass = Class.forName(clusterClassName);
+                        Constructor clusterConstructor = clusterClass
+                                .getConstructor(new Class[]{Map.class, Integer.class});
+                        this.cluster = (Cluster) clusterConstructor
+                                .newInstance(new Object[]{args, new Integer(this.controlPort)});
+                    } catch (ClassNotFoundException err) {
+                        Logger.log(Logger.DEBUG, RESOURCES, "Launcher.ClusterNotFound");
+                    } catch (Throwable err) {
+                        Logger.log(Logger.WARNING, RESOURCES, "Launcher.ClusterStartupError", err);
+                    }
                 }
             }
-        }
-        
-        // If jndi is enabled, run the container wide jndi populator
-        if (useJNDI) {
-            String jndiMgrClassName = WebAppConfiguration.stringArg(args, "containerJndiClassName",
-                    DEFAULT_JNDI_MGR_CLASS).trim();
+
+            // If jndi is enabled, run the container wide jndi populator
+            if (useJNDI) {
+                String jndiMgrClassName = WebAppConfiguration.stringArg(args, "containerJndiClassName",
+                        DEFAULT_JNDI_MGR_CLASS).trim();
+                try {
+                    // Build the realm
+                    Class jndiMgrClass = Class.forName(jndiMgrClassName, true, commonLibCL);
+                    Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] {
+                            Map.class, List.class, ClassLoader.class });
+                    this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] {
+                            args, null, commonLibCL });
+                    this.globalJndiManager.setup();
+                } catch (ClassNotFoundException err) {
+                    Logger.log(Logger.DEBUG, RESOURCES,
+                            "Launcher.JNDIDisabled");
+                } catch (Throwable err) {
+                    Logger.log(Logger.ERROR, RESOURCES,
+                            "Launcher.JNDIError", jndiMgrClassName, err);
+                }
+            }
+
+            // Open the web apps
+            this.hostGroup = new HostGroup(this.cluster, this.objectPool, commonLibCL,
+                    (File []) commonLibCLPaths.toArray(new File[0]), args);
+
+            // Create connectors (http, https and ajp)
+            this.listeners = new ArrayList();
+            spawnListener(HTTP_LISTENER_CLASS);
+            spawnListener(AJP_LISTENER_CLASS);
             try {
-                // Build the realm
-                Class jndiMgrClass = Class.forName(jndiMgrClassName, true, commonLibCL);
-                Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] { 
-                        Map.class, List.class, ClassLoader.class });
-                this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] { 
-                        args, null, commonLibCL });
-                this.globalJndiManager.setup();
+                Class.forName("javax.net.ServerSocketFactory");
+                spawnListener(HTTPS_LISTENER_CLASS);
             } catch (ClassNotFoundException err) {
                 Logger.log(Logger.DEBUG, RESOURCES,
-                        "Launcher.JNDIDisabled");
-            } catch (Throwable err) {
-                Logger.log(Logger.ERROR, RESOURCES,
-                        "Launcher.JNDIError", jndiMgrClassName, err);
+                        "Launcher.NeedsJDK14", HTTPS_LISTENER_CLASS);
             }
-        }
-        
-        // Open the web apps
-        this.hostGroup = new HostGroup(this.cluster, this.objectPool, commonLibCL, 
-                (File []) commonLibCLPaths.toArray(new File[0]), args);
 
-        // Create connectors (http, https and ajp)
-        this.listeners = new ArrayList();
-        spawnListener(HTTP_LISTENER_CLASS);
-        spawnListener(AJP_LISTENER_CLASS);
-        try {
-            Class.forName("javax.net.ServerSocketFactory");
-            spawnListener(HTTPS_LISTENER_CLASS);
-        } catch (ClassNotFoundException err) {
-            Logger.log(Logger.DEBUG, RESOURCES, 
-                    "Launcher.NeedsJDK14", HTTPS_LISTENER_CLASS);
-        }
+            this.controlThread = new Thread(this, RESOURCES.getString(
+                    "Launcher.ThreadName", "" + this.controlPort));
+            this.controlThread.setDaemon(false);
+            this.controlThread.start();
 
-        this.controlThread = new Thread(this, RESOURCES.getString(
-                "Launcher.ThreadName", "" + this.controlPort));
-        this.controlThread.setDaemon(false);
-        this.controlThread.start();
+            success = true;
+        } finally {
+            if (!success)
+                shutdown();
+        }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
-
     }
 
     /**
@@ -223,24 +229,25 @@ public class Launcher implements Runnable {
      * don't do anything too adventurous in the constructor, or if you do, 
      * catch and log any errors locally before rethrowing.
      */
-    protected void spawnListener(String listenerClassName) {
+    protected void spawnListener(String listenerClassName) throws IOException {
         try {
             Class listenerClass = Class.forName(listenerClassName);
             Constructor listenerConstructor = listenerClass
-                    .getConstructor(new Class[] { Map.class,
+                    .getConstructor(new Class[]{Map.class,
                             ObjectPool.class, HostGroup.class});
             Listener listener = (Listener) listenerConstructor
-                    .newInstance(new Object[] { args, this.objectPool, 
+                    .newInstance(new Object[] { args, this.objectPool,
                             this.hostGroup });
             if (listener.start()) {
                 this.listeners.add(listener);
             }
-        } catch (ClassNotFoundException err) {
-            Logger.log(Logger.INFO, RESOURCES, 
-                    "Launcher.ListenerNotFound", listenerClassName);
+//        } catch (ClassNotFoundException err) {
+//            Logger.log(Logger.INFO, RESOURCES,
+//                    "Launcher.ListenerNotFound", listenerClassName);
         } catch (Throwable err) {
-            Logger.log(Logger.ERROR, RESOURCES, 
-                    "Launcher.ListenerStartupError", listenerClassName, err);
+//            Logger.log(Logger.ERROR, RESOURCES,
+//                    "Launcher.ListenerStartupError", listenerClassName, err);
+            throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }
     }
 

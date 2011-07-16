@@ -62,6 +62,7 @@ public class Ajp13Listener implements Listener, Runnable {
     private int listenPort;
     private boolean interrupted;
     private String listenAddress;
+    private ServerSocket serverSocket;
 
     /**
      * Constructor
@@ -77,10 +78,24 @@ public class Ajp13Listener implements Listener, Runnable {
                 "ajp13ListenAddress", null);
     }
 
-    public boolean start() {
+    public boolean start() throws IOException {
         if (this.listenPort < 0) {
             return false;
         } else {
+            ServerSocket ss = null;
+            try {
+                ss = this.listenAddress == null ? new ServerSocket(
+                        this.listenPort, BACKLOG_COUNT) : new ServerSocket(
+                        this.listenPort, BACKLOG_COUNT, InetAddress
+                                .getByName(this.listenAddress));
+            } catch (IOException e) {
+                throw (IOException)new IOException("Failed to listen on port "+listenPort).initCause(e);
+            }
+            ss.setSoTimeout(LISTENER_TIMEOUT);
+            Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.StartupOK",
+                    this.listenPort + "");
+            this.serverSocket = ss;
+
             this.interrupted = false;
             Thread thread = new Thread(this, Launcher.RESOURCES.getString(
                     "Listener.ThreadName", new String[] { "ajp13",
@@ -96,20 +111,12 @@ public class Ajp13Listener implements Listener, Runnable {
      */
     public void run() {
         try {
-            ServerSocket ss = this.listenAddress == null ? new ServerSocket(
-                    this.listenPort, BACKLOG_COUNT) : new ServerSocket(
-                    this.listenPort, BACKLOG_COUNT, InetAddress
-                            .getByName(this.listenAddress));
-            ss.setSoTimeout(LISTENER_TIMEOUT);
-            Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.StartupOK",
-                    this.listenPort + "");
-
             // Enter the main loop
             while (!interrupted) {
                 // Get the listener
                 Socket s = null;
                 try {
-                    s = ss.accept();
+                    s = serverSocket.accept();
                 } catch (java.io.InterruptedIOException err) {
                     s = null;
                 }
@@ -121,7 +128,8 @@ public class Ajp13Listener implements Listener, Runnable {
             }
 
             // Close server socket
-            ss.close();
+            serverSocket.close();
+            serverSocket = null;
 
             Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.ShutdownOK");
         } catch (Throwable err) {

@@ -41,6 +41,7 @@ public class HttpListener implements Listener, Runnable {
     protected int listenPort;
     protected String listenAddress;
     protected boolean interrupted;
+    private ServerSocket serverSocket;
 
     protected HttpListener() {
     }
@@ -60,11 +61,19 @@ public class HttpListener implements Listener, Runnable {
                 getConnectorName() + "DoHostnameLookups", DEFAULT_HNL);
     }
 
-    public boolean start() {
+    public boolean start() throws IOException {
         if (this.listenPort < 0) {
             return false;
         } else {
             this.interrupted = false;
+
+            ServerSocket ss = getServerSocket();
+            ss.setSoTimeout(LISTENER_TIMEOUT);
+            Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.StartupOK",
+                    new String[] { getConnectorName().toUpperCase(),
+                            this.listenPort + "" });
+            this.serverSocket = ss;
+
             Thread thread = new Thread(this, Launcher.RESOURCES.getString(
                     "Listener.ThreadName", new String[] { getConnectorName(),
                             "" + this.listenPort }));
@@ -99,11 +108,14 @@ public class HttpListener implements Listener, Runnable {
      * override in the SSL connector.
      */
     protected ServerSocket getServerSocket() throws IOException {
-        ServerSocket ss = this.listenAddress == null ? new ServerSocket(
-                this.listenPort, BACKLOG_COUNT) : new ServerSocket(
-                this.listenPort, BACKLOG_COUNT, InetAddress
-                        .getByName(this.listenAddress));
-        return ss;
+        try {
+            return this.listenAddress == null ? new ServerSocket(
+                    this.listenPort, BACKLOG_COUNT) : new ServerSocket(
+                    this.listenPort, BACKLOG_COUNT, InetAddress
+                            .getByName(this.listenAddress));
+        } catch (IOException e) {
+            throw (IOException)new IOException("Failed to listen on port "+listenPort).initCause(e);
+        }
     }
 
     /**
@@ -113,18 +125,13 @@ public class HttpListener implements Listener, Runnable {
      */
     public void run() {
         try {
-            ServerSocket ss = getServerSocket();
-            ss.setSoTimeout(LISTENER_TIMEOUT);
-            Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.StartupOK",
-                    new String[] { getConnectorName().toUpperCase(),
-                            this.listenPort + "" });
 
             // Enter the main loop
             while (!interrupted) {
                 // Get the listener
                 Socket s = null;
                 try {
-                    s = ss.accept();
+                    s = serverSocket.accept();
                 } catch (java.io.InterruptedIOException err) {
                     s = null;
                 }
@@ -136,14 +143,15 @@ public class HttpListener implements Listener, Runnable {
             }
 
             // Close server socket
-            ss.close();
+            serverSocket.close();
+            serverSocket = null;
+
+            Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.ShutdownOK",
+                    getConnectorName().toUpperCase());
         } catch (Throwable err) {
             Logger.log(Logger.ERROR, Launcher.RESOURCES, "HttpListener.ShutdownError",
                     getConnectorName().toUpperCase(), err);
         }
-
-        Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.ShutdownOK",
-                getConnectorName().toUpperCase());
     }
 
     /**

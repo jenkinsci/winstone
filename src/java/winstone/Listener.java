@@ -28,7 +28,7 @@ public interface Listener {
     /**
      * After the listener is loaded and initialized, this starts the thread
      */
-    public boolean start();
+    public boolean start() throws IOException;
 
     /**
      * Called by the request handler thread, because it needs specific setup
