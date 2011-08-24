@@ -70,61 +70,68 @@ public class HttpsListener extends HttpListener {
     public HttpsListener(Map args, ObjectPool objectPool, HostGroup hostGroup) throws IOException {
         super(args, objectPool, hostGroup);
 
-        try {
-            performClientAuth = WebAppConfiguration.booleanArg(args, getConnectorName() + "VerifyClient",false);
-            String opensslCert = WebAppConfiguration.stringArg(args, getConnectorName() + "Certificate",null);
-            String opensslKey =  WebAppConfiguration.stringArg(args, getConnectorName() + "PrivateKey",null);
-            String keyStore =    WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStore", null);
-            String pwd =         WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStorePassword", null);
+        if (listenPort<0) {
+            // not running HTTPS listener
+            keystore = null;
+            password = null;
+            keyManagerType = null;
+        } else {
+            try {
+                performClientAuth = WebAppConfiguration.booleanArg(args, getConnectorName() + "VerifyClient",false);
+                String opensslCert = WebAppConfiguration.stringArg(args, getConnectorName() + "Certificate",null);
+                String opensslKey =  WebAppConfiguration.stringArg(args, getConnectorName() + "PrivateKey",null);
+                String keyStore =    WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStore", null);
+                String pwd =         WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStorePassword", null);
 
-            if ((opensslCert!=null ^ opensslKey!=null))
-                throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}PrivateKey need to be used together", new Object[]{getConnectorName()}));
-            if (keyStore!=null && opensslKey!=null)
-                throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}KeyStore are mutually exclusive", new Object[]{getConnectorName()}));
+                if ((opensslCert!=null ^ opensslKey!=null))
+                    throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}PrivateKey need to be used together", new Object[]{getConnectorName()}));
+                if (keyStore!=null && opensslKey!=null)
+                    throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}KeyStore are mutually exclusive", new Object[]{getConnectorName()}));
 
-            if (keyStore!=null) {
-                // load from Java style JKS
-                File ksFile = new File(keyStore);
-                if (!ksFile.exists() || !ksFile.isFile())
-                    throw new WinstoneException(SSL_RESOURCES.getString(
-                            "HttpsListener.KeyStoreNotFound", ksFile.getPath()));
+                if (keyStore!=null) {
+                    // load from Java style JKS
+                    File ksFile = new File(keyStore);
+                    if (!ksFile.exists() || !ksFile.isFile())
+                        throw new WinstoneException(SSL_RESOURCES.getString(
+                                "HttpsListener.KeyStoreNotFound", ksFile.getPath()));
 
-                this.password = pwd!=null ? pwd.toCharArray() : null;
+                    this.password = pwd!=null ? pwd.toCharArray() : null;
 
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(new FileInputStream(ksFile), this.password);
-            } else if (opensslCert!=null) {
-                // load from openssl style key files
-                CertificateFactory cf = CertificateFactory.getInstance("X509");
-                Certificate cert = cf.generateCertificate(new FileInputStream(opensslCert));
-                PrivateKey key = readPEMRSAPrivateKey(new FileReader(opensslKey));
+                    keystore = KeyStore.getInstance("JKS");
+                    keystore.load(new FileInputStream(ksFile), this.password);
+                } else if (opensslCert!=null) {
+                    // load from openssl style key files
+                    CertificateFactory cf = CertificateFactory.getInstance("X509");
+                    Certificate cert = cf.generateCertificate(new FileInputStream(opensslCert));
+                    PrivateKey key = readPEMRSAPrivateKey(new FileReader(opensslKey));
 
-                this.password = "changeit".toCharArray();
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", key, password, new Certificate[]{cert});
-            } else {
-                // use self-signed certificate
-                this.password = "changeit".toCharArray();
-                System.out.println("Using one-time self-signed certificate");
+                    this.password = "changeit".toCharArray();
+                    keystore = KeyStore.getInstance("JKS");
+                    keystore.load(null);
+                    keystore.setKeyEntry("hudson", key, password, new Certificate[]{cert});
+                } else {
+                    // use self-signed certificate
+                    this.password = "changeit".toCharArray();
+                    System.out.println("Using one-time self-signed certificate");
 
-                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
-                ckg.generate(1024);
-                PrivateKey privKey = ckg.getPrivateKey();
+                    CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
+                    ckg.generate(1024);
+                    PrivateKey privKey = ckg.getPrivateKey();
 
-                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
+                    X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
+                    X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
 
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+                    keystore = KeyStore.getInstance("JKS");
+                    keystore.load(null);
+                    keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+                }
+            } catch (GeneralSecurityException e) {
+                throw (IOException)new IOException("Failed to handle keys").initCause(e);
             }
-        } catch (GeneralSecurityException e) {
-            throw (IOException)new IOException("Failed to handle keys").initCause(e);
-        }
 
-        this.keyManagerType = WebAppConfiguration.stringArg(args, 
-                getConnectorName() + "KeyManagerType", "SunX509");
+            this.keyManagerType = WebAppConfiguration.stringArg(args,
+                    getConnectorName() + "KeyManagerType", "SunX509");
+        }
     }
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
