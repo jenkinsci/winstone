@@ -805,7 +805,7 @@ public class WinstoneResponse implements HttpServletResponse {
             this.statusCode = sc;
         }
         String output = Launcher.RESOURCES.getString("WinstoneResponse.ErrorPage",
-                new String[] { sc + "", (msg == null ? "" : msg), "",
+                new String[] { sc + "", URIUtil.htmlEscape(msg == null ? "" : msg), "",
                         Launcher.RESOURCES.getString("ServerVersion"),
                         "" + new Date() });
         setContentLength(output.getBytes(getCharacterEncoding()).length);

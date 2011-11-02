@@ -42,7 +42,7 @@ public class ErrorServlet extends HttpServlet {
          
         // If we are here there was no error servlet, so show the default error page
         String output = Launcher.RESOURCES.getString("WinstoneResponse.ErrorPage",
-                new String[] { sc + "", (msg == null ? "" : msg), sw.toString(),
+                new String[] { sc + "", URIUtil.htmlEscape(msg == null ? "" : msg), URIUtil.htmlEscape(sw.toString()),
                 Launcher.RESOURCES.getString("ServerVersion"),
                         "" + new Date() });
         response.setContentLength(output.getBytes(response.getCharacterEncoding()).length);

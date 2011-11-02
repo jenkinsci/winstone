@@ -50,4 +50,21 @@ public class URIUtil {
         return buf.toString();
     }
 
+    /**
+     * Performs necessary escaping to render arbitrary plain text as plain text without any markup.
+     */
+    public static String htmlEscape(String text) {
+        StringBuilder buf = new StringBuilder(text.length()+64);
+        for( int i=0; i<text.length(); i++ ) {
+            char ch = text.charAt(i);
+            if(ch=='<')
+                buf.append("&lt;");
+            else
+            if(ch=='&')
+                buf.append("&amp;");
+            else
+                buf.append(ch);
+        }
+        return buf.toString();
+    }
 }
