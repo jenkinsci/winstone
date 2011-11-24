@@ -1031,7 +1031,9 @@ public class WinstoneRequest implements HttpServletRequest {
                 Logger.log(Logger.WARNING, Launcher.RESOURCES, "WinstoneRequest.BothMethods");
             }
         }
-        this.parsedParameters = new Boolean(false);
+        if (method.equals(METHOD_POST) && POST_PARAMETERS.equals(contentType)) {
+            this.parsedParameters = new Boolean(false);
+        }
         return this.inputData;
     }
 
