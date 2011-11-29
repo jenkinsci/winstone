@@ -1034,7 +1034,7 @@ public class WinstoneRequest implements HttpServletRequest {
                 this.inputReader = new BufferedReader(new InputStreamReader(
                         this.inputData));
             }
-            this.parsedParameters = new Boolean(false);
+            this.parsedParameters = Boolean.FALSE;
             return this.inputReader;
         }
     }
