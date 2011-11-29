@@ -608,20 +608,38 @@ public class WinstoneRequest implements HttpServletRequest {
             else if (name.equalsIgnoreCase(CONTENT_LENGTH_HEADER))
                 this.contentLength = Integer.parseInt(value);
             else if (name.equalsIgnoreCase(HOST_HEADER)) {
-                int nextColonPos = value.indexOf(':');
-                if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
-                    this.serverName = value;
-                    if (this.scheme != null) {
-                        if (this.scheme.equals("http")) {
-                            this.serverPort = 80;
-                        } else if (this.scheme.equals("https")) {
-                            this.serverPort = 443;
+            	if (value.indexOf('[')!=-1 && value.indexOf(']')!=-1) {
+            		//IPv6 host as per rfc2732
+            		this.serverName=value.substring(value.indexOf('[')+1, value.indexOf(']'));
+            		int nextColonPos = value.indexOf("]:");
+            		if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
+                        if (this.scheme != null) {
+                            if (this.scheme.equals("http")) {
+                                this.serverPort = 80;
+                            } else if (this.scheme.equals("https")) {
+                                this.serverPort = 443;
+                            }
                         }
+                    } else {
+                        this.serverPort = Integer.parseInt(value.substring(nextColonPos + 2));
                     }
-                } else {
-                    this.serverName = value.substring(0, nextColonPos);
-                    this.serverPort = Integer.parseInt(value.substring(nextColonPos + 1));
-                }
+				} else{
+					//IPv4 host
+					int nextColonPos = value.indexOf(':');
+	                if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
+	                    this.serverName = value;
+	                    if (this.scheme != null) {
+	                        if (this.scheme.equals("http")) {
+	                            this.serverPort = 80;
+	                        } else if (this.scheme.equals("https")) {
+	                            this.serverPort = 443;
+	                        }
+	                    }
+	                } else {
+	                    this.serverName = value.substring(0, nextColonPos);
+	                    this.serverPort = Integer.parseInt(value.substring(nextColonPos + 1));
+	                }
+				}
             }
             else if (name.equalsIgnoreCase(CONTENT_TYPE_HEADER)) {
                 this.contentType = value;
