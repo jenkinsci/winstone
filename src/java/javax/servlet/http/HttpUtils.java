@@ -6,6 +6,8 @@
  */
 package javax.servlet.http;
 
+import winstone.SizeRestrictedHashtable;
+
 import java.util.Hashtable;
 import javax.servlet.ServletInputStream;
 import java.util.StringTokenizer;
@@ -55,7 +57,7 @@ public class HttpUtils {
      *             and builds a HashTable object with key-value pairs.
      */
     public static Hashtable parseQueryString(String urlEncodedParams) {
-        Hashtable params = new Hashtable();
+        Hashtable params = new SizeRestrictedHashtable(MAX_PARAMETER_COUNT);
         StringTokenizer st = new StringTokenizer(urlEncodedParams, "&", false);
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
@@ -97,4 +99,6 @@ public class HttpUtils {
         }
         return workspace.toString();
     }
+    
+    public static int MAX_PARAMETER_COUNT = Integer.getInteger(HttpUtils.class.getName()+".maxParameterCount",10000);
 }

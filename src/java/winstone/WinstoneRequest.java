@@ -44,6 +44,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUtils;
 
 
 /**
@@ -129,7 +130,7 @@ public class WinstoneRequest implements HttpServletRequest {
      */
     public WinstoneRequest() throws IOException {
         this.attributes = new Hashtable();
-        this.parameters = new Hashtable();
+        this.parameters = new SizeRestrictedHashtable(HttpUtils.MAX_PARAMETER_COUNT);
         this.locales = new ArrayList();
         this.attributesStack = new Stack();
         this.parametersStack = new Stack();
@@ -539,7 +540,7 @@ public class WinstoneRequest implements HttpServletRequest {
                     "WinstoneRequest.BothMethods");
             this.parsedParameters = Boolean.TRUE;
         } else if (parsedParameters == null) {
-            Map workingParameters = new HashMap();
+            Map workingParameters = new SizeRestrictedHashMap(HttpUtils.MAX_PARAMETER_COUNT);
             try {
                 // Parse query string from request
                 if ((method.equals(METHOD_GET) || method.equals(METHOD_HEAD) || 
@@ -761,7 +762,7 @@ public class WinstoneRequest implements HttpServletRequest {
         }
 
         // Tokenize by commas
-        Map localeEntries = new HashMap();
+        Map localeEntries = new SizeRestrictedHashMap(HttpUtils.MAX_PARAMETER_COUNT);
         StringTokenizer commaTK = new StringTokenizer(lb.toString(), ",", false);
         for (; commaTK.hasMoreTokens();) {
             String clause = commaTK.nextToken();
@@ -826,11 +827,11 @@ public class WinstoneRequest implements HttpServletRequest {
     }
 
     public void addIncludeQueryParameters(String queryString) {
-        Map lastParams = new Hashtable();
+        Map lastParams = new SizeRestrictedHashtable(HttpUtils.MAX_PARAMETER_COUNT);
         if (!this.parametersStack.isEmpty()) {
             lastParams.putAll((Map) this.parametersStack.peek());
         }
-        Map newQueryParams = new HashMap();
+        Map newQueryParams = new SizeRestrictedHashMap(HttpUtils.MAX_PARAMETER_COUNT);
         if (queryString != null) {
             extractParameters(queryString, this.encoding, newQueryParams, false);
         }
@@ -1112,7 +1113,7 @@ public class WinstoneRequest implements HttpServletRequest {
     }
 
     public Map getParameterMap() {
-        Hashtable paramMap = new Hashtable();
+        Hashtable paramMap = new SizeRestrictedHashtable(HttpUtils.MAX_PARAMETER_COUNT);
         for (Enumeration names = this.getParameterNames(); names
                 .hasMoreElements();) {
             String name = (String) names.nextElement();

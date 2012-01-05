@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import javax.servlet.http.HttpUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -393,6 +394,13 @@ public class Launcher implements Runnable {
             printUsage();
             return;
         }
+
+
+        String maxParameterCount = (String)args.get("maxParameterCount");
+        if (maxParameterCount!=null) {
+            HttpUtils.MAX_PARAMETER_COUNT = Integer.parseInt(maxParameterCount);
+        }
+        
         // Launch
         try {
             new Launcher(args);

@@ -24,9 +24,12 @@ import java.util.Vector;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpUtils;
 
 import winstone.Launcher;
 import winstone.Logger;
+import winstone.SizeRestrictedHashMap;
+import winstone.SizeRestrictedHashtable;
 import winstone.WinstoneException;
 import winstone.WinstoneInputStream;
 import winstone.WinstoneRequest;
@@ -289,7 +292,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
         if (hasBeenForwarded()) {
             return super.getParameterMap();
         } else {
-            Hashtable paramMap = new Hashtable();
+            Hashtable paramMap = new SizeRestrictedHashtable(HttpUtils.MAX_PARAMETER_COUNT);
             for (Enumeration names = this.getParameterNames(); names.hasMoreElements();) {
                 String name = (String) names.nextElement();
                 paramMap.put(name, getParameterValues(name));
@@ -337,7 +340,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
             String contentType = this.oldRequest.getContentType();
             String queryString = this.oldRequest.getQueryString();
             String method = this.oldRequest.getMethod();
-            Map workingParameters = new HashMap();
+            Map workingParameters = new SizeRestrictedHashMap(HttpUtils.MAX_PARAMETER_COUNT);
             try {
                 // Parse query string from request
                 if ((method.equals(METHOD_GET) || method.equals(METHOD_HEAD) || 
