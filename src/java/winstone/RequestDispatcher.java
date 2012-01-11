@@ -119,7 +119,7 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
         this.queryString = queryString;
         this.requestURI = errorHandlerURI;
 
-        this.errorStatusCode = new Integer(statusCode);
+        this.errorStatusCode = statusCode;
         this.errorException = exception;
         this.errorSummaryMessage = summaryMessage;
         this.matchingFilters = getMatchingFilters(errorFilterPatterns, this.webAppConfig, 
@@ -295,7 +295,7 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
                     }
                     
                     // Revert back to the original request and response
-                    rsp.setErrorStatusCode(this.errorStatusCode.intValue());
+                    rsp.setErrorStatusCode(this.errorStatusCode);
                     request = req;
                     response = rsp;
                 }
@@ -372,7 +372,7 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
         // Forward / include as requested in the beginning
         if (this.doInclude == null)
             return; // will never happen, because we can't call doFilter before forward/include
-        else if (this.doInclude.booleanValue())
+        else if (this.doInclude)
             include(request, response);
         else
             forward(request, response);
@@ -400,14 +400,12 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, 
                         "RequestDispatcher.CalcFilterChain", cacheKey);
                 List outFilters = new ArrayList();
-                for (int n = 0; n < filterPatterns.length; n++) {
+                for (Mapping filterPattern : filterPatterns) {
                     // Get the pattern and eval it, bumping up the eval'd count
-                    Mapping filterPattern = filterPatterns[n];
-
                     // If the servlet name matches this name, execute it
                     if ((filterPattern.getLinkName() != null)
                             && (filterPattern.getLinkName().equals(servletName) ||
-                                    filterPattern.getLinkName().equals("*"))) {
+                            filterPattern.getLinkName().equals("*"))) {
                         outFilters.add(webAppConfig.getFilters().get(filterPattern.getMappedTo()));
                     }
                     // If the url path matches this filters mappings

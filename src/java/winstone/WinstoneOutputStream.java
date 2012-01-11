@@ -145,8 +145,8 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
                     "WinstoneOutputStream.ResponseStatus", statusLine);
 
             // Write headers and cookies
-            for (Iterator i = this.owner.getHeaders().iterator(); i.hasNext();) {
-                String header = (String) i.next();
+            for (Object o2 : this.owner.getHeaders()) {
+                String header = (String) o2;
                 o.write(header.getBytes("8859_1"));
                 o.write(CR_LF);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
@@ -154,8 +154,8 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             }
 
             if (!this.owner.getHeaders().isEmpty()) {
-                for (Iterator i = this.owner.getCookies().iterator(); i.hasNext();) {
-                    Cookie cookie = (Cookie) i.next();
+                for (Object o1 : this.owner.getCookies()) {
+                    Cookie cookie = (Cookie) o1;
                     String cookieText = this.owner.writeCookie(cookie);
                     o.write(cookieText.getBytes("8859_1"));
                     o.write(CR_LF);
@@ -260,8 +260,8 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     
     public void clearIncludeStackForForward() throws IOException {
         if (isIncluding()) {
-            for (Iterator i = this.includeByteStreams.iterator(); i.hasNext(); ) {
-                ((ByteArrayOutputStream) i.next()).close();
+            for (Object includeByteStream : this.includeByteStreams) {
+                ((ByteArrayOutputStream) includeByteStream).close();
             }
             this.includeByteStreams.clear();
         }

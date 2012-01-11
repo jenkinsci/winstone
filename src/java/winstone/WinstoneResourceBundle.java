@@ -97,8 +97,8 @@ public class WinstoneResourceBundle {
     public static String globalReplace(String input, String parameters[][]) {
         if (parameters != null) {
             StringBuffer out = new StringBuffer(input);
-            for (int n = 0; n < parameters.length; n++) {
-                globalReplace(out, parameters[n][0], parameters[n][1]);
+            for (String[] parameter : parameters) {
+                globalReplace(out, parameter[0], parameter[1]);
             }
             return out.toString();
         } else {

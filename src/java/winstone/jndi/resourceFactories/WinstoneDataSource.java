@@ -347,9 +347,9 @@ public class WinstoneDataSource implements DataSource, Runnable {
     protected void executeKeepAliveOnUnused() {
         // keep alive all unused roConns now
         List dead = new ArrayList();
-        
-        for (Iterator i = this.unusedRealConnections.iterator(); i.hasNext();) {
-            Connection conn = (Connection) i.next();
+
+        for (Object unusedRealConnection : this.unusedRealConnections) {
+            Connection conn = (Connection) unusedRealConnection;
 
             try {
                 executeKeepAlive(conn);
@@ -357,9 +357,9 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 dead.add(conn);
             }
         }
-        
-        for (Iterator i = dead.iterator(); i.hasNext(); ) {
-            killConnection(this.unusedRealConnections, (Connection) i.next());
+
+        for (Object aDead : dead) {
+            killConnection(this.unusedRealConnections, (Connection) aDead);
         }
         
         log(Logger.FULL_DEBUG, "WinstoneDataSource.KeepAliveFinished", "" + 

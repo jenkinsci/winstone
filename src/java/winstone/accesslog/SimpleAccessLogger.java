@@ -80,7 +80,7 @@ public class SimpleAccessLogger implements AccessLogger {
     public void log(String originalURL, WinstoneRequest request, WinstoneResponse response) {
         String uriLine = request.getMethod() + " " + originalURL + " " + request.getProtocol();
         int status = response.getErrorStatusCode() == null ? response.getStatus() 
-                : response.getErrorStatusCode().intValue();
+                : response.getErrorStatusCode();
         int size = response.getWinstoneOutputStream().getBytesCommitted();
         String date = null;
         synchronized (DF) {

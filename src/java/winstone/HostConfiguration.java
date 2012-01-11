@@ -152,8 +152,8 @@ public class HostConfiguration implements Runnable {
     
     public void destroy() {
         Set prefixes = new HashSet(this.webapps.keySet());
-        for (Iterator i = prefixes.iterator(); i.hasNext(); ) {
-            destroyWebApp((String) i.next());
+        for (Object prefixe : prefixes) {
+            destroyWebApp((String) prefixe);
         }
         if (this.thread != null) {
             this.thread.interrupt();
@@ -162,8 +162,8 @@ public class HostConfiguration implements Runnable {
     
     public void invalidateExpiredSessions() {
         Set webapps = new HashSet(this.webapps.values());
-        for (Iterator i = webapps.iterator(); i.hasNext(); ) {
-            ((WebAppConfiguration) i.next()).invalidateExpiredSessions();
+        for (Object webapp : webapps) {
+            ((WebAppConfiguration) webapp).invalidateExpiredSessions();
         }
     }
 
@@ -288,8 +288,7 @@ public class HostConfiguration implements Runnable {
     private void deleteRecursive(File dir) {
         File[] children = dir.listFiles();
         if(children!=null) {
-            for (int i = 0; i < children.length; i++) {
-                File child = children[i];
+            for (File child : children) {
                 deleteRecursive(child);
             }
         }
@@ -306,19 +305,19 @@ public class HostConfiguration implements Runnable {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
         } else {
             File children[] = webappsDir.listFiles();
-            for (int n = 0; n < children.length; n++) {
-                String childName = children[n].getName();
-                
+            for (File aChildren : children) {
+                String childName = aChildren.getName();
+
                 // Check any directories for warfiles that match, and skip: only deploy the war file
-                if (children[n].isDirectory()) {
-                    File matchingWarFile = new File(webappsDir, children[n].getName() + ".war");
+                if (aChildren.isDirectory()) {
+                    File matchingWarFile = new File(webappsDir, aChildren.getName() + ".war");
                     if (matchingWarFile.exists() && matchingWarFile.isFile()) {
                         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
                     } else {
-                        String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName; 
+                        String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
                         if (!this.webapps.containsKey(prefix)) {
                             try {
-                                WebAppConfiguration webAppConfig = initWebApp(prefix, children[n], childName);
+                                WebAppConfiguration webAppConfig = initWebApp(prefix, aChildren, childName);
                                 this.webapps.put(webAppConfig.getContextPath(), webAppConfig);
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
@@ -329,14 +328,14 @@ public class HostConfiguration implements Runnable {
                 } else if (childName.endsWith(".war")) {
                     String outputName = childName.substring(0, childName.lastIndexOf(".war"));
                     String prefix = outputName.equalsIgnoreCase("ROOT") ? "" : "/" + outputName;
-                    
+
                     if (!this.webapps.containsKey(prefix)) {
                         File outputDir = new File(webappsDir, outputName);
                         outputDir.mkdirs();
                         try {
-                            WebAppConfiguration webAppConfig = initWebApp(prefix, 
-                                            getWebRoot(new File(webappsDir, outputName),
-                                                    children[n]), outputName);
+                            WebAppConfiguration webAppConfig = initWebApp(prefix,
+                                    getWebRoot(new File(webappsDir, outputName),
+                                            aChildren), outputName);
                             this.webapps.put(webAppConfig.getContextPath(), webAppConfig);
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {
@@ -350,8 +349,8 @@ public class HostConfiguration implements Runnable {
     
     public WebAppConfiguration getWebAppBySessionKey(String sessionKey) {
         List allwebapps = new ArrayList(this.webapps.values());
-        for (Iterator i = allwebapps.iterator(); i.hasNext(); ) {
-            WebAppConfiguration webapp = (WebAppConfiguration) i.next();
+        for (Object allwebapp : allwebapps) {
+            WebAppConfiguration webapp = (WebAppConfiguration) allwebapp;
             WinstoneSession session = webapp.getSessionById(sessionKey, false);
             if (session != null) {
                 return webapp;

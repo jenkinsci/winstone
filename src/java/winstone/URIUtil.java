@@ -38,10 +38,10 @@ public class URIUtil {
         if (path.startsWith("/"))
             buf.append('/');
         boolean first = true;
-        for (Iterator itr = r.iterator(); itr.hasNext();) {
-            String token = (String) itr.next();
-            if (!first)     buf.append('/');
-            else            first = false;
+        for (Object aR : r) {
+            String token = (String) aR;
+            if (!first) buf.append('/');
+            else first = false;
             buf.append(token);
         }
         // translation: if (path.endsWith("/") && !buf.endsWith("/"))

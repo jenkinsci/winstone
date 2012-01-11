@@ -169,13 +169,13 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
             throws SAXException, IOException {
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WebXmlParser.ResolvingEntity",
                 new String[] { publicName, url });
-        for (int n = 0; n < LOCAL_ENTITY_TABLE.length; n++) {
-            if (((LOCAL_ENTITY_TABLE[n][0] != null) && (publicName != null) && 
-                        publicName.equals(LOCAL_ENTITY_TABLE[n][0])) ||
-                    ((LOCAL_ENTITY_TABLE[n][1] != null) && (url != null) && 
-                            url.equals(LOCAL_ENTITY_TABLE[n][1]))) {
-                if (this.commonLoader.getResource(LOCAL_ENTITY_TABLE[n][2]) != null) {
-                    return getLocalResource(url, LOCAL_ENTITY_TABLE[n][2]);
+        for (String[] aLOCAL_ENTITY_TABLE : LOCAL_ENTITY_TABLE) {
+            if (((aLOCAL_ENTITY_TABLE[0] != null) && (publicName != null) &&
+                    publicName.equals(aLOCAL_ENTITY_TABLE[0])) ||
+                    ((aLOCAL_ENTITY_TABLE[1] != null) && (url != null) &&
+                            url.equals(aLOCAL_ENTITY_TABLE[1]))) {
+                if (this.commonLoader.getResource(aLOCAL_ENTITY_TABLE[2]) != null) {
+                    return getLocalResource(url, aLOCAL_ENTITY_TABLE[2]);
                 }
             }
         }

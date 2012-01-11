@@ -198,8 +198,8 @@ public class Mapping implements java.util.Comparator {
         Mapping one = (Mapping) objOne;
         Mapping two = (Mapping) objTwo;
 
-        Integer intOne = new Integer(one.getPatternType());
-        Integer intTwo = new Integer(two.getPatternType());
+        Integer intOne = one.getPatternType();
+        Integer intTwo = two.getPatternType();
         int order = -1 * intOne.compareTo(intTwo);
         if (order != 0) {
             return order;

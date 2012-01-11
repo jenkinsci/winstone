@@ -38,9 +38,9 @@ public class ObjectPool implements Runnable {
     private List usedRequestHandlerThreads;
     private List unusedRequestPool;
     private List unusedResponsePool;
-    private Object requestHandlerSemaphore = new Boolean(true);
-    private Object requestPoolSemaphore = new Boolean(true);
-    private Object responsePoolSemaphore = new Boolean(true);
+    private Object requestHandlerSemaphore = true;
+    private Object requestPoolSemaphore = true;
+    private Object responsePoolSemaphore = true;
     private int threadIndex = 0;
     private boolean simulateModUniqueId;
     private boolean saveSessions;
@@ -117,11 +117,9 @@ public class ObjectPool implements Runnable {
     public void destroy() {
         synchronized (this.requestHandlerSemaphore) {
             Collection usedHandlers = new ArrayList(this.usedRequestHandlerThreads);
-            for (Iterator i = usedHandlers.iterator(); i.hasNext();)
-                releaseRequestHandler((RequestHandlerThread) i.next());
+            for (Object usedHandler : usedHandlers) releaseRequestHandler((RequestHandlerThread) usedHandler);
             Collection unusedHandlers = new ArrayList(this.unusedRequestHandlerThreads);
-            for (Iterator i = unusedHandlers.iterator(); i.hasNext();)
-                ((RequestHandlerThread) i.next()).destroy();
+            for (Object unusedHandler : unusedHandlers) ((RequestHandlerThread) unusedHandler).destroy();
             this.unusedRequestHandlerThreads.clear();
         }
         if (this.thread != null) {

@@ -134,7 +134,7 @@ public class WinstoneResponse implements HttpServletResponse {
     }
 
     public void setErrorStatusCode(int statusCode) {
-        this.errorStatusCode = new Integer(statusCode);
+        this.errorStatusCode = statusCode;
         this.statusCode = statusCode;
     }
     
@@ -272,8 +272,8 @@ public class WinstoneResponse implements HttpServletResponse {
         }
         // Write out the new session cookie if it's present
         HostConfiguration hostConfig = req.getHostGroup().getHostByName(req.getServerName());
-        for (Iterator i = req.getCurrentSessionIds().keySet().iterator(); i.hasNext(); ) {
-            String prefix = (String) i.next();
+        for (Object o1 : req.getCurrentSessionIds().keySet()) {
+            String prefix = (String) o1;
             String sessionId = (String) req.getCurrentSessionIds().get(prefix);
             WebAppConfiguration ownerContext = hostConfig.getWebAppByURI(prefix);
             if (ownerContext != null) {
@@ -285,15 +285,15 @@ public class WinstoneResponse implements HttpServletResponse {
                     cookie.setSecure(req.isSecure());
                     cookie.setVersion(0); //req.isSecure() ? 1 : 0);
                     cookie.setPath(req.getWebAppConfig().getContextPath().equals("") ? "/"
-                                    : req.getWebAppConfig().getContextPath());
+                            : req.getWebAppConfig().getContextPath());
                     this.cookies.add(cookie); // don't call addCookie because we might be including
                 }
             }
         }
         
         // Look for expired sessions: ie ones where the requested and current ids are different
-        for (Iterator i = req.getRequestedSessionIds().keySet().iterator(); i.hasNext(); ) {
-            String prefix = (String) i.next();
+        for (Object o : req.getRequestedSessionIds().keySet()) {
+            String prefix = (String) o;
             String sessionId = (String) req.getRequestedSessionIds().get(prefix);
             if (!req.getCurrentSessionIds().containsKey(prefix)) {
                 Cookie cookie = new Cookie(WinstoneSession.SESSION_COOKIE_NAME, sessionId);
@@ -566,8 +566,8 @@ public class WinstoneResponse implements HttpServletResponse {
     }
 
     public boolean containsHeader(String name) {
-        for (int n = 0; n < this.headers.size(); n++)
-            if (((String) this.headers.get(n)).startsWith(name))
+        for (Object header : this.headers)
+            if (((String) header).startsWith(name))
                 return true;
         return false;
     }
@@ -684,8 +684,8 @@ public class WinstoneResponse implements HttpServletResponse {
     }
     
     public String getHeader(String name) {
-        for (int n = 0; n < this.headers.size(); n++) {
-            String header = (String) this.headers.get(n);
+        for (Object header1 : this.headers) {
+            String header = (String) header1;
             if (header.startsWith(name + ": "))
                 return header.substring(name.length() + 2);
         }
@@ -729,7 +729,7 @@ public class WinstoneResponse implements HttpServletResponse {
         resetBuffer();
         
         // Build location
-        StringBuffer fullLocation = new StringBuffer();
+        StringBuilder fullLocation = new StringBuilder();
         if (location.startsWith("http://") || location.startsWith("https://")) {
             fullLocation.append(location);
         } else {

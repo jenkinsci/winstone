@@ -118,13 +118,13 @@ public class Launcher implements Runnable {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
                 File children[] = libFolder.listFiles();
-                for (int n = 0; n < children.length; n++)
-                    if (children[n].getName().endsWith(".jar")
-                            || children[n].getName().endsWith(".zip")) {
-                        jars.add(children[n].toURL());
-                        commonLibCLPaths.add(children[n]);
+                for (File aChildren : children)
+                    if (aChildren.getName().endsWith(".jar")
+                            || aChildren.getName().endsWith(".zip")) {
+                        jars.add(aChildren.toURL());
+                        commonLibCLPaths.add(aChildren);
                         Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
-                                children[n].getName());
+                                aChildren.getName());
                     }
             } else {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
@@ -150,7 +150,7 @@ public class Launcher implements Runnable {
                         Constructor clusterConstructor = clusterClass
                                 .getConstructor(new Class[]{Map.class, Integer.class});
                         this.cluster = (Cluster) clusterConstructor
-                                .newInstance(new Object[]{args, new Integer(this.controlPort)});
+                                .newInstance(args, new Integer(this.controlPort));
                     } catch (ClassNotFoundException err) {
                         Logger.log(Logger.DEBUG, RESOURCES, "Launcher.ClusterNotFound");
                     } catch (Throwable err) {
@@ -166,8 +166,7 @@ public class Launcher implements Runnable {
                     Class jndiMgrClass = Option.CONTAINER_JNDI_CLASSNAME.get(args,JNDIManager.class,commonLibCL);
                     Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] {
                             Map.class, List.class, ClassLoader.class });
-                    this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] {
-                            args, null, commonLibCL });
+                    this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(args, null, commonLibCL);
                     this.globalJndiManager.setup();
                 } catch (ClassNotFoundException err) {
                     Logger.log(Logger.DEBUG, RESOURCES,
@@ -220,8 +219,8 @@ public class Launcher implements Runnable {
                     .getConstructor(new Class[]{Map.class,
                             ObjectPool.class, HostGroup.class});
             Listener listener = (Listener) listenerConstructor
-                    .newInstance(new Object[] { args, this.objectPool,
-                            this.hostGroup });
+                    .newInstance(args, this.objectPool,
+                            this.hostGroup);
             if (listener.start()) {
                 this.listeners.add(listener);
             }
@@ -334,8 +333,7 @@ public class Launcher implements Runnable {
     
     public void shutdown() {
         // Release all listeners/pools/webapps
-        for (Iterator i = this.listeners.iterator(); i.hasNext();)
-            ((Listener) i.next()).destroy();
+        for (Object listener : this.listeners) ((Listener) listener).destroy();
         this.objectPool.destroy();
         if (this.cluster != null)
             this.cluster.destroy();

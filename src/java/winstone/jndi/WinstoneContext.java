@@ -50,8 +50,8 @@ public class WinstoneContext implements Context {
             String absoluteName, Object contextLock) throws NamingException {
         this.environment = new Hashtable();
         List sourceKeys = new ArrayList(sourceEnvironment.keySet());
-        for (Iterator i = sourceKeys.iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object sourceKey : sourceKeys) {
+            String key = (String) sourceKey;
             addToEnvironment(key, sourceEnvironment.get(key));
         }
         this.parent = parent;
@@ -69,8 +69,8 @@ public class WinstoneContext implements Context {
             String absoluteName, Object contextLock, Hashtable bindings) throws NamingException {
         this.environment = new Hashtable();
         List sourceKeys = new ArrayList(sourceEnvironment.keySet());
-        for (Iterator i = sourceKeys.iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object sourceKey : sourceKeys) {
+            String key = (String) sourceKey;
             addToEnvironment(key, sourceEnvironment.get(key));
         }
         this.parent = parent;
@@ -461,7 +461,7 @@ public class WinstoneContext implements Context {
             else {
                 childContext = new WinstoneContext(this.environment, this,
                         this.myAbsoluteName + "/" + childName.get(0),
-                        new Boolean(true));
+                        true);
                 this.bindings.put(childName.get(0), childContext);
             }
         }

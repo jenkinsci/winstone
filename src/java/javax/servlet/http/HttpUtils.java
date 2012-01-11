@@ -85,7 +85,7 @@ public class HttpUtils {
     }
 
     private static String decodeURLToken(String in) {
-        StringBuffer workspace = new StringBuffer();
+        StringBuilder workspace = new StringBuilder();
         for (int n = 0; n < in.length(); n++) {
             char thisChar = in.charAt(n);
             if (thisChar == '+')

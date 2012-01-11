@@ -80,8 +80,7 @@ public class LoadTest {
             Thread.sleep(this.stepPeriod + gracePeriod);
 
             // int errorCount = (noOfSeconds * n) - this.successCount;
-            Long averageSuccessTime = this.successCount == 0 ? null : new Long(
-                    this.successTimeTotal / this.successCount);
+            Long averageSuccessTime = this.successCount == 0 ? null : this.successTimeTotal / this.successCount;
 
             // Write out results
             Logger.log(Logger.INFO, resources, "LoadTest.LineResult",
@@ -90,8 +89,7 @@ public class LoadTest {
                             averageSuccessTime + "" });
 
             // Close threads
-            for (Iterator i = threads.iterator(); i.hasNext();)
-                ((LoadTestThread) i.next()).destroy();
+            for (Object thread : threads) ((LoadTestThread) thread).destroy();
 
             this.successTimeTotal = 0;
             this.successCount = 0;
@@ -114,8 +112,7 @@ public class LoadTest {
         // Loop for args
         Map options = new HashMap();
         // String operation = "";
-        for (int n = 0; n < args.length; n++) {
-            String option = args[n];
+        for (String option : args) {
             if (option.startsWith("--")) {
                 int equalPos = option.indexOf('=');
                 String paramName = option.substring(2, equalPos == -1 ? option

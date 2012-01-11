@@ -44,8 +44,8 @@ public class ArgumentsRealm implements AuthenticationRealm {
         this.passwords = new Hashtable();
         this.roles = new Hashtable();
 
-        for (Iterator i = args.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object o : args.keySet()) {
+            String key = (String) o;
             if (key.startsWith(Option.ARGUMENTS_REALM_PASSWORD.name)) {
                 String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
                 String password = (String) args.get(key);
@@ -56,7 +56,7 @@ public class ArgumentsRealm implements AuthenticationRealm {
                 } else {
                     StringTokenizer st = new StringTokenizer(roleList, ",");
                     List rl = new ArrayList();
-                    for (; st.hasMoreTokens();) {
+                    for (; st.hasMoreTokens(); ) {
                         String currentRole = st.nextToken();
                         if (rolesAllowed.contains(currentRole))
                             rl.add(currentRole);

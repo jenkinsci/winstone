@@ -38,8 +38,8 @@ public class WebAppJNDIManager extends ContainerJNDIManager {
         // If the webXML nodes are not null, validate that all the entries we
         // wanted have been created
         if (webXMLNodes != null)
-            for (Iterator i = webXMLNodes.iterator(); i.hasNext();) {
-                Node node = (Node) i.next();
+            for (Object webXMLNode : webXMLNodes) {
+                Node node = (Node) webXMLNode;
 
                 // Extract the env-entry nodes and create the objects
                 if (node.getNodeType() != Node.ELEMENT_NODE)

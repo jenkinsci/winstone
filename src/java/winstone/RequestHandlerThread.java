@@ -139,10 +139,10 @@ public class RequestHandlerThread implements Runnable {
                         // Now we've verified it's in the right webapp, send
                         // request in scope notify
                         ServletRequestListener reqLsnrs[] = webAppConfig.getRequestListeners();
-                        for (int n = 0; n < reqLsnrs.length; n++) {
+                        for (ServletRequestListener reqLsnr1 : reqLsnrs) {
                             ClassLoader cl = Thread.currentThread().getContextClassLoader();
                             Thread.currentThread().setContextClassLoader(webAppConfig.getLoader());
-                            reqLsnrs[n].requestInitialized(new ServletRequestEvent(webAppConfig, req));
+                            reqLsnr1.requestInitialized(new ServletRequestEvent(webAppConfig, req));
                             Thread.currentThread().setContextClassLoader(cl);
                         }
 
@@ -166,11 +166,11 @@ public class RequestHandlerThread implements Runnable {
                         req.markSessionsAsRequestFinished(this.requestStartTime, this.saveSessions);
 
                         // send request listener notifies
-                        for (int n = 0; n < reqLsnrs.length; n++) {
+                        for (ServletRequestListener reqLsnr : reqLsnrs) {
                             ClassLoader cl = Thread.currentThread().getContextClassLoader();
                             Thread.currentThread().setContextClassLoader(webAppConfig.getLoader());
-                            reqLsnrs[n].requestDestroyed(new ServletRequestEvent(webAppConfig, req));
-                            Thread.currentThread().setContextClassLoader(cl);                            
+                            reqLsnr.requestDestroyed(new ServletRequestEvent(webAppConfig, req));
+                            Thread.currentThread().setContextClassLoader(cl);
                         }
 
                         req.setWebAppConfig(null);

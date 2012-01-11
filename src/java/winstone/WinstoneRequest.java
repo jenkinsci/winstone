@@ -208,9 +208,9 @@ public class WinstoneRequest implements HttpServletRequest {
      * Steps through the header array, searching for the first header matching
      */
     private String extractFirstHeader(String name) {
-        for (int n = 0; n < this.headers.length; n++) {
-            if (this.headers[n].toUpperCase().startsWith(name.toUpperCase() + ':')) {
-                return this.headers[n].substring(name.length() + 1).trim(); // 1 for colon
+        for (String header : this.headers) {
+            if (header.toUpperCase().startsWith(name.toUpperCase() + ':')) {
+                return header.substring(name.length() + 1).trim(); // 1 for colon
             }
         }
         return null;
@@ -218,8 +218,7 @@ public class WinstoneRequest implements HttpServletRequest {
 
     private Collection extractHeaderNameList() {
         Collection headerNames = new HashSet();
-        for (int n = 0; n < this.headers.length; n++) {
-            String name = this.headers[n];
+        for (String name : this.headers) {
             int colonPos = name.indexOf(':');
             headerNames.add(name.substring(0, colonPos));
         }
@@ -536,7 +535,7 @@ public class WinstoneRequest implements HttpServletRequest {
      * the parameters map.
      */
     public void parseRequestParameters() {
-        if ((parsedParameters != null) && !parsedParameters.booleanValue()) {
+        if ((parsedParameters != null) && !parsedParameters) {
             Logger.log(Logger.WARNING, Launcher.RESOURCES,
                     "WinstoneRequest.BothMethods");
             this.parsedParameters = Boolean.TRUE;
@@ -592,8 +591,8 @@ public class WinstoneRequest implements HttpServletRequest {
         // Iterate through headers
         List outHeaderList = new ArrayList();
         List cookieList = new ArrayList();
-        for (Iterator i = headerList.iterator(); i.hasNext();) {
-            String header = (String) i.next();
+        for (Object aHeaderList : headerList) {
+            String header = (String) aHeaderList;
             int colonPos = header.indexOf(':');
             String name = header.substring(0, colonPos);
             String value = header.substring(colonPos + 1).trim();
@@ -610,11 +609,11 @@ public class WinstoneRequest implements HttpServletRequest {
             else if (name.equalsIgnoreCase(CONTENT_LENGTH_HEADER))
                 this.contentLength = Integer.parseInt(value);
             else if (name.equalsIgnoreCase(HOST_HEADER)) {
-            	if (value.indexOf('[')!=-1 && value.indexOf(']')!=-1) {
-            		//IPv6 host as per rfc2732
-            		this.serverName=value.substring(value.indexOf('[')+1, value.indexOf(']'));
-            		int nextColonPos = value.indexOf("]:");
-            		if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
+                if (value.indexOf('[') != -1 && value.indexOf(']') != -1) {
+                    //IPv6 host as per rfc2732
+                    this.serverName = value.substring(value.indexOf('[') + 1, value.indexOf(']'));
+                    int nextColonPos = value.indexOf("]:");
+                    if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
                         if (this.scheme != null) {
                             if (this.scheme.equals("http")) {
                                 this.serverPort = 80;
@@ -625,25 +624,24 @@ public class WinstoneRequest implements HttpServletRequest {
                     } else {
                         this.serverPort = Integer.parseInt(value.substring(nextColonPos + 2));
                     }
-				} else{
-					//IPv4 host
-					int nextColonPos = value.indexOf(':');
-	                if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
-	                    this.serverName = value;
-	                    if (this.scheme != null) {
-	                        if (this.scheme.equals("http")) {
-	                            this.serverPort = 80;
-	                        } else if (this.scheme.equals("https")) {
-	                            this.serverPort = 443;
-	                        }
-	                    }
-	                } else {
-	                    this.serverName = value.substring(0, nextColonPos);
-	                    this.serverPort = Integer.parseInt(value.substring(nextColonPos + 1));
-	                }
-				}
-            }
-            else if (name.equalsIgnoreCase(CONTENT_TYPE_HEADER)) {
+                } else {
+                    //IPv4 host
+                    int nextColonPos = value.indexOf(':');
+                    if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
+                        this.serverName = value;
+                        if (this.scheme != null) {
+                            if (this.scheme.equals("http")) {
+                                this.serverPort = 80;
+                            } else if (this.scheme.equals("https")) {
+                                this.serverPort = 443;
+                            }
+                        }
+                    } else {
+                        this.serverName = value.substring(0, nextColonPos);
+                        this.serverPort = Integer.parseInt(value.substring(nextColonPos + 1));
+                    }
+                }
+            } else if (name.equalsIgnoreCase(CONTENT_TYPE_HEADER)) {
                 this.contentType = value;
                 int semicolon = value.lastIndexOf(';');
                 if (semicolon != -1) {
@@ -755,7 +753,7 @@ public class WinstoneRequest implements HttpServletRequest {
 
     private List parseLocales(String header) {
         // Strip out the whitespace
-        StringBuffer lb = new StringBuffer();
+        StringBuilder lb = new StringBuilder();
         for (int n = 0; n < header.length(); n++) {
             char c = header.charAt(n);
             if (!Character.isWhitespace(c))
@@ -769,13 +767,13 @@ public class WinstoneRequest implements HttpServletRequest {
             String clause = commaTK.nextToken();
 
             // Tokenize by semicolon
-            Float quality = new Float(1);
+            Float quality = (float) 1;
             if (clause.indexOf(";q=") != -1) {
                 int pos = clause.indexOf(";q=");
                 try {
                     quality = new Float(clause.substring(pos + 3));
                 } catch (NumberFormatException err) {
-                    quality = new Float(0);
+                    quality = (float) 0;
                 }
                 clause = clause.substring(0, pos);
             }
@@ -816,12 +814,11 @@ public class WinstoneRequest implements HttpServletRequest {
         for (int n = 0; n < orderKeys.length; n++) {
             // Skip backwards through the list of maps and add to the output list
             int reversedIndex = (orderKeys.length - 1) - n;
-            if ((orderKeys[reversedIndex].floatValue() <= 0)
-                    || (orderKeys[reversedIndex].floatValue() > 1))
+            if ((orderKeys[reversedIndex] <= 0)
+                    || (orderKeys[reversedIndex] > 1))
                 continue;
             List localeList = (List) localeEntries.get(orderKeys[reversedIndex]);
-            for (Iterator i = localeList.iterator(); i.hasNext();)
-                outputLocaleList.add(i.next());
+            for (Object aLocaleList : localeList) outputLocaleList.add(aLocaleList);
         }
 
         return outputLocaleList;
@@ -927,11 +924,11 @@ public class WinstoneRequest implements HttpServletRequest {
 
         // fire event
         if (this.requestAttributeListeners != null) {
-            for (int n = 0; n < this.requestAttributeListeners.length; n++) {
+            for (ServletRequestAttributeListener requestAttributeListener : this.requestAttributeListeners) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(getWebAppConfig().getLoader());
-                this.requestAttributeListeners[n].attributeRemoved(
-                        new ServletRequestAttributeEvent(this.webappConfig, 
+                requestAttributeListener.attributeRemoved(
+                        new ServletRequestAttributeEvent(this.webappConfig,
                                 this, name, value));
                 Thread.currentThread().setContextClassLoader(cl);
             }
@@ -948,19 +945,19 @@ public class WinstoneRequest implements HttpServletRequest {
             // fire event
             if (this.requestAttributeListeners != null) {
                 if (oldValue == null) {
-                    for (int n = 0; n < this.requestAttributeListeners.length; n++) {
+                    for (ServletRequestAttributeListener requestAttributeListener : this.requestAttributeListeners) {
                         ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         Thread.currentThread().setContextClassLoader(getWebAppConfig().getLoader());
-                        this.requestAttributeListeners[n].attributeAdded(
-                                new ServletRequestAttributeEvent(this.webappConfig, 
+                        requestAttributeListener.attributeAdded(
+                                new ServletRequestAttributeEvent(this.webappConfig,
                                         this, name, o));
                         Thread.currentThread().setContextClassLoader(cl);
                     }
                 } else {
-                    for (int n = 0; n < this.requestAttributeListeners.length; n++) {
+                    for (ServletRequestAttributeListener requestAttributeListener : this.requestAttributeListeners) {
                         ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         Thread.currentThread().setContextClassLoader(getWebAppConfig().getLoader());
-                        this.requestAttributeListeners[n]
+                        requestAttributeListener
                                 .attributeReplaced(new ServletRequestAttributeEvent(
                                         this.webappConfig, this, name, oldValue));
                         Thread.currentThread().setContextClassLoader(cl);
@@ -1052,7 +1049,7 @@ public class WinstoneRequest implements HttpServletRequest {
             }
         }
         if (method.equals(METHOD_POST) && POST_PARAMETERS.equals(contentType)) {
-            this.parsedParameters = new Boolean(false);
+            this.parsedParameters = false;
         }
         return this.inputData;
     }
@@ -1208,11 +1205,11 @@ public class WinstoneRequest implements HttpServletRequest {
 
     public Enumeration getHeaders(String name) {
         List headers = new ArrayList();
-        for (int n = 0; n < this.headers.length; n++)
-            if (this.headers[n].toUpperCase().startsWith(
+        for (String header : this.headers)
+            if (header.toUpperCase().startsWith(
                     name.toUpperCase() + ':'))
                 headers
-                        .add(this.headers[n].substring(name.length() + 1)
+                        .add(header.substring(name.length() + 1)
                                 .trim()); // 1 for colon
         return Collections.enumeration(headers);
     }
@@ -1369,8 +1366,8 @@ public class WinstoneRequest implements HttpServletRequest {
     }
 
     public void markSessionsAsRequestFinished(long lastAccessedTime, boolean saveSessions) {
-        for (Iterator i = this.usedSessions.iterator(); i.hasNext(); ) {
-            WinstoneSession session = (WinstoneSession) i.next();
+        for (Object usedSession : this.usedSessions) {
+            WinstoneSession session = (WinstoneSession) usedSession;
             session.setLastAccessedDate(lastAccessedTime);
             session.removeUsed(this);
             if (saveSessions) {

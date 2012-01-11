@@ -72,8 +72,8 @@ public class Ajp13OutputStream extends WinstoneOutputStream {
             this.committed = true;
 
             ByteArrayOutputStream headerArrayStream = new ByteArrayOutputStream();
-            for (Iterator i = this.owner.getHeaders().iterator(); i.hasNext();) {
-                String header = (String) i.next();
+            for (Object o1 : this.owner.getHeaders()) {
+                String header = (String) o1;
                 int colonPos = header.indexOf(':');
                 if (colonPos == -1)
                     throw new WinstoneException(Ajp13Listener.AJP_RESOURCES.getString(
@@ -90,8 +90,8 @@ public class Ajp13OutputStream extends WinstoneOutputStream {
                 headerArrayStream.write(getStringBlock(headerValue));
             }
 
-            for (Iterator i = this.owner.getCookies().iterator(); i.hasNext();) {
-                Cookie cookie = (Cookie) i.next();
+            for (Object o : this.owner.getCookies()) {
+                Cookie cookie = (Cookie) o;
                 String cookieText = this.owner.writeCookie(cookie);
                 int colonPos = cookieText.indexOf(':');
                 if (colonPos == -1)

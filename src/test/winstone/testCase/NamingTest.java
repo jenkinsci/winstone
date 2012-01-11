@@ -132,13 +132,13 @@ public class NamingTest extends TestCase {
         Context child = this.ic.createSubcontext("TestBindContext");
         assertNotNull("Created subcontext TestBindContext must not be null",
                 child);
-        child.bind("bindInteger", new Integer(80));
+        child.bind("bindInteger", 80);
         Object lookupInt = this.ic.lookup("TestBindContext/bindInteger");
         assertNotNull(
                 "java:/comp/env/TestBindContext/bindInteger should be non-null",
                 lookupInt);
         assertEquals("java:/comp/env/TestBindContext/bindInteger", lookupInt,
-                new Integer(80));
+                80);
         this.ic.destroySubcontext("java:/comp/env/TestBindContext");
     }
 
@@ -154,7 +154,7 @@ public class NamingTest extends TestCase {
                 rebindChild);
         rebindChild.rebind(
                 "java:/comp/env/TestRebindContext/ChildRebind/integer",
-                new Integer(25));
+                25);
         rebindChild.close();
         child.close();
 
@@ -164,7 +164,7 @@ public class NamingTest extends TestCase {
                 "java:/comp/env/TestRebindContext/ChildRebind/integer should be non-null",
                 lookupInt);
         assertEquals("java:/comp/env/TestRebindContext/ChildRebind/integer",
-                lookupInt, new Integer(25));
+                lookupInt, 25);
 
         this.ic
                 .rebind("TestRebindContext/ChildRebind/integer",
@@ -175,14 +175,14 @@ public class NamingTest extends TestCase {
                 "TestRebindContext/ChildRebind/integer should be non-null",
                 lookupInt2);
         assertEquals("TestRebindContext/ChildRebind/integer", lookupInt2,
-                new Integer(40));
+                40);
         Object lookupInt3 = this.ic
                 .lookup("java:/comp/env/TestRebindContext/ChildRebind/integer");
         assertNotNull(
                 "java:/comp/env/TestRebindContext/ChildRebind/integer should be non-null",
                 lookupInt3);
         assertEquals("java:/comp/env/TestRebindContext/ChildRebind/integer",
-                lookupInt3, new Integer(40));
+                lookupInt3, 40);
 
         this.ic
                 .destroySubcontext("java:/comp/env/TestRebindContext/ChildRebind");

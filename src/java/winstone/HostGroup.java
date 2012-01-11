@@ -71,8 +71,8 @@ public class HostGroup {
     
     public void destroy() {
         Set hostnames = new HashSet(this.hostConfigs.keySet());
-        for (Iterator i = hostnames.iterator(); i.hasNext(); ) {
-            String hostname = (String) i.next();
+        for (Object hostname1 : hostnames) {
+            String hostname = (String) hostname1;
             HostConfiguration host = (HostConfiguration) this.hostConfigs.get(hostname);
             host.destroy();
             this.hostConfigs.remove(hostname);
@@ -104,13 +104,13 @@ public class HostGroup {
             if ((children == null) || (children.length == 0)) {
                 throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsEmpty", hostsDir.getPath()));
             }
-            for (int n = 0; n < children.length; n++) {
-                String childName = children[n].getName();
+            for (File aChildren : children) {
+                String childName = aChildren.getName();
 
                 // Mount directories as host dirs
-                if (children[n].isDirectory()) {
+                if (aChildren.isDirectory()) {
                     if (!this.hostConfigs.containsKey(childName)) {
-                        initHost(children[n], childName, cluster,
+                        initHost(aChildren, childName, cluster,
                                 objectPool, commonLibCL, commonLibCLPaths, args);
                     }
                 }

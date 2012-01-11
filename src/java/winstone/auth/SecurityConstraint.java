@@ -111,11 +111,11 @@ public class SecurityConstraint {
      * Call this to evaluate the security constraint - is this operation allowed ?
      */
     public boolean isAllowed(HttpServletRequest request) {
-        for (int n = 0; n < this.rolesAllowed.length; n++) {
-            if (request.isUserInRole(this.rolesAllowed[n])) {
+        for (String aRolesAllowed : this.rolesAllowed) {
+            if (request.isUserInRole(aRolesAllowed)) {
                 Logger.log(Logger.FULL_DEBUG, BaseAuthenticationHandler.AUTH_RESOURCES,
-                        "SecurityConstraint.Passed", new String[] {
-                                this.displayName, this.rolesAllowed[n] });
+                        "SecurityConstraint.Passed", new String[]{
+                        this.displayName, aRolesAllowed});
                 return true;
             }
         }

@@ -48,9 +48,9 @@ public class ContainerJNDIManager implements JNDIManager {
         // Build all the objects we wanted
         this.objectsToCreate = new HashMap();
         
-        Collection keys = new ArrayList(args != null ? args.keySet() : (Collection) new ArrayList());
-        for (Iterator i = keys.iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        Collection keys = new ArrayList(args != null ? args.keySet() : new ArrayList());
+        for (Object key1 : keys) {
+            String key = (String) key1;
 
             if (key.startsWith(Option.JDNI_RESOURCE.name)) {
                 String resName = key.substring(14);
@@ -75,8 +75,8 @@ public class ContainerJNDIManager implements JNDIManager {
         
         try {
             InitialContext ic = new InitialContext();
-            for (Iterator i = this.objectsToCreate.keySet().iterator(); i.hasNext();) {
-                String name = (String) i.next();
+            for (Object o : this.objectsToCreate.keySet()) {
+                String name = (String) o;
                 try {
                     Name fullName = new CompositeName(name);
                     Context currentContext = ic;
@@ -96,8 +96,8 @@ public class ContainerJNDIManager implements JNDIManager {
                             "ContainerJNDIManager.BoundResource", name);
                 } catch (NamingException err) {
                     Logger.log(Logger.ERROR, JNDI_RESOURCES,
-                                    "ContainerJNDIManager.ErrorBindingResource",
-                                    name, err);
+                            "ContainerJNDIManager.ErrorBindingResource",
+                            name, err);
                 }
             }
             Logger.log(Logger.DEBUG, JNDI_RESOURCES, 
@@ -115,9 +115,8 @@ public class ContainerJNDIManager implements JNDIManager {
     public void tearDown() {
         try {
             InitialContext ic = new InitialContext();
-            for (Iterator i = this.objectsToCreate.keySet().iterator(); i
-                    .hasNext();) {
-                String name = (String) i.next();
+            for (Object o : this.objectsToCreate.keySet()) {
+                String name = (String) o;
                 try {
                     ic.unbind(name);
                 } catch (NamingException err) {
@@ -170,8 +169,7 @@ public class ContainerJNDIManager implements JNDIManager {
                     Method smtpMethod = smtpClass.getMethod("getInstance",
                             new Class[] { Properties.class,
                                     Class.forName("javax.mail.Authenticator") });
-                    return smtpMethod.invoke(null, new Object[] {
-                            extractRelevantArgs(args, name), null });
+                    return smtpMethod.invoke(null, extractRelevantArgs(args, name), null);
                     //return Session.getInstance(extractRelevantArgs(args, name), null);
                 } catch (Throwable err) {
                     Logger.log(Logger.ERROR, JNDI_RESOURCES,
@@ -186,7 +184,7 @@ public class ContainerJNDIManager implements JNDIManager {
                     Class objClass = Class.forName(className.trim(), true, loader);
                     Constructor objConstr = objClass
                             .getConstructor(new Class[] { String.class });
-                    return objConstr.newInstance(new Object[] { value });
+                    return objConstr.newInstance(value);
                 } catch (Throwable err) {
                     Logger.log(Logger.ERROR, JNDI_RESOURCES,
                             "ContainerJNDIManager.ErrorBuildingObject", new String[] {
@@ -206,8 +204,8 @@ public class ContainerJNDIManager implements JNDIManager {
      */
     private Properties extractRelevantArgs(Map input, String name) {
         Properties relevantArgs = new Properties();
-        for (Iterator i = input.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object o : input.keySet()) {
+            String key = (String) o;
             if (key.startsWith("jndi.param." + name + "."))
                 relevantArgs.put(key.substring(12 + name.length()), input
                         .get(key));

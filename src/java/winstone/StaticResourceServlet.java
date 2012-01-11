@@ -213,8 +213,8 @@ public class StaticResourceServlet extends HttpServlet {
                     .lastModified());
             OutputStream out = response.getOutputStream();
             int bytesRead = 0;
-            for (Iterator i = ranges.iterator(); i.hasNext();) {
-                String rangeBlock = (String) i.next();
+            for (Object range : ranges) {
+                String rangeBlock = (String) range;
                 int delim = rangeBlock.indexOf('-');
                 int start = Integer.parseInt(rangeBlock.substring(0, delim));
                 int end = Integer.parseInt(rangeBlock.substring(delim + 1));
@@ -272,10 +272,10 @@ public class StaticResourceServlet extends HttpServlet {
         }
 
         // Write the rows for each file
-        for (int n = 0; n < children.length; n++) {
-            if (!children[n].getName().equalsIgnoreCase("web-inf") && 
-                    !children[n].getName().equalsIgnoreCase("meta-inf")) {
-                File file = children[n];
+        for (File aChildren : children) {
+            if (!aChildren.getName().equalsIgnoreCase("web-inf") &&
+                    !aChildren.getName().equalsIgnoreCase("meta-inf")) {
+                File file = aChildren;
                 String date = noDateLabel;
                 String size = directoryLabel;
                 if (!file.isDirectory()) {
@@ -286,7 +286,7 @@ public class StaticResourceServlet extends HttpServlet {
                 }
                 rowString.write(Launcher.RESOURCES.getString(
                         "StaticResourceServlet.DirectoryList.Row",
-                        new String[] {
+                        new String[]{
                                 rowTextColour,
                                 rowCount % 2 == 0 ? evenColour : oddColour,
                                 file.getName() + (file.isDirectory() ? "/" : ""),
@@ -336,7 +336,7 @@ public class StaticResourceServlet extends HttpServlet {
     
     public static String constructOurCanonicalVersion(File current, File stopPoint) {
         int backOnes = 0;
-        StringBuffer ourCanonicalVersion = new StringBuffer();
+        StringBuilder ourCanonicalVersion = new StringBuilder();
         while ((current != null) && !current.equals(stopPoint)) {
             if (current.getName().equals("..")) {
                 backOnes++;

@@ -43,7 +43,7 @@ public class FilterConfiguration implements javax.servlet.FilterConfig {
     private ServletContext context;
     private ClassLoader loader;
     private boolean unavailableException;
-    private Object filterSemaphore = new Boolean(true);
+    private Object filterSemaphore = true;
 
     protected FilterConfiguration(ServletContext context, ClassLoader loader) {
         this.context = context;

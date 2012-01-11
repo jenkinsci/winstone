@@ -59,7 +59,7 @@ public class SimpleCluster implements Runnable, Cluster {
         this.interrupted = false;
         this.clusterAddresses = new Hashtable();
         if (controlPort != null)
-            this.controlPort = controlPort.intValue();
+            this.controlPort = controlPort;
 
         // Start cluster init thread
         this.initialClusterNodes = Option.CLUSTER_NODES.get(args);
@@ -96,8 +96,8 @@ public class SimpleCluster implements Runnable, Cluster {
                 Set addresses = new HashSet(this.clusterAddresses.keySet());
                 Date noHeartbeatDate = new Date(System.currentTimeMillis()
                         - (MAX_NO_OF_MISSING_HEARTBEATS * HEARTBEAT_PERIOD));
-                for (Iterator i = addresses.iterator(); i.hasNext();) {
-                    String ipPort = (String) i.next();
+                for (Object address : addresses) {
+                    String ipPort = (String) address;
 
                     Date lastHeartBeat = (Date) this.clusterAddresses
                             .get(ipPort);
@@ -134,10 +134,10 @@ public class SimpleCluster implements Runnable, Cluster {
         // Iterate through the cluster members
         Collection addresses = new ArrayList(clusterAddresses.keySet());
         Collection searchThreads = new ArrayList();
-        for (Iterator i = addresses.iterator(); i.hasNext();) {
-            String ipPort = (String) i.next();
+        for (Object address : addresses) {
+            String ipPort = (String) address;
             ClusterSessionSearch search = new ClusterSessionSearch(
-                    webAppConfig.getContextPath(), webAppConfig.getOwnerHostname(), 
+                    webAppConfig.getContextPath(), webAppConfig.getOwnerHostname(),
                     sessionId, ipPort, this.controlPort);
             searchThreads.add(search);
         }
@@ -150,9 +150,8 @@ public class SimpleCluster implements Runnable, Cluster {
             // Loop through all search threads. If finished, exit, otherwise
             // sleep
             List finishedThreads = new ArrayList();
-            for (Iterator i = searchThreads.iterator(); i.hasNext();) {
-                ClusterSessionSearch searchThread = (ClusterSessionSearch) i
-                        .next();
+            for (Object searchThread1 : searchThreads) {
+                ClusterSessionSearch searchThread = (ClusterSessionSearch) searchThread1;
                 if (!searchThread.isFinished())
                     continue;
                 else if (searchThread.getResult() == null)
@@ -164,8 +163,7 @@ public class SimpleCluster implements Runnable, Cluster {
             }
 
             // Remove finished threads
-            for (Iterator i = finishedThreads.iterator(); i.hasNext();)
-                searchThreads.remove(i.next());
+            for (Object finishedThread : finishedThreads) searchThreads.remove(finishedThread);
 
             if (searchThreads.isEmpty() || (answer != null))
                 finished = true;
@@ -177,8 +175,8 @@ public class SimpleCluster implements Runnable, Cluster {
         }
 
         // Once we have an answer, terminate all search threads
-        for (Iterator i = searchThreads.iterator(); i.hasNext();) {
-            ClusterSessionSearch searchThread = (ClusterSessionSearch) i.next();
+        for (Object searchThread1 : searchThreads) {
+            ClusterSessionSearch searchThread = (ClusterSessionSearch) searchThread1;
             searchThread.destroy();
         }
         if (answer != null) {
@@ -335,8 +333,8 @@ public class SimpleCluster implements Runnable, Cluster {
                 + port;
         List allClusterNodes = new ArrayList(this.clusterAddresses.keySet());
         List relevantClusterNodes = new ArrayList();
-        for (Iterator i = allClusterNodes.iterator(); i.hasNext();) {
-            String node = (String) i.next();
+        for (Object allClusterNode : allClusterNodes) {
+            String node = (String) allClusterNode;
             if (!node.equals(ipPortSender))
                 relevantClusterNodes.add(node);
         }
@@ -344,8 +342,8 @@ public class SimpleCluster implements Runnable, Cluster {
         ObjectOutputStream outData = new ObjectOutputStream(out);
         outData.writeInt(relevantClusterNodes.size());
         outData.flush();
-        for (Iterator i = relevantClusterNodes.iterator(); i.hasNext();) {
-            String ipPort = (String) i.next();
+        for (Object relevantClusterNode : relevantClusterNodes) {
+            String ipPort = (String) relevantClusterNode;
             if (!ipPort.equals(ipPortSender))
                 outData.writeUTF(ipPort);
             outData.flush();

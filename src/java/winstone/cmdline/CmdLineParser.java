@@ -43,30 +43,29 @@ public class CmdLineParser {
         
         // Get command line args
         String configFilename = RESOURCES.getString("Launcher.DefaultPropertyFile");
-        for (int n = 0; n < argv.length; n++) {
-            String option = argv[n];
+        for (String option : argv) {
             if (option.startsWith("--")) {
                 int equalPos = option.indexOf('=');
-                String paramName = option.substring(2, 
+                String paramName = option.substring(2,
                         equalPos == -1 ? option.length() : equalPos);
                 Option<?> opt = toOption(paramName);
-                if (opt==null)
-                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.UnrecognizedOption",option));
-                
+                if (opt == null)
+                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.UnrecognizedOption", option));
+
                 if (equalPos != -1) {
                     args.put(paramName, option.substring(equalPos + 1));
                 } else {
-                    if (opt.type==Boolean.class)
+                    if (opt.type == Boolean.class)
                         args.put(paramName, "true");
                     else
-                        throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.OperandExpected",option));
+                        throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.OperandExpected", option));
                 }
                 if (paramName.equals(Option.CONFIG.name)) {
                     configFilename = args.get(paramName);
                 }
             } else {
                 if (args.containsKey(nonSwitchArgName))
-                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.MultipleArgs",option));
+                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.MultipleArgs", option));
                 args.put(nonSwitchArgName, option);
             }
         }
@@ -89,8 +88,8 @@ public class CmdLineParser {
     private static void loadPropsFromStream(InputStream inConfig, Map args) throws IOException {
         Properties props = new Properties();
         props.load(inConfig);
-        for (Iterator i = props.keySet().iterator(); i.hasNext(); ) {
-            String key = (String) i.next();
+        for (Object o : props.keySet()) {
+            String key = (String) o;
             if (!args.containsKey(key.trim())) {
                 args.put(key.trim(), props.getProperty(key).trim());
             }

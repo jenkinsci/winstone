@@ -39,7 +39,7 @@ public class Logger {
     public static int FULL_DEBUG = 8;
     public static int MAX = 9;
 
-    protected static Boolean semaphore = new Boolean(true);
+    protected static Boolean semaphore = true;
     protected static boolean initialised = false;
     protected static Writer defaultStream;
     protected static Map namedStreams;
@@ -204,7 +204,7 @@ public class Logger {
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
-            String messageKey, String param) {
+            String messageKey, Object param) {
         if (currentDebugLevel < level) {
             return;
         } else {
@@ -222,7 +222,7 @@ public class Logger {
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
-            String messageKey, String param, Throwable error) {
+            String messageKey, Object param, Throwable error) {
         if (currentDebugLevel < level) {
             return;
         } else {
@@ -231,7 +231,7 @@ public class Logger {
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
-            String messageKey, String params[], Throwable error) {
+            String messageKey, Object params[], Throwable error) {
         if (currentDebugLevel < level) {
             return;
         } else {
@@ -240,7 +240,7 @@ public class Logger {
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
-            String streamName, String messageKey, String params[], Throwable error) {
+            String streamName, String messageKey, Object params[], Throwable error) {
         if (currentDebugLevel < level) {
             return;
         } else {

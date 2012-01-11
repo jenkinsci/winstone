@@ -40,7 +40,7 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
     }
 
     public void setContentLength(int length) {
-        this.contentLength = new Integer(length);
+        this.contentLength = length;
         this.readSoFar = 0;
     }
 
@@ -49,7 +49,7 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
             int data = this.inData.read();
 //            System.out.println("Char: " + (char) data);
             return data;
-        } else if (this.contentLength.intValue() > this.readSoFar) {
+        } else if (this.contentLength > this.readSoFar) {
             this.readSoFar++;
             int data = this.inData.read();
 //            System.out.println("Char: " + (char) data);
@@ -62,7 +62,7 @@ public class WinstoneInputStream extends javax.servlet.ServletInputStream {
         if (this.contentLength == null) {
             return this.inData.read(b,off,len);
         } else {
-            len = Math.min(len, this.contentLength.intValue()-this.readSoFar);
+            len = Math.min(len, this.contentLength -this.readSoFar);
             if (len<=0)     return -1;
             int r = this.inData.read(b,off,len);
             if (r<0)    return r;   // EOF

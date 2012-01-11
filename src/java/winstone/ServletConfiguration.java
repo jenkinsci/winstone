@@ -57,7 +57,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
     private String jspFile;
 //    private String runAsRole;
     private Map securityRoleRefs;
-    private Object servletSemaphore = new Boolean(true);
+    private Object servletSemaphore = true;
     private boolean isSingleThreadModel = false;
     private boolean unavailable = false;
     private Throwable unavailableException = null;
@@ -289,8 +289,8 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
      * loadOnStartup values. Otherwise used.
      */
     public int compareTo(Object objTwo) {
-        Integer one = new Integer(this.loadOnStartup);
-        Integer two = new Integer(((ServletConfiguration) objTwo).loadOnStartup);
+        Integer one = this.loadOnStartup;
+        Integer two = ((ServletConfiguration) objTwo).loadOnStartup;
         return one.compareTo(two);
     }
 

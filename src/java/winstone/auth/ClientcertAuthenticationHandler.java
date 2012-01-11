@@ -57,9 +57,9 @@ public class ClientcertAuthenticationHandler extends BaseAuthenticationHandler {
                 .getAttribute("javax.servlet.request.X509Certificate");
         if ((certificateArray != null) && (certificateArray.length > 0)) {
             boolean failed = false;
-            for (int n = 0; n < certificateArray.length; n++)
+            for (X509Certificate aCertificateArray : certificateArray)
                 try {
-                    certificateArray[n].checkValidity();
+                    aCertificateArray.checkValidity();
                 } catch (Throwable err) {
                     failed = true;
                 }

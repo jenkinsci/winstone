@@ -47,8 +47,8 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
         this.loadedClasses = new HashSet();
         if (urls != null) {
             this.classPaths = new File[urls.length];
-            for (int n = 0 ; n < urls.length; n++) {
-                this.classPaths[this.classPathsLength++] = new File(urls[n].getFile());
+            for (URL url : urls) {
+                this.classPaths[this.classPathsLength++] = new File(url.getFile());
             }
         }
     }
@@ -120,7 +120,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
                             } else if (path.isDirectory()) {
                                 File classLocation = new File(path, className);
                                 if (classLocation.exists()) {
-                                    classDate = new Long(classLocation.lastModified());
+                                    classDate = classLocation.lastModified();
                                     classLocationTable.put(className, classLocation);
                                 }
                             } else if (path.isFile()) {
@@ -130,7 +130,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
                             }
                         }
                     } else if (location.exists())
-                        classDate = new Long(location.lastModified());
+                        classDate = location.lastModified();
 
                     // Has class vanished ? Leave a note and skip over it
                     if (classDate == null) {
@@ -155,8 +155,8 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
                         Logger.log(Logger.INFO, CL_RESOURCES, 
                                 "ReloadingClassLoader.ReloadRequired",
                                 new String[] {className, 
-                                        "" + new Date(classDate.longValue()),
-                                        "" + new Date(oldClassDate.longValue()) });
+                                        "" + new Date(classDate),
+                                        "" + new Date(oldClassDate) });
                         this.webAppConfig.resetClassLoader();
                     }
                 }
@@ -192,7 +192,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
         for (Enumeration e = jar.entries(); e.hasMoreElements() && !interrupted;) {
             JarEntry entry = (JarEntry) e.nextElement();
             if (entry.getName().equals(classResourceName))
-                return new Long(path.lastModified());
+                return path.lastModified();
         }
         return null;
     }

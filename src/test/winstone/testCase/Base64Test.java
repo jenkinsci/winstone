@@ -40,11 +40,11 @@ public class Base64Test extends TestCase {
 
     public static String hexEncode(byte input[]) {
 
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
-        for (int i = 0; i < input.length; i++)
-            out.append(Integer.toString((input[i] & 0xf0) >> 4, 16))
-               .append(Integer.toString(input[i] & 0x0f, 16));
+        for (byte anInput : input)
+            out.append(Integer.toString((anInput & 0xf0) >> 4, 16))
+                    .append(Integer.toString(anInput & 0x0f, 16));
 
         return out.toString();
     }

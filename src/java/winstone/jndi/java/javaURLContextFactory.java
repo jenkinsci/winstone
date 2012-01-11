@@ -26,12 +26,12 @@ import winstone.jndi.WinstoneContext;
 public class javaURLContextFactory implements InitialContextFactory, ObjectFactory {
 
     private static WinstoneContext rootContext;
-    private Object lock = new Boolean(true);
+    private Object lock = true;
 
     public Context getInitialContext(Hashtable env) throws NamingException {
         synchronized (lock) {
             if (rootContext == null) {
-                Object lock = new Boolean(true);
+                Object lock = true;
                 rootContext = new WinstoneContext(env, null, "java:", lock);
                 WinstoneContext compCtx = new WinstoneContext(env, rootContext, "java:/comp", lock);
                 WinstoneContext envCtx = new WinstoneContext(env, compCtx, "java:/comp/env", lock);

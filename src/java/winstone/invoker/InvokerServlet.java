@@ -57,9 +57,7 @@ public class InvokerServlet extends HttpServlet {
     public void destroy() {
         if (this.mountedInstances != null) {
             synchronized (this.mountedInstances) {
-                for (Iterator i = this.mountedInstances.values().iterator(); i
-                        .hasNext();)
-                    ((ServletConfiguration) i.next()).destroy();
+                for (Object o : this.mountedInstances.values()) ((ServletConfiguration) o).destroy();
                 this.mountedInstances.clear();
             }
         }

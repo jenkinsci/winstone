@@ -307,9 +307,8 @@ public class Ajp13Listener implements Listener, Runnable {
         // req.setRequestURI(headers.getURI());
 
         // Get query string if supplied
-        for (Iterator i = headers.getAttributes().keySet().iterator(); i
-                .hasNext();) {
-            String attName = (String) i.next();
+        for (Object o : headers.getAttributes().keySet()) {
+            String attName = (String) o;
             if (attName.equals("query_string")) {
                 String qs = (String) headers.getAttributes().get("query_string");
                 req.setQueryString(qs);
@@ -346,9 +345,9 @@ public class Ajp13Listener implements Listener, Runnable {
                 req.setIsSecure(true);
             } else
                 Logger.log(Logger.DEBUG, AJP_RESOURCES,
-                        "Ajp13Listener.UnknownAttribute", new String[] {
-                                attName,
-                                "" + headers.getAttributes().get(attName) });
+                        "Ajp13Listener.UnknownAttribute", new String[]{
+                        attName,
+                        "" + headers.getAttributes().get(attName)});
         }
         return headers.getURI();
 
@@ -356,21 +355,21 @@ public class Ajp13Listener implements Listener, Runnable {
 
     private Integer getKeySize(String cipherSuite) {
         if (cipherSuite.indexOf("_WITH_NULL_") != -1)
-            return new Integer(0);
+            return 0;
         else if (cipherSuite.indexOf("_WITH_IDEA_CBC_") != -1)
-            return new Integer(128);
+            return 128;
         else if (cipherSuite.indexOf("_WITH_RC2_CBC_40_") != -1)
-            return new Integer(40);
+            return 40;
         else if (cipherSuite.indexOf("_WITH_RC4_40_") != -1)
-            return new Integer(40);
+            return 40;
         else if (cipherSuite.indexOf("_WITH_RC4_128_") != -1)
-            return new Integer(128);
+            return 128;
         else if (cipherSuite.indexOf("_WITH_DES40_CBC_") != -1)
-            return new Integer(40);
+            return 40;
         else if (cipherSuite.indexOf("_WITH_DES_CBC_") != -1)
-            return new Integer(56);
+            return 56;
         else if (cipherSuite.indexOf("_WITH_3DES_EDE_CBC_") != -1)
-            return new Integer(168);
+            return 168;
         else
             return null;
     }

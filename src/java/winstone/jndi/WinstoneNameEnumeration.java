@@ -32,9 +32,9 @@ public class WinstoneNameEnumeration implements NamingEnumeration {
         Object keys[] = bindings.keySet().toArray();
         Arrays.sort(keys);
         Vector nameClassPairs = new Vector();
-        for (int n = 0; n < keys.length; n++)
-            nameClassPairs.add(new NameClassPair((String) keys[n], bindings
-                    .get(keys[n]).getClass().getName()));
+        for (Object key : keys)
+            nameClassPairs.add(new NameClassPair((String) key, bindings
+                    .get(key).getClass().getName()));
         this.nameEnumeration = nameClassPairs.elements();
     }
 

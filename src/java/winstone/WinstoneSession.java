@@ -56,7 +56,7 @@ public class WinstoneSession implements HttpSession, Serializable {
     private HttpSessionListener sessionListeners[];
     private HttpSessionActivationListener sessionActivationListeners[];
     private boolean distributable;
-    private Object sessionMonitor = new Boolean(true);
+    private Object sessionMonitor = true;
     private Set requestsUsingMe;
 
     /**
@@ -78,10 +78,10 @@ public class WinstoneSession implements HttpSession, Serializable {
     
     public void sendCreatedNotifies() {
         // Notify session listeners of new session
-        for (int n = 0; n < this.sessionListeners.length; n++) {
+        for (HttpSessionListener sessionListener : this.sessionListeners) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-            this.sessionListeners[n].sessionCreated(new HttpSessionEvent(this));
+            sessionListener.sessionCreated(new HttpSessionEvent(this));
             Thread.currentThread().setContextClassLoader(cl);
         }
     }
@@ -191,22 +191,22 @@ public class WinstoneSession implements HttpSession, Serializable {
 
         // Notify other listeners
         if (oldValue != null)
-            for (int n = 0; n < this.sessionAttributeListeners.length; n++) {
+            for (HttpSessionAttributeListener sessionAttributeListener1 : this.sessionAttributeListeners) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-                this.sessionAttributeListeners[n].attributeReplaced(
+                sessionAttributeListener1.attributeReplaced(
                         new HttpSessionBindingEvent(this, name, oldValue));
                 Thread.currentThread().setContextClassLoader(cl);
             }
                 
         else
-            for (int n = 0; n < this.sessionAttributeListeners.length; n++) {
+            for (HttpSessionAttributeListener sessionAttributeListener : this.sessionAttributeListeners) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-                this.sessionAttributeListeners[n].attributeAdded(
+                sessionAttributeListener.attributeAdded(
                         new HttpSessionBindingEvent(this, name, value));
                 Thread.currentThread().setContextClassLoader(cl);
-                
+
             }
     }
 
@@ -229,10 +229,10 @@ public class WinstoneSession implements HttpSession, Serializable {
             Thread.currentThread().setContextClassLoader(cl);
         }
         if (value != null)
-            for (int n = 0; n < this.sessionAttributeListeners.length; n++) {
+            for (HttpSessionAttributeListener sessionAttributeListener : this.sessionAttributeListeners) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-                this.sessionAttributeListeners[n].attributeRemoved(
+                sessionAttributeListener.attributeRemoved(
                         new HttpSessionBindingEvent(this, name, value));
                 Thread.currentThread().setContextClassLoader(cl);
             }
@@ -288,8 +288,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         }
 
         List keys = new ArrayList(this.sessionData.keySet());
-        for (Iterator i = keys.iterator(); i.hasNext();)
-            removeAttribute((String) i.next());
+        for (Object key : keys) removeAttribute((String) key);
         synchronized (this.sessionMonitor) {
             this.sessionData.clear();
         }
@@ -302,10 +301,10 @@ public class WinstoneSession implements HttpSession, Serializable {
      */
     public void passivate() {
         // Notify session listeners of invalidated session
-        for (int n = 0; n < this.sessionActivationListeners.length; n++) {
+        for (HttpSessionActivationListener sessionActivationListener : this.sessionActivationListeners) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-            this.sessionActivationListeners[n].sessionWillPassivate(
+            sessionActivationListener.sessionWillPassivate(
                     new HttpSessionEvent(this));
             Thread.currentThread().setContextClassLoader(cl);
         }
@@ -329,10 +328,10 @@ public class WinstoneSession implements HttpSession, Serializable {
         webAppConfig.setSessionListeners(this);
 
         // Notify session listeners of invalidated session
-        for (int n = 0; n < this.sessionActivationListeners.length; n++) {
+        for (HttpSessionActivationListener sessionActivationListener : this.sessionActivationListeners) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(this.webAppConfig.getLoader());
-            this.sessionActivationListeners[n].sessionDidActivate(
+            sessionActivationListener.sessionDidActivate(
                     new HttpSessionEvent(this));
             Thread.currentThread().setContextClassLoader(cl);
         }
@@ -379,12 +378,12 @@ public class WinstoneSession implements HttpSession, Serializable {
         // Iterate through the files in the dir, instantiate and then add to the sessions set
         File tempDir = getSessionTempDir(webAppConfig);
         File possibleSessionFiles[] = tempDir.listFiles();
-        for (int n = 0; n < possibleSessionFiles.length; n++) {
-            if (possibleSessionFiles[n].getName().endsWith(".ser")) {
+        for (File possibleSessionFile : possibleSessionFiles) {
+            if (possibleSessionFile.getName().endsWith(".ser")) {
                 InputStream in = null;
                 ObjectInputStream objIn = null;
                 try {
-                    in = new FileInputStream(possibleSessionFiles[n]);
+                    in = new FileInputStream(possibleSessionFile);
                     objIn = new ObjectInputStream(in);
                     WinstoneSession session = (WinstoneSession) objIn.readObject();
                     session.setWebAppConfiguration(webAppConfig);
@@ -394,20 +393,26 @@ public class WinstoneSession implements HttpSession, Serializable {
                         expiredCount++;
                     } else {
                         webAppConfig.addSession(session.getId(), session);
-                        Logger.log(Logger.DEBUG, Launcher.RESOURCES, 
+                        Logger.log(Logger.DEBUG, Launcher.RESOURCES,
                                 "WinstoneSession.RestoredSession", session.getId());
                     }
                 } catch (Throwable err) {
-                    Logger.log(Logger.ERROR, Launcher.RESOURCES, 
+                    Logger.log(Logger.ERROR, Launcher.RESOURCES,
                             "WinstoneSession.ErrorLoadingSession", err);
                 } finally {
                     if (objIn != null) {
-                        try {objIn.close();} catch (IOException err) {}
+                        try {
+                            objIn.close();
+                        } catch (IOException err) {
+                        }
                     }
                     if (in != null) {
-                        try {in.close();} catch (IOException err) {}
+                        try {
+                            in.close();
+                        } catch (IOException err) {
+                        }
                     }
-                    possibleSessionFiles[n].delete();
+                    possibleSessionFile.delete();
                 }
             }
         }
@@ -436,19 +441,19 @@ public class WinstoneSession implements HttpSession, Serializable {
         // Write the map, but first remove non-serializables
         Map copy = new HashMap(sessionData);
         Set keys = new HashSet(copy.keySet());
-        for (Iterator i = keys.iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object key1 : keys) {
+            String key = (String) key1;
             if (!(copy.get(key) instanceof Serializable)) {
                 Logger.log(Logger.WARNING, Launcher.RESOURCES,
-                                "WinstoneSession.SkippingNonSerializable",
-                                new String[] { key,
-                                        copy.get(key).getClass().getName() });
+                        "WinstoneSession.SkippingNonSerializable",
+                        new String[]{key,
+                                copy.get(key).getClass().getName()});
             }
             copy.remove(key);
         }
         out.writeInt(copy.size());
-        for (Iterator i = copy.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
+        for (Object o : copy.keySet()) {
+            String key = (String) o;
             out.writeUTF(key);
             out.writeObject(copy.get(key));
         }
@@ -480,7 +485,7 @@ public class WinstoneSession implements HttpSession, Serializable {
             Object variable = in.readObject();
             this.sessionData.put(key, variable);
         }
-        this.sessionMonitor = new Boolean(true);
+        this.sessionMonitor = true;
     }
 
     /**
