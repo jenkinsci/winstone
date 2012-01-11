@@ -43,8 +43,8 @@ public class WinstoneResourceBundle {
     /**
      * Perform a string replace for a single from/to pair.
      */
-    public String getString(String key, String parameter) {
-        return globalReplace(this.resources.getString(key), "[#0]", parameter);
+    public String getString(String key, Object parameter) {
+        return globalReplace(this.resources.getString(key), "[#0]", parameter!=null?parameter.toString():null);
     }
 
     /**

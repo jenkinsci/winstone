@@ -26,6 +26,7 @@ import org.w3c.dom.Node;
 import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
+import winstone.Option;
 import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 
@@ -36,7 +37,6 @@ import winstone.WinstoneResourceBundle;
 public class FileRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     
-    final String FILE_NAME_ARGUMENT = "fileRealm.configFile";
     final String DEFAULT_FILE_NAME = "users.xml";
     final String ELEM_USER = "user";
     final String ATT_USERNAME = "username";
@@ -54,9 +54,8 @@ public class FileRealm implements AuthenticationRealm {
         this.roles = new Hashtable();
 
         // Get the filename and parse the xml doc
-        String realmFileName = args.get(FILE_NAME_ARGUMENT) == null ? DEFAULT_FILE_NAME
-                : (String) args.get(FILE_NAME_ARGUMENT);
-        File realmFile = new File(realmFileName);
+        File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
+        if (realmFile==null)    realmFile = new File(DEFAULT_FILE_NAME);
         if (!realmFile.exists())
             throw new WinstoneException(REALM_RESOURCES.getString(
                     "FileRealm.FileNotFound", realmFile.getPath()));

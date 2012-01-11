@@ -37,12 +37,12 @@ public class HostGroup {
         this.hostConfigs = new Hashtable();
         
         // Is this the single or multiple configuration ? Check args
-        String hostDirName = (String) args.get("hostsDir");
-        String webappsDirName = (String) args.get("webappsDir");
+        File hostDir = Option.HOSTS_DIR.get(args);
+        File webappsDir = Option.WEBAPPS_DIR.get(args);
 
         // If host mode
-        if (hostDirName == null) {
-            initHost(webappsDirName, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL, 
+        if (hostDir == null) {
+            initHost(webappsDir, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             this.defaultHostName = DEFAULT_HOSTNAME;
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete", 
@@ -50,7 +50,7 @@ public class HostGroup {
         }
         // Otherwise multi-webapp mode
         else {
-            initMultiHostDir(hostDirName, cluster, objectPool, commonLibCL, 
+            initMultiHostDir(hostDir, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete", 
                     new String[] {this.hostConfigs.size() + "", this.hostConfigs.keySet() + ""});
@@ -78,30 +78,29 @@ public class HostGroup {
         this.hostConfigs.clear();
     }
     
-    protected void initHost(String webappsDirName, String hostname, Cluster cluster, 
+    protected void initHost(File webappsDir, String hostname, Cluster cluster,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(hostname, cluster, objectPool, commonLibCL, 
-                commonLibCLPaths, args, webappsDirName);
+                commonLibCLPaths, args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }
     
-    protected void initMultiHostDir(String hostsDirName, Cluster cluster,
+    protected void initMultiHostDir(File hostsDir, Cluster cluster,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
-        if (hostsDirName == null) {
-            hostsDirName = "hosts";
+        if (hostsDir == null) {
+            hostsDir = new File("hosts");
         }
-        File hostsDir = new File(hostsDirName);
         if (!hostsDir.exists()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirNotFound", hostsDirName));
+            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirNotFound", hostsDir.getPath()));
         } else if (!hostsDir.isDirectory()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsNotDirectory", hostsDirName));
+            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsNotDirectory", hostsDir.getPath()));
         } else {
             File children[] = hostsDir.listFiles();
             if ((children == null) || (children.length == 0)) {
-                throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsEmpty", hostsDirName));
+                throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsEmpty", hostsDir.getPath()));
             }
             for (int n = 0; n < children.length; n++) {
                 String childName = children[n].getName();
@@ -109,7 +108,7 @@ public class HostGroup {
                 // Mount directories as host dirs
                 if (children[n].isDirectory()) {
                     if (!this.hostConfigs.containsKey(childName)) {
-                        initHost(children[n].getCanonicalPath(), childName, cluster, 
+                        initHost(children[n], childName, cluster,
                                 objectPool, commonLibCL, commonLibCLPaths, args);
                     }
                 }

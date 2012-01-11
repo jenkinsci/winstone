@@ -29,8 +29,8 @@ import winstone.Launcher;
 import winstone.Listener;
 import winstone.Logger;
 import winstone.ObjectPool;
+import winstone.Option;
 import winstone.RequestHandlerThread;
-import winstone.WebAppConfiguration;
 import winstone.WinstoneException;
 import winstone.WinstoneInputStream;
 import winstone.WinstoneOutputStream;
@@ -49,7 +49,6 @@ public class Ajp13Listener implements Listener, Runnable {
     public final static WinstoneResourceBundle AJP_RESOURCES = new WinstoneResourceBundle("winstone.ajp13.LocalStrings");
     
     private final static int LISTENER_TIMEOUT = 5000; // every 5s reset the listener socket
-    private final static int DEFAULT_PORT = 8009;
     private final static int CONNECTION_TIMEOUT = 60000;
     private final static int BACKLOG_COUNT = 1000;
     private final static int KEEP_ALIVE_TIMEOUT = -1;
@@ -72,10 +71,8 @@ public class Ajp13Listener implements Listener, Runnable {
         this.hostGroup = hostGroup;
         this.objectPool = objectPool;
 
-        this.listenPort = Integer.parseInt(WebAppConfiguration.stringArg(args,
-                "ajp13Port", "" + DEFAULT_PORT));
-        this.listenAddress = WebAppConfiguration.stringArg(args,
-                "ajp13ListenAddress", null);
+        this.listenPort = Option.AJP13_PORT.get(args);
+        this.listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
     }
 
     public boolean start() throws IOException {

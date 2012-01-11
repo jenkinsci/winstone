@@ -45,6 +45,9 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import sun.net.dns.ResolverConfiguration.Options;
+import winstone.classLoader.ReloadingClassLoader;
+import winstone.realm.ArgumentsRealm;
 
 /**
  * Models the web.xml file's details ... basically just a bunch of configuration
@@ -103,11 +106,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
     private static final String JSP_SERVLET_LOG_LEVEL = "WARNING";
     private static final String INVOKER_SERVLET_NAME = "invoker";
     private static final String INVOKER_SERVLET_CLASS = "winstone.invoker.InvokerServlet";
-    private static final String DEFAULT_INVOKER_PREFIX = "/servlet/";
     private static final String DEFAULT_SERVLET_NAME = "default";
     private static final String DEFAULT_SERVLET_CLASS = "winstone.StaticResourceServlet";
-    private static final String DEFAULT_REALM_CLASS = "winstone.realm.ArgumentsRealm";
-    private static final String DEFAULT_JNDI_MGR_CLASS = "winstone.jndi.WebAppJNDIManager";
     private static final String RELOADING_CL_CLASS = "winstone.classLoader.ReloadingClassLoader";
     private static final String WEBAPP_CL_CLASS = "winstone.classLoader.WebappClassLoader";    
     private static final String ERROR_SERVLET_NAME = "winstoneErrorServlet";
@@ -192,11 +192,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             return textNode.trim();
         }
     }
-    
-    public static boolean useSavedSessions(Map args) {
-        return booleanArg(args, "useSavedSessions", false);
-    }
-    
+
     /**
      * Constructor. This parses the xml and sets up for basic routing
      */
@@ -218,10 +214,10 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                 webRoot, localLoaderClassPathFiles);
         
         // Build switch values
-        boolean useJasper = booleanArg(startupArgs, "useJasper", true);
-        boolean useInvoker = booleanArg(startupArgs, "useInvoker", false);
-        boolean useJNDI = booleanArg(startupArgs, "useJNDI", false);
-        this.useSavedSessions = useSavedSessions(startupArgs);
+        boolean useJasper = Option.USE_JASPER.get(startupArgs,true);
+        boolean useInvoker = Option.USE_INVOKER.get(startupArgs);
+        boolean useJNDI = Option.USE_JNDI.get(startupArgs);
+        this.useSavedSessions = Option.USE_SAVED_SESSIONS.get(startupArgs);
         
         // Check jasper is available - simple tests
         if (useJasper) {
@@ -229,7 +225,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                 Class.forName("javax.servlet.jsp.JspFactory", true, parentClassLoader);
                 Class.forName(JSP_SERVLET_CLASS, true, this.loader);
             } catch (Throwable err) {
-                if (booleanArg(startupArgs, "useJasper", false)) {
+                if (Option.USE_JASPER.get(startupArgs, false)) {
                     Logger.log(Logger.WARNING, Launcher.RESOURCES, 
                             "WebAppConfig.JasperNotFound");
                     Logger.log(Logger.DEBUG, Launcher.RESOURCES, 
@@ -297,7 +293,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         this.mimeTypes = new Hashtable();
         String[] typeList = new String[] {
                 Launcher.RESOURCES.getString("WebAppConfig.DefaultMimeTypes"),
-                stringArg(startupArgs,"mimeTypes",null)
+                Option.MIME_TYPES.get(startupArgs)
         };
         for (int i=0; i<typeList.length; i++) {
             String allTypes = typeList[i];
@@ -685,15 +681,13 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             } else {
                 authMethod = WinstoneResourceBundle.globalReplace(authMethod, "-", "");
             }
-            String realmClassName = stringArg(startupArgs, "realmClassName",
-                    DEFAULT_REALM_CLASS).trim();
             String authClassName = "winstone.auth."
                     + authMethod.substring(0, 1).toUpperCase()
                     + authMethod.substring(1).toLowerCase()
                     + "AuthenticationHandler";
             try {
                 // Build the realm
-                Class realmClass = Class.forName(realmClassName, true, parentClassLoader);
+                Class realmClass = Option.REALM_CLASS_NAME.get(startupArgs, AuthenticationRealm.class, parentClassLoader);
                 Constructor realmConstr = realmClass.getConstructor(
                         new Class[] {Set.class, Map.class });
                 this.authenticationRealm = (AuthenticationRealm) realmConstr.newInstance(
@@ -713,20 +707,17 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                         "WebAppConfig.AuthDisabled", authMethod);
             } catch (Throwable err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES,
-                        "WebAppConfig.AuthError", new String[] { authClassName,
-                                realmClassName }, err);
+                        "WebAppConfig.AuthError", new String[] { authClassName, "" }, err);
             }
-        } else if (!stringArg(startupArgs, "realmClassName", "").trim().equals("")) {
+        } else if (Option.REALM_CLASS_NAME.isIn(startupArgs)) {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.NoWebXMLSecurityDefs");
         }
 
         // Instantiate the JNDI manager
-        String jndiMgrClassName = stringArg(startupArgs, "webappJndiClassName",
-                DEFAULT_JNDI_MGR_CLASS).trim();
         if (useJNDI) {
             try {
                 // Build the realm
-                Class jndiMgrClass = Class.forName(jndiMgrClassName, true, parentClassLoader);
+                Class jndiMgrClass = Option.WEBAPP_JNDI_CLASSNAME.get(startupArgs, JNDIManager.class, parentClassLoader);
                 Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] { 
                         Map.class, List.class, ClassLoader.class });
                 this.jndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] { 
@@ -738,28 +729,26 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                         "WebAppConfig.JNDIDisabled");
             } catch (Throwable err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES,
-                        "WebAppConfig.JNDIError", jndiMgrClassName, err);
+                        "WebAppConfig.JNDIError", "", err);
             }
         }
         
-        String loggerClassName = stringArg(startupArgs, "accessLoggerClassName", "").trim();
-        if (!loggerClassName.equals("")) {
-            try {
+        try {
+            Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(startupArgs,AccessLogger.class,parentClassLoader);
+            if (loggerClass!=null) {
                 // Build the realm
-                Class loggerClass = Class.forName(loggerClassName, true, parentClassLoader);
-                Constructor loggerConstr = loggerClass.getConstructor(new Class[] { 
+                Constructor loggerConstr = loggerClass.getConstructor(new Class[] {
                         WebAppConfiguration.class, Map.class });
-                this.accessLogger = (AccessLogger) loggerConstr.newInstance(new Object[] {
-                        this, startupArgs});
-            } catch (Throwable err) {
-                Logger.log(Logger.ERROR, Launcher.RESOURCES,
-                        "WebAppConfig.LoggerError", loggerClassName, err);
+                this.accessLogger = (AccessLogger) loggerConstr.newInstance(new Object[] {this, startupArgs});
+            } else {
+                Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
+
             }
-        } else {
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
-            
+        } catch (Throwable err) {
+            Logger.log(Logger.ERROR, Launcher.RESOURCES,
+                    "WebAppConfig.LoggerError", "", err);
         }
-        
+
         // Add the default index.html welcomeFile if none are supplied
         if (localWelcomeFiles.isEmpty()) {
             if (useJasper) {
@@ -812,7 +801,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
 
         // If we don't have an instance of the default servlet, mount the inbuilt one
         if (this.servletInstances.get(this.defaultServletName) == null) {
-            boolean useDirLists = booleanArg(startupArgs, "directoryListings", true);
+            boolean useDirLists = Option.DIRECTORY_LISTINGS.get(startupArgs);
             
             Map staticParams = new Hashtable();
             staticParams.put("webRoot", webRoot);
@@ -869,8 +858,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         // Initialise invoker servlet if requested
         if (useInvoker) {
             // Get generic options
-            String invokerPrefix = stringArg(startupArgs, "invokerPrefix",
-                    DEFAULT_INVOKER_PREFIX);
+            String invokerPrefix = Option.INVOKER_PREFIX.get(startupArgs);
             Map invokerParams = new HashMap();
             invokerParams.put("prefix", this.prefix);
             invokerParams.put("invokerPrefix", invokerPrefix);
@@ -982,27 +970,20 @@ public class WebAppConfiguration implements ServletContext, Comparator {
 
         URL jarURLs[] = (URL []) urlList.toArray(new URL[urlList.size()]);
         
-        String preferredClassLoader = stringArg(startupArgs, "preferredClassLoader", WEBAPP_CL_CLASS);
-        if (booleanArg(startupArgs, "useServletReloading", false) && 
-                stringArg(startupArgs, "preferredClassLoader", "").equals("")) {
-            preferredClassLoader = RELOADING_CL_CLASS;
-        }
-        
         // Try to set up the preferred class loader, and if we fail, use the normal one
         ClassLoader outputCL = null;
-        if (!preferredClassLoader.equals("")) {
-            try {
-                Class preferredCL = Class.forName(preferredClassLoader, true, parentClassLoader);
-                Constructor reloadConstr = preferredCL.getConstructor(new Class[] { 
-                        URL[].class, ClassLoader.class});
-                outputCL = (ClassLoader) reloadConstr.newInstance(new Object[] { 
-                        jarURLs, parentClassLoader});
-            } catch (Throwable err) {
-                if (!stringArg(startupArgs, "preferredClassLoader", "").equals("") || 
-                        !preferredClassLoader.equals(WEBAPP_CL_CLASS)) {
-                    Logger.log(Logger.ERROR, Launcher.RESOURCES, "WebAppConfig.CLError", err);
-                }
+        try {
+            Class preferredClassLoader = Option.PREFERRED_CLASS_LOADER.get(startupArgs,ClassLoader.class,parentClassLoader);
+            if (Option.USE_SERVLET_RELOADING.get(startupArgs) &&
+                !Option.PREFERRED_CLASS_LOADER.isIn(startupArgs)) {
+                preferredClassLoader = ReloadingClassLoader.class;
             }
+            Constructor reloadConstr = preferredClassLoader.getConstructor(new Class[] {
+                    URL[].class, ClassLoader.class});
+            outputCL = (ClassLoader) reloadConstr.newInstance(new Object[] {
+                    jarURLs, parentClassLoader});
+        } catch (Throwable err) {
+            Logger.log(Logger.ERROR, Launcher.RESOURCES, "WebAppConfig.CLError", err);
         }
 
         if (outputCL == null) {

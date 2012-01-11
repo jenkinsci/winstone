@@ -18,6 +18,7 @@ import java.util.Map;
 
 import winstone.AccessLogger;
 import winstone.Logger;
+import winstone.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;
@@ -50,7 +51,7 @@ public class SimpleAccessLogger implements AccessLogger {
 //        this.webAppConfig = webAppConfig;
         
         // Get pattern
-        String patternType = WebAppConfiguration.stringArg(startupArgs, "simpleAccessLogger.format", "combined");
+        String patternType = Option.SIMPLE_ACCESS_LOGGER_FORMAT.get(startupArgs);
         if (patternType.equalsIgnoreCase("combined")) {
             this.pattern = COMBINED;
         } else if (patternType.equalsIgnoreCase("common")) {
@@ -62,8 +63,7 @@ public class SimpleAccessLogger implements AccessLogger {
         }
         
         // Get filename
-        String filePattern = WebAppConfiguration.stringArg(startupArgs, "simpleAccessLogger.file", 
-                "logs/###host###/###webapp###_access.log");
+        String filePattern =  Option.SIMPLE_ACCESS_LOGGER_FILE.get(startupArgs);
         this.fileName = WinstoneResourceBundle.globalReplace(filePattern, 
                 new String [][] {{"###host###", webAppConfig.getOwnerHostname()},
                     {"###webapp###", webAppConfig.getContextName()}});

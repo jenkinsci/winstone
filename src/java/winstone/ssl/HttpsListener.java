@@ -35,7 +35,7 @@ import winstone.HostGroup;
 import winstone.HttpListener;
 import winstone.Logger;
 import winstone.ObjectPool;
-import winstone.WebAppConfiguration;
+import winstone.Option;
 import winstone.WinstoneException;
 import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;
@@ -77,28 +77,27 @@ public class HttpsListener extends HttpListener {
             keyManagerType = null;
         } else {
             try {
-                performClientAuth = WebAppConfiguration.booleanArg(args, getConnectorName() + "VerifyClient",false);
-                String opensslCert = WebAppConfiguration.stringArg(args, getConnectorName() + "Certificate",null);
-                String opensslKey =  WebAppConfiguration.stringArg(args, getConnectorName() + "PrivateKey",null);
-                String keyStore =    WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStore", null);
-                String pwd =         WebAppConfiguration.stringArg(args, getConnectorName() + "KeyStorePassword", null);
+                performClientAuth = Option.HTTPS_VERIFY_CLIENT.get(args);
+                File opensslCert = Option.HTTPS_CERTIFICATE.get(args);
+                File opensslKey =  Option.HTTPS_PRIVATE_KEY.get(args);
+                File keyStore =    Option.HTTPS_KEY_STORE.get(args);
+                String pwd =         Option.HTTPS_KEY_STORE_PASSWORD.get(args);
 
                 if ((opensslCert!=null ^ opensslKey!=null))
-                    throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}PrivateKey need to be used together", new Object[]{getConnectorName()}));
+                    throw new WinstoneException(MessageFormat.format("--{0} and --{1} need to be used together", Option.HTTPS_CERTIFICATE, Option.HTTPS_PRIVATE_KEY));
                 if (keyStore!=null && opensslKey!=null)
-                    throw new WinstoneException(MessageFormat.format("--{0}Certificate and --{0}KeyStore are mutually exclusive", new Object[]{getConnectorName()}));
+                    throw new WinstoneException(MessageFormat.format("--{0} and --{1} are mutually exclusive", Option.HTTPS_KEY_STORE, Option.HTTPS_PRIVATE_KEY));
 
                 if (keyStore!=null) {
                     // load from Java style JKS
-                    File ksFile = new File(keyStore);
-                    if (!ksFile.exists() || !ksFile.isFile())
+                    if (!keyStore.exists() || !keyStore.isFile())
                         throw new WinstoneException(SSL_RESOURCES.getString(
-                                "HttpsListener.KeyStoreNotFound", ksFile.getPath()));
+                                "HttpsListener.KeyStoreNotFound", keyStore.getPath()));
 
                     this.password = pwd!=null ? pwd.toCharArray() : null;
 
                     keystore = KeyStore.getInstance("JKS");
-                    keystore.load(new FileInputStream(ksFile), this.password);
+                    keystore.load(new FileInputStream(keyStore), this.password);
                 } else if (opensslCert!=null) {
                     // load from openssl style key files
                     CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -129,8 +128,7 @@ public class HttpsListener extends HttpListener {
                 throw (IOException)new IOException("Failed to handle keys").initCause(e);
             }
 
-            this.keyManagerType = WebAppConfiguration.stringArg(args,
-                    getConnectorName() + "KeyManagerType", "SunX509");
+            this.keyManagerType = Option.HTTPS_KEY_MANAGER_TYPE.get(args);
         }
     }
 

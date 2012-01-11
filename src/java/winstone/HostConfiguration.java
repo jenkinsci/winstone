@@ -50,7 +50,7 @@ public class HostConfiguration implements Runnable {
     private Thread thread;
     
     public HostConfiguration(String hostname, Cluster cluster, ObjectPool objectPool, ClassLoader commonLibCL, 
-            File commonLibCLPaths[], Map args, String webappsDirName) throws IOException {
+            File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
         this.hostname = hostname;
         this.args = args;
         this.webapps = new Hashtable();
@@ -60,15 +60,12 @@ public class HostConfiguration implements Runnable {
         this.commonLibCLPaths = commonLibCLPaths;
         
         // Is this the single or multiple configuration ? Check args
-        String warfile = (String) args.get("warfile");
-        String webroot = (String) args.get("webroot");
+        File warfile = Option.WARFILE.get(args);
+        File webroot = Option.WEBROOT.get(args);
         
         // If single-webapp mode
-        if ((webappsDirName == null) && ((warfile != null) || (webroot != null))) {
-            String prefix = (String) args.get("prefix");
-            if (prefix == null) {
-                prefix = "";
-            }
+        if ((webappsDir == null) && ((warfile != null) || (webroot != null))) {
+            String prefix = Option.PREFIX.get(args);
             try {
                 this.webapps.put(prefix, initWebApp(prefix, getWebRoot(webroot, warfile), "webapp"));
             } catch (IOException err) {
@@ -77,7 +74,7 @@ public class HostConfiguration implements Runnable {
         }
         // Otherwise multi-webapp mode
         else {
-            initMultiWebappDir(webappsDirName);
+            initMultiWebappDir(webappsDir);
         }
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete", 
                 new String[] {this.webapps.size() + "", this.webapps.keySet() + ""});
@@ -142,7 +139,7 @@ public class HostConfiguration implements Runnable {
      * Destroy this webapp instance. Kills the webapps, plus any servlets,
      * attributes, etc
      * 
-     * @param webApp The webapp to destroy
+     * @param prefix The webapp to destroy
      */
     private void destroyWebApp(String prefix) {
         WebAppConfiguration webAppConfig = (WebAppConfiguration) this.webapps.get(prefix);
@@ -203,28 +200,27 @@ public class HostConfiguration implements Runnable {
      * war file is newer than. If none is supplied, use the default temp
      * directory.
      */
-    protected File getWebRoot(String requestedWebroot, String warfileName) throws IOException {
-        if (warfileName != null) {
+    protected File getWebRoot(File requestedWebroot, File warfile) throws IOException {
+        if (warfile != null) {
             Logger.log(Logger.INFO, Launcher.RESOURCES,
                     "HostConfig.BeginningWarExtraction");
 
             // open the war file
-            File warfileRef = new File(warfileName);
-            if (!warfileRef.exists() || !warfileRef.isFile())
+            if (!warfile.exists() || !warfile.isFile())
                 throw new WinstoneException(Launcher.RESOURCES.getString(
-                        "HostConfig.WarFileInvalid", warfileName));
+                        "HostConfig.WarFileInvalid", warfile));
 
             // Get the webroot folder (or a temp dir if none supplied)
             File unzippedDir = null;
             if (requestedWebroot != null) {
-                unzippedDir = new File(requestedWebroot);
+                unzippedDir = requestedWebroot;
             } else {
                 File tempFile = File.createTempFile("dummy", "dummy");
                 String userName = System.getProperty("user.name");
                 unzippedDir = new File(tempFile.getParent(),
                         (userName != null ? WinstoneResourceBundle.globalReplace(userName, 
                                 new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
-                        "winstone/" + warfileRef.getName());
+                        "winstone/" + warfile.getName());
                 tempFile.delete();
             }
             if (unzippedDir.exists()) {
@@ -239,7 +235,7 @@ public class HostConfiguration implements Runnable {
 
             // check consistency and if out-of-sync, recreate
             File timestampFile = new File(unzippedDir,".timestamp");
-            if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()-warfileRef.lastModified())>1000) {
+            if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()- warfile.lastModified())>1000) {
                 // contents of the target directory is inconsistent from the war.
                 deleteRecursive(unzippedDir);
                 unzippedDir.mkdirs();
@@ -250,7 +246,7 @@ public class HostConfiguration implements Runnable {
             
             // Iterate through the files
             byte buffer[] = new byte[8192];
-            JarFile warArchive = new JarFile(warfileRef);
+            JarFile warArchive = new JarFile(warfile);
             for (Enumeration e = warArchive.entries(); e.hasMoreElements();) {
                 JarEntry element = (JarEntry) e.nextElement();
                 if (element.isDirectory()) {
@@ -260,7 +256,7 @@ public class HostConfiguration implements Runnable {
 
                 // If archive date is newer than unzipped file, overwrite
                 File outFile = new File(unzippedDir, elemName);
-                if (outFile.exists() && (outFile.lastModified() > warfileRef.lastModified())) {
+                if (outFile.exists() && (outFile.lastModified() > warfile.lastModified())) {
                     continue;
                 }
                 outFile.getParentFile().mkdirs();
@@ -279,12 +275,12 @@ public class HostConfiguration implements Runnable {
 
             // extraction completed
             new FileOutputStream(timestampFile).close();
-            timestampFile.setLastModified(warfileRef.lastModified());
+            timestampFile.setLastModified(warfile.lastModified());
 
             // Return webroot
             return unzippedDir;
         } else {
-            return new File(requestedWebroot);
+            return requestedWebroot;
         }
     }
 
@@ -299,15 +295,14 @@ public class HostConfiguration implements Runnable {
         dir.delete();
     }
 
-    protected void initMultiWebappDir(String webappsDirName) throws IOException {
-        if (webappsDirName == null) {
-            webappsDirName = "webapps";
+    protected void initMultiWebappDir(File webappsDir) throws IOException {
+        if (webappsDir == null) {
+            webappsDir = new File("webapps");
         }
-        File webappsDir = new File(webappsDirName);
         if (!webappsDir.exists()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirNotFound", webappsDirName));
+            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirNotFound", webappsDir.getPath()));
         } else if (!webappsDir.isDirectory()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDirName));
+            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
         } else {
             File children[] = webappsDir.listFiles();
             for (int n = 0; n < children.length; n++) {
@@ -339,8 +334,8 @@ public class HostConfiguration implements Runnable {
                         outputDir.mkdirs();
                         try {
                             WebAppConfiguration webAppConfig = initWebApp(prefix, 
-                                            getWebRoot(new File(webappsDir, outputName).getCanonicalPath(),
-                                                    children[n].getCanonicalPath()), outputName);
+                                            getWebRoot(new File(webappsDir, outputName),
+                                                    children[n]), outputName);
                             this.webapps.put(webAppConfig.getContextPath(), webAppConfig);
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {

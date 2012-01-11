@@ -18,6 +18,7 @@ import java.util.StringTokenizer;
 import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
+import winstone.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 
@@ -31,9 +32,7 @@ import winstone.WinstoneResourceBundle;
  */
 public class ArgumentsRealm implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
-    
-    static final String PASSWORD_PREFIX = "argumentsRealm.passwd.";
-    static final String ROLES_PREFIX = "argumentsRealm.roles.";
+
     private Map passwords;
     private Map roles;
 
@@ -47,11 +46,11 @@ public class ArgumentsRealm implements AuthenticationRealm {
 
         for (Iterator i = args.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
-            if (key.startsWith(PASSWORD_PREFIX)) {
-                String userName = key.substring(PASSWORD_PREFIX.length());
+            if (key.startsWith(Option.ARGUMENTS_REALM_PASSWORD.name)) {
+                String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
                 String password = (String) args.get(key);
 
-                String roleList = WebAppConfiguration.stringArg(args, ROLES_PREFIX + userName, "");
+                String roleList = WebAppConfiguration.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 if (roleList.equals("")) {
                     Logger.log(Logger.WARNING, REALM_RESOURCES, "ArgumentsRealm.UndeclaredRoles", userName);
                 } else {

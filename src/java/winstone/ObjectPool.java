@@ -50,8 +50,8 @@ public class ObjectPool implements Runnable {
      * and responses
      */
     public ObjectPool(Map args) throws IOException {
-        this.simulateModUniqueId = WebAppConfiguration.booleanArg(args, "simulateModUniqueId", false);
-        this.saveSessions = WebAppConfiguration.useSavedSessions(args);
+        this.simulateModUniqueId = Option.SIMULATE_MOD_UNIQUE_ID.get(args);
+        this.saveSessions = Option.USE_SAVED_SESSIONS.get(args);
 
         // Build the initial pool of handler threads
         this.unusedRequestHandlerThreads = new ArrayList();
@@ -62,18 +62,9 @@ public class ObjectPool implements Runnable {
         this.unusedResponsePool = new ArrayList();
 
         // Get handler pool options
-        if (args.get("handlerCountStartup") != null) {
-            STARTUP_REQUEST_HANDLERS_IN_POOL = Integer.parseInt((String) args
-                    .get("handlerCountStartup"));
-        }
-        if (args.get("handlerCountMax") != null) {
-            MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Integer.parseInt((String) args
-                    .get("handlerCountMax"));
-        }
-        if (args.get("handlerCountMaxIdle") != null) {
-            MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Integer.parseInt((String) args
-                    .get("handlerCountMaxIdle"));
-        }
+        STARTUP_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_STARTUP.get(args);
+        MAX_REQUEST_HANDLERS_IN_POOL     = Option.HANDLER_COUNT_MAX.get(args);
+        MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_MAX_IDLE.get(args);
 
         // Start the base set of handler threads
         for (int n = 0; n < STARTUP_REQUEST_HANDLERS_IN_POOL; n++) {

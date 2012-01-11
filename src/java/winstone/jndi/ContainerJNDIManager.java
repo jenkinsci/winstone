@@ -24,6 +24,7 @@ import javax.naming.NamingException;
 
 import winstone.JNDIManager;
 import winstone.Logger;
+import winstone.Option;
 import winstone.WinstoneResourceBundle;
 import winstone.jndi.resourceFactories.WinstoneDataSource;
 
@@ -51,10 +52,10 @@ public class ContainerJNDIManager implements JNDIManager {
         for (Iterator i = keys.iterator(); i.hasNext();) {
             String key = (String) i.next();
 
-            if (key.startsWith("jndi.resource.")) {
+            if (key.startsWith(Option.JDNI_RESOURCE.name)) {
                 String resName = key.substring(14);
                 String className = (String) args.get(key);
-                String value = (String) args.get("jndi.param." + resName
+                String value = (String) args.get(Option.JNDI_PARAM.name + resName
                         + ".value");
                 Logger.log(Logger.FULL_DEBUG, JNDI_RESOURCES,
                         "ContainerJNDIManager.CreatingResourceArgs", resName);

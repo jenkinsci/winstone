@@ -28,6 +28,7 @@ import winstone.Cluster;
 import winstone.HostConfiguration;
 import winstone.HostGroup;
 import winstone.Logger;
+import winstone.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 import winstone.WinstoneSession;
@@ -61,7 +62,7 @@ public class SimpleCluster implements Runnable, Cluster {
             this.controlPort = controlPort.intValue();
 
         // Start cluster init thread
-        this.initialClusterNodes = (String) args.get("clusterNodes");
+        this.initialClusterNodes = Option.CLUSTER_NODES.get(args);
         Thread thread = new Thread(this, CLUSTER_RESOURCES
                 .getString("SimpleCluster.ThreadName"));
         thread.setDaemon(true);

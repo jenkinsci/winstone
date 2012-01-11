@@ -39,8 +39,6 @@ public class Launcher implements Runnable {
     static final String HTTP_LISTENER_CLASS = "winstone.HttpListener";
     static final String HTTPS_LISTENER_CLASS = "winstone.ssl.HttpsListener";
     static final String AJP_LISTENER_CLASS = "winstone.ajp13.Ajp13Listener";
-    static final String CLUSTER_CLASS = "winstone.cluster.SimpleCluster";
-    static final String DEFAULT_JNDI_MGR_CLASS = "winstone.jndi.ContainerJNDIManager";
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
@@ -65,7 +63,7 @@ public class Launcher implements Runnable {
     public Launcher(Map args) throws IOException {
         boolean success=false;
         try {
-            boolean useJNDI = WebAppConfiguration.booleanArg(args, "useJNDI", false);
+            boolean useJNDI = Option.USE_JNDI.get(args);
 
             // Set jndi resource handler if not set (workaround for JamVM bug)
             if (useJNDI) try {
@@ -81,32 +79,28 @@ public class Launcher implements Runnable {
             Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
 
             this.args = args;
-            this.controlPort = (args.get("controlPort") == null ? DEFAULT_CONTROL_PORT
-                    : Integer.parseInt((String) args.get("controlPort")));
+            this.controlPort =Option.CONTROL_PORT.get(args);
 
             // Check for java home
             List jars = new ArrayList();
             List commonLibCLPaths = new ArrayList();
             String defaultJavaHome = System.getProperty("java.home");
-            String javaHome = WebAppConfiguration.stringArg(args, "javaHome", defaultJavaHome);
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome);
-            String toolsJarLocation = WebAppConfiguration.stringArg(args, "toolsJar", null);
-            File toolsJar = null;
-            if (toolsJarLocation == null) {
+            File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
+            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
+            File toolsJar = Option.TOOLS_JAR.get(args);
+            if (toolsJar == null) {
                 toolsJar = new File(javaHome, "lib/tools.jar");
 
                 // first try - if it doesn't exist, try up one dir since we might have
                 // the JRE home by mistake
                 if (!toolsJar.exists()) {
-                    File javaHome2 = new File(javaHome).getParentFile();
+                    File javaHome2 = javaHome.getParentFile();
                     File toolsJar2 = new File(javaHome2, "lib/tools.jar");
                     if (toolsJar2.exists()) {
-                        javaHome = javaHome2.getCanonicalPath();
+                        javaHome = javaHome2;
                         toolsJar = toolsJar2;
                     }
                 }
-            } else {
-                toolsJar = new File(toolsJarLocation);
             }
 
             // Add tools jar to classloader path
@@ -115,13 +109,11 @@ public class Launcher implements Runnable {
                 commonLibCLPaths.add(toolsJar);
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                         toolsJar.getName());
-            } else if (WebAppConfiguration.booleanArg(args, "useJasper", false))
+            } else if (Option.USE_JASPER.get(args))
                 Logger.log(Logger.WARNING, RESOURCES, "Launcher.ToolsJarNotFound");
 
             // Set up common lib class loader
-            String commonLibCLFolder = WebAppConfiguration.stringArg(args,
-                    "commonLibFolder", "lib");
-            File libFolder = new File(commonLibCLFolder);
+            File libFolder = Option.COMMON_LIB_FOLDER.get(args,new File("lib"));
             if (libFolder.exists() && libFolder.isDirectory()) {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
@@ -148,19 +140,13 @@ public class Launcher implements Runnable {
             this.objectPool = new ObjectPool(args);
 
             // Optionally set up clustering if enabled and libraries are available
-            String useCluster = (String) args.get("useCluster");
-            boolean switchOnCluster = (useCluster != null)
-                    && (useCluster.equalsIgnoreCase("true") || useCluster
-                            .equalsIgnoreCase("yes"));
-            if (switchOnCluster) {
+            if (Option.USE_CLUSTER.get(args)) {
                 if (this.controlPort < 0) {
                     Logger.log(Logger.INFO, RESOURCES,
                             "Launcher.ClusterOffNoControlPort");
                 } else {
-                    String clusterClassName = WebAppConfiguration.stringArg(args, "clusterClassName",
-                            CLUSTER_CLASS).trim();
                     try {
-                        Class clusterClass = Class.forName(clusterClassName);
+                        Class clusterClass = Option.CLUSTER_CLASS_NAME.get(args,Cluster.class);
                         Constructor clusterConstructor = clusterClass
                                 .getConstructor(new Class[]{Map.class, Integer.class});
                         this.cluster = (Cluster) clusterConstructor
@@ -175,11 +161,9 @@ public class Launcher implements Runnable {
 
             // If jndi is enabled, run the container wide jndi populator
             if (useJNDI) {
-                String jndiMgrClassName = WebAppConfiguration.stringArg(args, "containerJndiClassName",
-                        DEFAULT_JNDI_MGR_CLASS).trim();
                 try {
                     // Build the realm
-                    Class jndiMgrClass = Class.forName(jndiMgrClassName, true, commonLibCL);
+                    Class jndiMgrClass = Option.CONTAINER_JNDI_CLASSNAME.get(args,JNDIManager.class,commonLibCL);
                     Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] {
                             Map.class, List.class, ClassLoader.class });
                     this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(new Object[] {
@@ -190,7 +174,7 @@ public class Launcher implements Runnable {
                             "Launcher.JNDIDisabled");
                 } catch (Throwable err) {
                     Logger.log(Logger.ERROR, RESOURCES,
-                            "Launcher.JNDIError", jndiMgrClassName, err);
+                            "Launcher.JNDIError", "", err);
                 }
             }
 
@@ -380,7 +364,7 @@ public class Launcher implements Runnable {
     public static void main(String argv[]) throws IOException {
         Map args = getArgsFromCommandLine(argv);
         
-        if (args.containsKey("usage") || args.containsKey("help")) {
+        if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
             printUsage();
             return;
         }
@@ -389,16 +373,16 @@ public class Launcher implements Runnable {
         deployEmbeddedWarfile(args);
         
         // Check for embedded warfile
-        if (!args.containsKey("webroot") && !args.containsKey("warfile") 
-                && !args.containsKey("webappsDir")&& !args.containsKey("hostsDir")) {
+        if (!Option.WEBROOT.isIn(args) && !Option.WARFILE.isIn(args)
+         && !Option.WEBAPPS_DIR.isIn(args) && !Option.HOSTS_DIR.isIn(args)) {
             printUsage();
             return;
         }
 
 
-        String maxParameterCount = (String)args.get("maxParameterCount");
-        if (maxParameterCount!=null) {
-            HttpUtils.MAX_PARAMETER_COUNT = Integer.parseInt(maxParameterCount);
+        int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
+        if (maxParameterCount>0) {
+            HttpUtils.MAX_PARAMETER_COUNT = maxParameterCount;
         }
         
         // Launch
@@ -458,7 +442,7 @@ public class Launcher implements Runnable {
                 } else {
                     args.put(paramName, "true");
                 }
-                if (paramName.equals("config")) {
+                if (paramName.equals(Option.CONFIG.name)) {
                     configFilename = (String) args.get(paramName);
                 }
             } else {
@@ -505,10 +489,10 @@ public class Launcher implements Runnable {
             out.close();
             embeddedWarfile.close();
             
-            args.put("warfile", tempWarfile.getAbsolutePath());
-            args.put("webroot", tempWebroot.getAbsolutePath());
-            args.remove("webappsDir");
-            args.remove("hostsDir");
+            Option.WARFILE.put(args, tempWarfile.getAbsolutePath());
+            Option.WARFILE.put(args, tempWebroot.getAbsolutePath());
+            Option.WEBAPPS_DIR.remove(args);
+            Option.HOSTS_DIR.remove(args);
         }
     }
     
@@ -527,8 +511,8 @@ public class Launcher implements Runnable {
     public static void initLogger(Map args) throws IOException {
         // Reset the log level
         int logLevel = WebAppConfiguration.intArg(args, "debug", Logger.INFO);
-//        boolean showThrowingLineNo = WebAppConfiguration.booleanArg(args, "logThrowingLineNo", false);
-        boolean showThrowingThread = WebAppConfiguration.booleanArg(args, "logThrowingThread", false);
+        boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
+        boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream = null;
         if (args.get("logfile") != null) {
             logStream = new FileOutputStream((String) args.get("logfile"));

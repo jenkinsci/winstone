@@ -54,11 +54,11 @@ public class HttpListener implements Listener, Runnable {
         this.hostGroup = hostGroup;
         this.objectPool = objectPool;
         this.listenPort = Integer.parseInt(WebAppConfiguration.stringArg(args,
-                getConnectorName() + "Port", "" + getDefaultPort()));
+                getConnectorName() + Option._PORT, "" + getDefaultPort()));
         this.listenAddress = WebAppConfiguration.stringArg(args,
-                getConnectorName() + "ListenAddress", null);
+                getConnectorName() + Option._LISTEN_ADDRESS, null);
         this.doHostnameLookups = WebAppConfiguration.booleanArg(args,
-                getConnectorName() + "DoHostnameLookups", DEFAULT_HNL);
+                getConnectorName() + Option._DO_HOSTNAME_LOOKUPS, DEFAULT_HNL);
     }
 
     public boolean start() throws IOException {
