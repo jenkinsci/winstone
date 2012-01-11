@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 

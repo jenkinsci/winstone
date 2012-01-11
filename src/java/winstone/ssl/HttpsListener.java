@@ -35,7 +35,7 @@ import winstone.HostGroup;
 import winstone.HttpListener;
 import winstone.Logger;
 import winstone.ObjectPool;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WinstoneException;
 import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;

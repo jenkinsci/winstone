@@ -16,6 +16,10 @@ import winstone.Launcher;
 import winstone.Logger;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
+import winstone.cmdline.CmdLineParser;
+import winstone.cmdline.Option;
+import winstone.cmdline.Option.OInt;
+import winstone.cmdline.Option.OString;
 
 /**
  * Included so that we can control winstone from the command line a little more
@@ -31,6 +35,12 @@ public class WinstoneControl {
     final static String OPERATION_RELOAD = "reload:";
     static int TIMEOUT = 10000;
 
+    public static OInt CONTROL_PORT = Option.integer("controlPort");
+    public static OInt PORT = Option.integer("port");
+    public static OInt DEBUG = Option.integer("debug",5);
+    public static OString HOST = Option.string("host", "localhost");
+
+
     /**
      * Parses command line parameters, and calls the appropriate method for
      * executing the winstone operation required.
@@ -38,41 +48,35 @@ public class WinstoneControl {
     public static void main(String argv[]) throws Exception {
 
         // Load args from the config file
-        Map options = Launcher.loadArgsFromCommandLineAndConfig(argv, "operation");
+        Map options = new CmdLineParser(Option.all(WinstoneControl.class)).parse(argv,"operation");
         String operation = (String) options.get("operation");
-        if (options.containsKey("controlPort") && !options.containsKey("port")) {
-            options.put("port", options.get("controlPort"));
-        }
 
         if (operation.equals("")) {
             printUsage();
             return;
         }
 
-        Logger.setCurrentDebugLevel(Integer.parseInt(WebAppConfiguration
-                .stringArg(options, "debug", "5")));
+        Logger.setCurrentDebugLevel(DEBUG.get(options));
 
-        String host = WebAppConfiguration.stringArg(options, "host", "localhost");
-        String port = WebAppConfiguration.stringArg(options, "port", "8081");
+        String host = HOST.get(options);
+        int port = PORT.get(options, CONTROL_PORT.get(options));
 
-        Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.UsingHostPort",
-                new String[] { host, port });
+        Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.UsingHostPort",host, port);
 
         // Check for shutdown
         if (operation.equalsIgnoreCase(OPERATION_SHUTDOWN)) {
-            Socket socket = new Socket(host, Integer.parseInt(port));
+            Socket socket = new Socket(host, port);
             socket.setSoTimeout(TIMEOUT);
             OutputStream out = socket.getOutputStream();
             out.write(Launcher.SHUTDOWN_TYPE);
             out.close();
-            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK",
-                    new String[] { host, port });
+            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK",host, port);
         }
 
         // check for reload
         else if (operation.toLowerCase().startsWith(OPERATION_RELOAD.toLowerCase())) {
             String webappName = operation.substring(OPERATION_RELOAD.length());
-            Socket socket = new Socket(host, Integer.parseInt(port));
+            Socket socket = new Socket(host, port);
             socket.setSoTimeout(TIMEOUT);
             OutputStream out = socket.getOutputStream();
             out.write(Launcher.RELOAD_TYPE);
@@ -81,8 +85,7 @@ public class WinstoneControl {
             objOut.writeUTF(webappName);
             objOut.close();
             out.close();
-            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",
-                    new String[] { host, port });
+            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",host, port);
         }
         else {
             printUsage();

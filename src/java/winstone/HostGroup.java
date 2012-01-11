@@ -6,6 +6,8 @@
  */
 package winstone;
 
+import winstone.cmdline.Option;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;

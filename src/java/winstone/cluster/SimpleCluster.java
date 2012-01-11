@@ -28,7 +28,7 @@ import winstone.Cluster;
 import winstone.HostConfiguration;
 import winstone.HostGroup;
 import winstone.Logger;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 import winstone.WinstoneSession;

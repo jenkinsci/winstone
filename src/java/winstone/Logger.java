@@ -213,7 +213,7 @@ public class Logger {
     }
 
     public static void log(int level, WinstoneResourceBundle resources,
-            String messageKey, String params[]) {
+            String messageKey, Object... params) {
         if (currentDebugLevel < level) {
             return;
         } else {

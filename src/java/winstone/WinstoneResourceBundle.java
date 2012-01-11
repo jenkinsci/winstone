@@ -44,18 +44,22 @@ public class WinstoneResourceBundle {
      * Perform a string replace for a single from/to pair.
      */
     public String getString(String key, Object parameter) {
-        return globalReplace(this.resources.getString(key), "[#0]", parameter!=null?parameter.toString():null);
+        return globalReplace(this.resources.getString(key), "[#0]", toString(parameter));
+    }
+
+    private String toString(Object s) {
+        return s!=null?s.toString():null;
     }
 
     /**
      * Perform a string replace for a set of from/to pairs.
      */
-    public String getString(String key, String[] parameters) {
+    public String getString(String key, Object[] parameters) {
         String myCopy = this.resources.getString(key);
         if (parameters != null) {
             String tokens[][] = new String[parameters.length][2];
             for (int n = 0; n < parameters.length; n++) {
-                tokens[n] = new String[] {"[#" + n + "]", parameters[n]};
+                tokens[n] = new String[] {"[#" + n + "]", toString(parameters[n])};
             }
             myCopy = globalReplace(myCopy, tokens);
         }

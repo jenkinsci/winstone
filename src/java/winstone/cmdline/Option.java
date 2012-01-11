@@ -1,6 +1,7 @@
-package winstone;
+package winstone.cmdline;
 
-import sun.net.dns.ResolverConfiguration.Options;
+import winstone.Launcher;
+import winstone.WebAppConfiguration;
 import winstone.classLoader.WebappClassLoader;
 import winstone.cluster.SimpleCluster;
 import winstone.jndi.ContainerJNDIManager;
@@ -8,17 +9,34 @@ import winstone.jndi.WebAppJNDIManager;
 import winstone.realm.ArgumentsRealm;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * Command line options used in {@link Launcher}.
+ * 
  * @author Kohsuke Kawaguchi
  */
 public class Option<T> {
-    
-    public static List<String> OPTIONS = new ArrayList<String>();
+    /**
+     * List up all the known options.
+     */
+    public static List<Option<?>> all(Class<?> clazz) {
+        List<Option<?>> r = new ArrayList<Option<?>>();
+        for (Field f : clazz.getFields()) {
+            if (Modifier.isStatic(f.getModifiers()) && Option.class.isAssignableFrom(f.getType())) {
+                try {
+                    r.add((Option<?>) f.get(null));
+                } catch (IllegalAccessException e) {
+                    throw (Error)new IllegalAccessError().initCause(e);
+                }
+            }
+        }
+        return r;
+    }
     
     public static final OFile WEBROOT=file("webroot");
     public static final OFile WARFILE=file("warfile");
@@ -124,6 +142,13 @@ public class Option<T> {
         return args.containsKey(name);
     }
 
+    /**
+     * Indicates an option name that takes some argument.
+     */
+    public boolean isWildcard() {
+        return name.endsWith(".");
+    }
+
     @Override
     public String toString() {
         return name;
@@ -156,7 +181,7 @@ public class Option<T> {
     public static OInt integer(String name,int defaultValue) {
         return new OInt(name,defaultValue);
     }
-    
+
     public static class OBoolean extends Option<Boolean> {
         public OBoolean(String name, boolean defaultValue) {
             super(name, Boolean.class, defaultValue);
@@ -177,6 +202,10 @@ public class Option<T> {
         }
 
         public int get(Map args) {
+            return WebAppConfiguration.intArg(args, name, defaultValue);
+        }
+
+        public int get(Map args, int defaultValue) {
             return WebAppConfiguration.intArg(args, name, defaultValue);
         }
     }
@@ -224,7 +253,7 @@ public class Option<T> {
             if (v.length()==0)  return defaultValue;
 
             Class<?> c = Class.forName(v, true, cl);
-            if (expectedType.isAssignableFrom(expectedType))
+            if (!expectedType.isAssignableFrom(c))
                 throw new ClassNotFoundException("Expected a subype of "+expectedType+" but got "+c+" instead");
 
             return c.asSubclass(expectedType);

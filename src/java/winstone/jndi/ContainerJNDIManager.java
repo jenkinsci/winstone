@@ -24,7 +24,7 @@ import javax.naming.NamingException;
 
 import winstone.JNDIManager;
 import winstone.Logger;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WinstoneResourceBundle;
 import winstone.jndi.resourceFactories.WinstoneDataSource;
 

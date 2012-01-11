@@ -6,9 +6,11 @@
  */
 package winstone;
 
+import winstone.cmdline.CmdLineParser;
+import winstone.cmdline.Option;
+
 import javax.servlet.http.HttpUtils;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +23,6 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,7 @@ public class Launcher implements Runnable {
     public static final byte RELOAD_TYPE = (byte) '4';
     
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
-    private int DEFAULT_CONTROL_PORT = -1;
-    
+
     private Thread controlThread;
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
@@ -146,7 +146,7 @@ public class Launcher implements Runnable {
                             "Launcher.ClusterOffNoControlPort");
                 } else {
                     try {
-                        Class clusterClass = Option.CLUSTER_CLASS_NAME.get(args,Cluster.class);
+                        Class clusterClass = Option.CLUSTER_CLASS_NAME.get(args, Cluster.class);
                         Constructor clusterConstructor = clusterClass
                                 .getConstructor(new Class[]{Map.class, Integer.class});
                         this.cluster = (Cluster) clusterConstructor
@@ -394,7 +394,7 @@ public class Launcher implements Runnable {
     }
     
     public static Map getArgsFromCommandLine(String argv[]) throws IOException {
-        Map args = loadArgsFromCommandLineAndConfig(argv, "nonSwitch");
+        Map args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
         
         // Small hack to allow re-use of the command line parsing inside the control tool
         String firstNonSwitchArgument = (String) args.get("nonSwitch");
@@ -405,66 +405,15 @@ public class Launcher implements Runnable {
             File webapp = new File(firstNonSwitchArgument);
             if (webapp.exists()) {
                 if (webapp.isDirectory()) {
-                    args.put("webroot", firstNonSwitchArgument);
+                    args.put(Option.WEBROOT.name, firstNonSwitchArgument);
                 } else if (webapp.isFile()) {
-                    args.put("warfile", firstNonSwitchArgument);
+                    args.put(Option.WARFILE.name, firstNonSwitchArgument);
                 }
             }
         }
         return args;
     }
 
-    public static Map loadArgsFromCommandLineAndConfig(String argv[], String nonSwitchArgName) 
-            throws IOException {
-        Map args = new HashMap();
-        
-        // Load embedded properties file 
-        String embeddedPropertiesFilename = RESOURCES.getString(
-                "Launcher.EmbeddedPropertiesFile");
-        
-        InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
-                embeddedPropertiesFilename);
-        if (embeddedPropsStream != null) {
-            loadPropsFromStream(embeddedPropsStream, args);
-            embeddedPropsStream.close();
-        }
-        
-        // Get command line args
-        String configFilename = RESOURCES.getString("Launcher.DefaultPropertyFile");
-        for (int n = 0; n < argv.length; n++) {
-            String option = argv[n];
-            if (option.startsWith("--")) {
-                int equalPos = option.indexOf('=');
-                String paramName = option.substring(2, 
-                        equalPos == -1 ? option.length() : equalPos);
-                if (equalPos != -1) {
-                    args.put(paramName, option.substring(equalPos + 1));
-                } else {
-                    args.put(paramName, "true");
-                }
-                if (paramName.equals(Option.CONFIG.name)) {
-                    configFilename = (String) args.get(paramName);
-                }
-            } else {
-                args.put(nonSwitchArgName, option);
-            }
-        }
-
-        // Load default props if available
-        File configFile = new File(configFilename);
-        if (configFile.exists() && configFile.isFile()) {
-            InputStream inConfig = new FileInputStream(configFile);
-            loadPropsFromStream(inConfig, args);
-            inConfig.close();
-            initLogger(args);
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingPropertyFile",
-                    configFilename);
-        } else {
-            initLogger(args);
-        }
-        return args;
-    }
-    
     protected static void deployEmbeddedWarfile(Map args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
@@ -494,18 +443,6 @@ public class Launcher implements Runnable {
             Option.WEBAPPS_DIR.remove(args);
             Option.HOSTS_DIR.remove(args);
         }
-    }
-    
-    protected static void loadPropsFromStream(InputStream inConfig, Map args) throws IOException {
-        Properties props = new Properties();
-        props.load(inConfig);
-        for (Iterator i = props.keySet().iterator(); i.hasNext(); ) {
-            String key = (String) i.next();
-            if (!args.containsKey(key.trim())) {
-                args.put(key.trim(), props.getProperty(key).trim());
-            }
-        }
-        props.clear();
     }
     
     public static void initLogger(Map args) throws IOException {

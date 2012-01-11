@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 

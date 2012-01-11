@@ -29,7 +29,7 @@ import winstone.Launcher;
 import winstone.Listener;
 import winstone.Logger;
 import winstone.ObjectPool;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.RequestHandlerThread;
 import winstone.WinstoneException;
 import winstone.WinstoneInputStream;

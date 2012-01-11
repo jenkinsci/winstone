@@ -18,7 +18,7 @@ import java.util.Map;
 
 import winstone.AccessLogger;
 import winstone.Logger;
-import winstone.Option;
+import winstone.cmdline.Option;
 import winstone.WebAppConfiguration;
 import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;

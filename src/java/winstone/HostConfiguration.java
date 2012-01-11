@@ -24,6 +24,7 @@ import java.util.jar.JarFile;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import winstone.cmdline.Option;
 
 /**
  * Manages the references to individual webapps within the container. This object handles

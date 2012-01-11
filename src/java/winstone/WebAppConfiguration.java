@@ -45,9 +45,8 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import sun.net.dns.ResolverConfiguration.Options;
 import winstone.classLoader.ReloadingClassLoader;
-import winstone.realm.ArgumentsRealm;
+import winstone.cmdline.Option;
 
 /**
  * Models the web.xml file's details ... basically just a bunch of configuration
