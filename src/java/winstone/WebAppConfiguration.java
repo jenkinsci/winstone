@@ -493,7 +493,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
 
                     for (Object mapping1 : mappings) {
                         String item = (String) mapping1;
-                        Mapping mapping = null;
+                        Mapping mapping;
                         try {
                             if (item.startsWith("srv:")) {
                                 mapping = Mapping.createFromLink(filterName, item.substring(4));
@@ -584,7 +584,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                     else
                         Logger.log(Logger.WARNING, Launcher.RESOURCES,
                                 "WebAppConfig.InvalidMimeMapping",
-                                new String[] { extension, mimeType });
+                                extension, mimeType);
                 }
 
                 // Process the list of welcome files
@@ -606,8 +606,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                         this.initParameters.put(name, value);
                     else
                         Logger.log(Logger.WARNING, Launcher.RESOURCES,
-                                "WebAppConfig.InvalidInitParam", new String[] {
-                                        name, value });
+                                "WebAppConfig.InvalidInitParam", name, value);
                 }
 
                 // Process locale encoding mapping elements
@@ -1203,7 +1202,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
     private void processMapping(String name, String pattern, Map exactPatterns,
             List folderPatterns, List extensionPatterns) {
         
-        Mapping urlPattern = null;
+        Mapping urlPattern;
         try {
             urlPattern = Mapping.createFromURL(name, pattern);
         } catch (WinstoneException err) {
@@ -1223,7 +1222,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             this.defaultServletName = name;
         } else {
             Logger.log(Logger.WARNING, Launcher.RESOURCES, "WebAppConfig.InvalidMount",
-                    new String[] { name, pattern });
+                    name, pattern);
         }
     }
 
@@ -1634,8 +1633,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
 
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "WinstoneResponse.TestingException",
-                        new String[] {this.errorPagesByExceptionKeysSorted[n].getName(),
-                            errWrapper.getClass().getName()});
+                        this.errorPagesByExceptionKeysSorted[n].getName(),
+                        errWrapper.getClass().getName());
                 if (exceptionClasses[n].isInstance(errWrapper)) {
                     String errorURI = (String) this.errorPagesByException.get(exceptionClasses[n]);
                     if (errorURI != null) {
@@ -1648,8 +1647,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                     } else {
                         Logger.log(Logger.WARNING, Launcher.RESOURCES, 
                                 "WinstoneResponse.SkippingException",
-                                new String[] {exceptionClasses[n].getName(),
-                                    (String) this.errorPagesByException.get(exceptionClasses[n]) });
+                                exceptionClasses[n].getName(),
+                                (String) this.errorPagesByException.get(exceptionClasses[n]));
                     }
                 } else {
                     Logger.log(Logger.WARNING, Launcher.RESOURCES, 
@@ -1833,7 +1832,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             throw new WinstoneException(Launcher.RESOURCES.getString(
                     "WebAppConfig.BadResourcePath", path));
         else {
-            String workingPath = null;
+            String workingPath;
             if (path.equals("/"))
                 workingPath = "";
             else {

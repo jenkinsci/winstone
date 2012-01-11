@@ -152,7 +152,7 @@ public class Logger {
         Writer stream = getStreamByName(streamName);
         if (stream != null) {
             Writer fullMessage = new StringWriter();
-            String date = null;
+            String date;
             synchronized (sdfLog) {
                 date = sdfLog.format(new Date());
             }

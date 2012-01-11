@@ -160,8 +160,7 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
         // On the first call, log and initialise the filter chain
         if (this.doInclude == null) {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                    "RequestDispatcher.IncludeMessage", new String[] {
-                            getName(), this.requestURI });
+                    "RequestDispatcher.IncludeMessage", getName(), this.requestURI);
             
             WinstoneRequest wr = getUnwrappedRequest(request);
             // Add the query string to the included query string stack
@@ -257,8 +256,7 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
         // Only on the first call to forward, we should set any forwarding attributes
         if (this.doInclude == null) {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                    "RequestDispatcher.ForwardMessage", new String[] {
-                    getName(), this.requestURI });
+                    "RequestDispatcher.ForwardMessage", getName(), this.requestURI);
             if (response.isCommitted()) {
                 throw new IllegalStateException(Launcher.RESOURCES.getString(
                         "RequestDispatcher.ForwardCommitted"));
@@ -386,13 +384,13 @@ public class RequestDispatcher implements javax.servlet.RequestDispatcher,
             WebAppConfiguration webAppConfig, String fullPath, String servletName,
             String filterChainType, boolean isURLBasedMatch) {
         
-        String cacheKey = null;
+        String cacheKey;
         if (isURLBasedMatch) {
             cacheKey = filterChainType + ":URI:" + fullPath;
         } else {
             cacheKey = filterChainType + ":Servlet:" + servletName;
         }
-        FilterConfiguration matchingFilters[] = null;
+        FilterConfiguration matchingFilters[];
         Map cache = webAppConfig.getFilterMatchCache();
         synchronized (cache) {
             matchingFilters = (FilterConfiguration []) cache.get(cacheKey); 

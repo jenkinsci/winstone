@@ -142,9 +142,8 @@ public class ObjectPool implements Runnable {
                 rh = (RequestHandlerThread) this.unusedRequestHandlerThreads.remove(unused - 1);
                 this.usedRequestHandlerThreads.add(rh);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "ObjectPool.UsingRHPoolThread", new String[] {
-                                "" + this.usedRequestHandlerThreads.size(),
-                                "" + this.unusedRequestHandlerThreads.size() });
+                        "ObjectPool.UsingRHPoolThread", "" + this.usedRequestHandlerThreads.size(),
+                        "" + this.unusedRequestHandlerThreads.size());
             }
 
             // If we are out (and not over our limit), allocate a new one
@@ -154,9 +153,8 @@ public class ObjectPool implements Runnable {
                         this.saveSessions);
                 this.usedRequestHandlerThreads.add(rh);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "ObjectPool.NewRHPoolThread", new String[] {
-                                "" + this.usedRequestHandlerThreads.size(),
-                                "" + this.unusedRequestHandlerThreads.size() });
+                        "ObjectPool.NewRHPoolThread", "" + this.usedRequestHandlerThreads.size(),
+                        "" + this.unusedRequestHandlerThreads.size());
             }
 
             // otherwise throw fail message - we've blown our limit
@@ -183,9 +181,8 @@ public class ObjectPool implements Runnable {
                             this.saveSessions);
                     this.usedRequestHandlerThreads.add(rh);
                     Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                            "ObjectPool.NewRHPoolThread", new String[] {
-                                    "" + this.usedRequestHandlerThreads.size(),
-                                    "" + this.unusedRequestHandlerThreads.size() });
+                            "ObjectPool.NewRHPoolThread", "" + this.usedRequestHandlerThreads.size(),
+                            "" + this.unusedRequestHandlerThreads.size());
                 }
             }
             if (rh != null)
@@ -206,9 +203,8 @@ public class ObjectPool implements Runnable {
             this.usedRequestHandlerThreads.remove(rh);
             this.unusedRequestHandlerThreads.add(rh);
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                    "ObjectPool.ReleasingRHPoolThread", new String[] {
-                            "" + this.usedRequestHandlerThreads.size(),
-                            "" + this.unusedRequestHandlerThreads.size() });
+                    "ObjectPool.ReleasingRHPoolThread", "" + this.usedRequestHandlerThreads.size(),
+                    "" + this.unusedRequestHandlerThreads.size());
         }
     }
 
@@ -216,7 +212,7 @@ public class ObjectPool implements Runnable {
      * An attempt at pooling request objects for reuse.
      */
     public WinstoneRequest getRequestFromPool() throws IOException {
-        WinstoneRequest req = null;
+        WinstoneRequest req;
         synchronized (this.requestPoolSemaphore) {
             // If we have any spare, get it from the pool
             int unused = this.unusedRequestPool.size();
@@ -248,8 +244,8 @@ public class ObjectPool implements Runnable {
     /**
      * An attempt at pooling request objects for reuse.
      */
-    public WinstoneResponse getResponseFromPool() throws IOException {
-        WinstoneResponse rsp = null;
+    public WinstoneResponse getResponseFromPool() {
+        WinstoneResponse rsp;
         synchronized (this.responsePoolSemaphore) {
             // If we have any spare, get it from the pool
             int unused = this.unusedResponsePool.size();

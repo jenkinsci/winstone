@@ -132,7 +132,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         if (this.isInvalidated) {
             throw new IllegalStateException(Launcher.RESOURCES.getString("WinstoneSession.InvalidatedSession"));
         }
-        Object att = null;
+        Object att;
         synchronized (this.sessionMonitor) {
             att = this.sessionData.get(name);
         }
@@ -143,7 +143,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         if (this.isInvalidated) {
             throw new IllegalStateException(Launcher.RESOURCES.getString("WinstoneSession.InvalidatedSession"));
         }
-        Enumeration names = null;
+        Enumeration names;
         synchronized (this.sessionMonitor) {
             names = Collections.enumeration(this.sessionData.keySet());
         }
@@ -170,7 +170,7 @@ public class WinstoneSession implements HttpSession, Serializable {
             Thread.currentThread().setContextClassLoader(cl);
         }
 
-        Object oldValue = null;
+        Object oldValue;
         synchronized (this.sessionMonitor) {
             oldValue = this.sessionData.get(name);
             if (value == null) {
@@ -214,7 +214,7 @@ public class WinstoneSession implements HttpSession, Serializable {
         if (this.isInvalidated) {
             throw new IllegalStateException(Launcher.RESOURCES.getString("WinstoneSession.InvalidatedSession"));
         }
-        Object value = null;
+        Object value;
         synchronized (this.sessionMonitor) {
             value = this.sessionData.get(name);
             this.sessionData.remove(name);
@@ -446,8 +446,8 @@ public class WinstoneSession implements HttpSession, Serializable {
             if (!(copy.get(key) instanceof Serializable)) {
                 Logger.log(Logger.WARNING, Launcher.RESOURCES,
                         "WinstoneSession.SkippingNonSerializable",
-                        new String[]{key,
-                                copy.get(key).getClass().getName()});
+                        key,
+                        copy.get(key).getClass().getName());
             }
             copy.remove(key);
         }

@@ -103,7 +103,7 @@ public class Mapping implements java.util.Comparator {
                     "Mapping.InvalidMount", new String[] { mappedTo, pattern }));
 
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "Mapping.MappedPattern",
-                new String[] { mappedTo, pattern });
+                mappedTo, pattern);
         return me;
     }
 

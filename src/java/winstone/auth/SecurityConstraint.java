@@ -114,8 +114,7 @@ public class SecurityConstraint {
         for (String aRolesAllowed : this.rolesAllowed) {
             if (request.isUserInRole(aRolesAllowed)) {
                 Logger.log(Logger.FULL_DEBUG, BaseAuthenticationHandler.AUTH_RESOURCES,
-                        "SecurityConstraint.Passed", new String[]{
-                        this.displayName, aRolesAllowed});
+                        "SecurityConstraint.Passed", this.displayName, aRolesAllowed);
                 return true;
             }
         }

@@ -65,8 +65,7 @@ public class RetryRequestWrapper extends HttpServletRequestWrapper {
     /**
      * Constructor - this populates the wrapper from the object in session
      */
-    public RetryRequestWrapper(HttpServletRequest request, RetryRequestParams oldRequest)
-                                 throws IOException {
+    public RetryRequestWrapper(HttpServletRequest request, RetryRequestParams oldRequest) {
         super(request);
         this.oldRequest = oldRequest;
         this.encoding = this.oldRequest.getEncoding();

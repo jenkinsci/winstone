@@ -77,8 +77,8 @@ public class HostConfiguration implements Runnable {
         else {
             initMultiWebappDir(webappsDir);
         }
-        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete", 
-                new String[] {this.webapps.size() + "", this.webapps.keySet() + ""});
+        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
+                this.webapps.size() + "", this.webapps.keySet() + "");
         
         
         this.thread = new Thread(this, "WinstoneHostConfigurationMgmt:" + this.hostname);
@@ -180,7 +180,7 @@ public class HostConfiguration implements Runnable {
         this.thread = null;
     }
     
-    public void reloadWebApp(String prefix) throws IOException {
+    public void reloadWebApp(String prefix) {
         WebAppConfiguration webAppConfig = (WebAppConfiguration) this.webapps.get(prefix);
         if (webAppConfig != null) {
             String webRoot = webAppConfig.getWebroot();
@@ -212,7 +212,7 @@ public class HostConfiguration implements Runnable {
                         "HostConfig.WarFileInvalid", warfile));
 
             // Get the webroot folder (or a temp dir if none supplied)
-            File unzippedDir = null;
+            File unzippedDir;
             if (requestedWebroot != null) {
                 unzippedDir = requestedWebroot;
             } else {
@@ -295,7 +295,7 @@ public class HostConfiguration implements Runnable {
         dir.delete();
     }
 
-    protected void initMultiWebappDir(File webappsDir) throws IOException {
+    protected void initMultiWebappDir(File webappsDir) {
         if (webappsDir == null) {
             webappsDir = new File("webapps");
         }

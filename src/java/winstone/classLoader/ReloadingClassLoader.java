@@ -102,7 +102,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
         Set lostClasses = new HashSet();
         while (!interrupted) {
             try {
-                String loadedClassesCopy[] = null;
+                String loadedClassesCopy[];
                 synchronized (this) {
                     loadedClassesCopy = (String []) this.loadedClasses.toArray(new String[0]);
                 }
@@ -154,9 +154,9 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
                         // Trigger reset of webAppConfig
                         Logger.log(Logger.INFO, CL_RESOURCES, 
                                 "ReloadingClassLoader.ReloadRequired",
-                                new String[] {className, 
-                                        "" + new Date(classDate),
-                                        "" + new Date(oldClassDate) });
+                                className,
+                                "" + new Date(classDate),
+                                "" + new Date(oldClassDate));
                         this.webAppConfig.resetClassLoader();
                     }
                 }
@@ -187,7 +187,7 @@ public class ReloadingClassLoader extends WebappClassLoader implements ServletCo
      * Iterates through a jar file searching for a class. If found, it returns that classes date
      */
     private Long searchJarPath(String classResourceName, File path)
-            throws IOException, InterruptedException {
+            throws IOException {
         JarFile jar = new JarFile(path);
         for (Enumeration e = jar.entries(); e.hasMoreElements() && !interrupted;) {
             JarEntry entry = (JarEntry) e.nextElement();

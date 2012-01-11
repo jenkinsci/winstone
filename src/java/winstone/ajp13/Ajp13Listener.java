@@ -79,7 +79,7 @@ public class Ajp13Listener implements Listener, Runnable {
         if (this.listenPort < 0) {
             return false;
         } else {
-            ServerSocket ss = null;
+            ServerSocket ss;
             try {
                 ss = this.listenAddress == null ? new ServerSocket(
                         this.listenPort, BACKLOG_COUNT) : new ServerSocket(
@@ -111,7 +111,7 @@ public class Ajp13Listener implements Listener, Runnable {
             // Enter the main loop
             while (!interrupted) {
                 // Get the listener
-                Socket s = null;
+                Socket s;
                 try {
                     s = serverSocket.accept();
                 } catch (java.io.InterruptedIOException err) {
@@ -189,7 +189,7 @@ public class Ajp13Listener implements Listener, Runnable {
 
             // If content-length present and non-zero, download the other
             // packets
-            WinstoneInputStream inData = null;
+            WinstoneInputStream inData;
             int contentLength = req.getContentLength();
             if (contentLength > 0) {
                 byte bodyContent[] = new byte[contentLength];
@@ -200,8 +200,7 @@ public class Ajp13Listener implements Listener, Runnable {
                     position = getBodyResponsePacket(inSocket, bodyContent,
                             position);
                     Logger.log(Logger.FULL_DEBUG, AJP_RESOURCES,
-                            "Ajp13Listener.ReadBodyProgress", new String[] {
-                                    "" + position, "" + contentLength });
+                            "Ajp13Listener.ReadBodyProgress", "" + position, "" + contentLength);
 
                 }
                 inData = new WinstoneInputStream(bodyContent);
@@ -231,8 +230,7 @@ public class Ajp13Listener implements Listener, Runnable {
      */
     public void deallocateRequestResponse(RequestHandlerThread handler,
             WinstoneRequest req, WinstoneResponse rsp,
-            WinstoneInputStream inData, WinstoneOutputStream outData) 
-            throws IOException {
+            WinstoneInputStream inData, WinstoneOutputStream outData) {
         handler.setInStream(null);
         handler.setOutStream(null);
         handler.setRequest(null);
@@ -345,9 +343,8 @@ public class Ajp13Listener implements Listener, Runnable {
                 req.setIsSecure(true);
             } else
                 Logger.log(Logger.DEBUG, AJP_RESOURCES,
-                        "Ajp13Listener.UnknownAttribute", new String[]{
-                        attName,
-                        "" + headers.getAttributes().get(attName)});
+                        "Ajp13Listener.UnknownAttribute", attName,
+                        "" + headers.getAttributes().get(attName));
         }
         return headers.getURI();
 
@@ -381,8 +378,7 @@ public class Ajp13Listener implements Listener, Runnable {
      * the handler thread to begin shutting down the socket and relase itself.
      */
     public boolean processKeepAlive(WinstoneRequest request,
-            WinstoneResponse response, InputStream inSocket)
-            throws IOException, InterruptedException {
+            WinstoneResponse response, InputStream inSocket) {
         return true;
     }
 

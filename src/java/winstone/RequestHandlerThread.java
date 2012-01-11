@@ -107,7 +107,7 @@ public class RequestHandlerThread implements Runnable {
                         HostConfiguration hostConfig = req.getHostGroup().getHostByName(req.getServerName());
                         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                                 "RequestHandlerThread.StartRequest",
-                                new String[] {"" + requestId, hostConfig.getHostname()});
+                                "" + requestId, hostConfig.getHostname());
 
                         // Get the URI from the request, check for prefix, then
                         // match it to a requestDispatcher
@@ -118,7 +118,7 @@ public class RequestHandlerThread implements Runnable {
                         if (webAppConfig == null) {
                             Logger.log(Logger.WARNING, Launcher.RESOURCES,
                                     "RequestHandlerThread.UnknownWebapp",
-                                    new String[] { servletURI });
+                                    servletURI);
                             rsp.sendError(WinstoneResponse.SC_NOT_FOUND, 
                                     Launcher.RESOURCES.getString("RequestHandlerThread.UnknownWebappPage", servletURI));
                             rsp.flushBuffer();
@@ -131,7 +131,7 @@ public class RequestHandlerThread implements Runnable {
                             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "RequestHandlerThread.FinishRequest",
                                     "" + requestId);
                             Logger.log(Logger.SPEED, Launcher.RESOURCES, "RequestHandlerThread.RequestTime",
-                                    new String[] { servletURI, "" + headerParseTime, "" + getRequestProcessTime() });
+                                    servletURI, "" + headerParseTime, "" + getRequestProcessTime());
                             continue;
                         }
                         req.setWebAppConfig(webAppConfig);
@@ -179,8 +179,8 @@ public class RequestHandlerThread implements Runnable {
 
                         this.listener.deallocateRequestResponse(this, req, rsp, inData, outData);
                         Logger.log(Logger.SPEED, Launcher.RESOURCES, "RequestHandlerThread.RequestTime",
-                                new String[] { servletURI, "" + headerParseTime, 
-                                                "" + getRequestProcessTime() });
+                                servletURI, "" + headerParseTime,
+                                "" + getRequestProcessTime());
                     } catch (InterruptedIOException errIO) {
                         continueFlag = false;
                         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
@@ -231,8 +231,8 @@ public class RequestHandlerThread implements Runnable {
      * another servlet.
      */
     private void processRequest(WebAppConfiguration webAppConfig, WinstoneRequest req, 
-            WinstoneResponse rsp, String path) throws IOException, ServletException {
-        RequestDispatcher rd = null;
+            WinstoneResponse rsp, String path) throws IOException {
+        RequestDispatcher rd;
         javax.servlet.RequestDispatcher rdError = null;
         try {
             rd = webAppConfig.getInitialDispatcher(path, req, rsp);

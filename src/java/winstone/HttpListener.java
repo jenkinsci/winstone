@@ -51,7 +51,7 @@ public class HttpListener implements Listener, Runnable {
     /**
      * Constructor
      */
-    public HttpListener(Map args, ObjectPool objectPool, HostGroup hostGroup) throws IOException {
+    public HttpListener(Map args, ObjectPool objectPool, HostGroup hostGroup) {
         // Load resources
         this.hostGroup = hostGroup;
         this.objectPool = objectPool;
@@ -72,8 +72,8 @@ public class HttpListener implements Listener, Runnable {
             ServerSocket ss = getServerSocket();
             ss.setSoTimeout(LISTENER_TIMEOUT);
             Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.StartupOK",
-                    new String[] { getConnectorName().toUpperCase(),
-                            this.listenPort + "" });
+                    getConnectorName().toUpperCase(),
+                    this.listenPort + "");
             this.serverSocket = ss;
 
             Thread thread = new Thread(this, Launcher.RESOURCES.getString(
@@ -131,7 +131,7 @@ public class HttpListener implements Listener, Runnable {
             // Enter the main loop
             while (!interrupted) {
                 // Get the listener
-                Socket s = null;
+                Socket s;
                 try {
                     s = serverSocket.accept();
                 } catch (java.io.InterruptedIOException err) {
@@ -212,8 +212,7 @@ public class HttpListener implements Listener, Runnable {
      */
     public void deallocateRequestResponse(RequestHandlerThread handler,
             WinstoneRequest req, WinstoneResponse rsp,
-            WinstoneInputStream inData, WinstoneOutputStream outData) 
-            throws IOException {
+            WinstoneInputStream inData, WinstoneOutputStream outData) {
         handler.setInStream(null);
         handler.setOutStream(null);
         handler.setRequest(null);
@@ -307,8 +306,7 @@ public class HttpListener implements Listener, Runnable {
      * socket and relase itself.
      */
     public boolean processKeepAlive(WinstoneRequest request,
-            WinstoneResponse response, InputStream inSocket)
-            throws IOException, InterruptedException {
+            WinstoneResponse response, InputStream inSocket) {
         // Try keep alive if allowed
         boolean continueFlag = !response.closeAfterRequest();
         return continueFlag;
@@ -328,7 +326,7 @@ public class HttpListener implements Listener, Runnable {
             throw new WinstoneException(Launcher.RESOURCES.getString(
                     "HttpListener.ErrorUriLine", uriLine));
         String method = uriLine.substring(0, spacePos).toUpperCase();
-        String fullURI = null;
+        String fullURI;
 
         // URI
         String remainder = uriLine.substring(spacePos + 1);

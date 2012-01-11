@@ -137,7 +137,7 @@ public class WinstoneRequest implements HttpServletRequest {
     /**
      * InputStream factory method.
      */
-    public WinstoneRequest() throws IOException {
+    public WinstoneRequest() {
         this.attributes = new Hashtable();
         this.parameters = new SizeRestrictedHashtable(HttpUtils.MAX_PARAMETER_COUNT);
         this.locales = new ArrayList();
@@ -416,8 +416,7 @@ public class WinstoneRequest implements HttpServletRequest {
     public static void extractParameters(String urlEncodedParams,
             String encoding, Map outputParams, boolean overwrite) {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                "WinstoneRequest.ParsingParameters", new String[] {
-                        urlEncodedParams, encoding });
+                "WinstoneRequest.ParsingParameters", urlEncodedParams, encoding);
         StringTokenizer st = new StringTokenizer(urlEncodedParams, "&", false);
         Set overwrittenParamNames = null;
         while (st.hasMoreTokens()) {
@@ -429,7 +428,7 @@ public class WinstoneRequest implements HttpServletRequest {
                 String decodedValue = (equalPos == -1 ? ""
                         : decodeURLToken(token.substring(equalPos + 1), encoding==null?"UTF-8":encoding));
 
-                Object already = null;
+                Object already;
                 if (overwrite) {
                     if (overwrittenParamNames == null) {
                         overwrittenParamNames = new HashSet();
@@ -563,8 +562,8 @@ public class WinstoneRequest implements HttpServletRequest {
                     if (readCount != contentLength)
                         Logger.log(Logger.WARNING, Launcher.RESOURCES,
                                 "WinstoneRequest.IncorrectContentLength",
-                                new String[] { contentLength + "",
-                                        readCount + "" });
+                                contentLength + "",
+                                readCount + "");
                     String paramLine = (this.encoding == null ? new String(
                             paramBuffer) : new String(paramBuffer,
                             this.encoding));
@@ -735,9 +734,9 @@ public class WinstoneRequest implements HttpServletRequest {
 //                    this.requestedSessionId = thisCookie.getValue();
 //                    this.currentSessionId = thisCookie.getValue();
                     Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                            "WinstoneRequest.SessionCookieFound", 
-                            new String[] {thisCookie.getValue(), 
-                            ownerContext == null ? "" : "prefix:" + ownerContext.getContextPath()});
+                            "WinstoneRequest.SessionCookieFound",
+                            thisCookie.getValue(),
+                            ownerContext == null ? "" : "prefix:" + ownerContext.getContextPath());
                 }
             }
         }
@@ -779,7 +778,7 @@ public class WinstoneRequest implements HttpServletRequest {
             }
 
             // Build the locale
-            String language = "";
+            String language;
             String country = "";
             String variant = "";
             int dpos = clause.indexOf('-');
@@ -880,8 +879,7 @@ public class WinstoneRequest implements HttpServletRequest {
             
             if (this.parsedParameters != null) {
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "WinstoneRequest.ParsingParameters", new String[] {
-                        forwardQueryString, this.encoding });
+                        "WinstoneRequest.ParsingParameters", forwardQueryString, this.encoding);
                 extractParameters(forwardQueryString, this.encoding, this.parameters, true);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "WinstoneRequest.ParamLine", "" + this.parameters);
@@ -977,7 +975,7 @@ public class WinstoneRequest implements HttpServletRequest {
         "blah".getBytes(encoding); // throws an exception if the encoding is unsupported
         if (this.inputReader == null) {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneRequest.SetCharEncoding",
-                    new String[] { this.encoding, encoding });
+                    this.encoding, encoding);
             this.encoding = encoding;
         }
     }
@@ -1179,7 +1177,7 @@ public class WinstoneRequest implements HttpServletRequest {
         if (dateHeader == null) {
             return -1;
         } else try {
-            Date date = null;
+            Date date;
             synchronized (headerDF) {
                 date = headerDF.parse(dateHeader);
             }

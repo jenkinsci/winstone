@@ -151,7 +151,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         newProps.put("user", username);
         newProps.put("password", password);
         Connection conn = this.driver.connect(this.url, newProps);
-        WinstoneConnection wrapper = null;
+        WinstoneConnection wrapper;
         synchronized (this.unusedRealConnections) {
             wrapper = new WinstoneConnection(conn, this);
             this.usedWrappers.add(wrapper);

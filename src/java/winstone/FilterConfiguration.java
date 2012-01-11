@@ -88,8 +88,7 @@ public class FilterConfiguration implements javax.servlet.FilterConfig {
             }
         }
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                "FilterConfiguration.DeployedInstance", new String[] {
-                        this.filterName, this.classFile });
+                "FilterConfiguration.DeployedInstance", this.filterName, this.classFile);
     }
 
     public String getFilterName() {

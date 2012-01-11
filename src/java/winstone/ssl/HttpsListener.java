@@ -265,8 +265,7 @@ public class HttpsListener extends HttpListener {
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    public SSLContext getSSLContext()
-            throws IOException {
+    public SSLContext getSSLContext() {
         try {
             // Check the key manager factory
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(this.keyManagerType);
@@ -277,8 +276,8 @@ public class HttpsListener extends HttpListener {
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = (String) e.nextElement();
                 Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
-                        "HttpsListener.KeyFound", new String[] { alias,
-                                keystore.getCertificate(alias) + "" });
+                        "HttpsListener.KeyFound", alias,
+                        keystore.getCertificate(alias) + "");
             }
 
             SSLContext context = SSLContext.getInstance("SSL");

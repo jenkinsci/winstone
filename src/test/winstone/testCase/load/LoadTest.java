@@ -55,10 +55,9 @@ public class LoadTest {
         this.stepPeriod = stepPeriod;
         this.gracePeriod = gracePeriod;
 
-        Logger.log(Logger.INFO, resources, "LoadTest.Config", new String[] {
-                this.url, this.useKeepAlives + "", this.startThreads + "",
+        Logger.log(Logger.INFO, resources, "LoadTest.Config", this.url, this.useKeepAlives + "", this.startThreads + "",
                 this.endThreads + "", this.stepSize + "", this.stepPeriod + "",
-                this.gracePeriod + "" });
+                this.gracePeriod + "");
     }
 
     public void test() throws InterruptedException {
@@ -84,9 +83,9 @@ public class LoadTest {
 
             // Write out results
             Logger.log(Logger.INFO, resources, "LoadTest.LineResult",
-                    new String[] { n + "", this.successCount + "",
-                            ((noOfSeconds * n) - this.successCount) + "",
-                            averageSuccessTime + "" });
+                    n + "", this.successCount + "",
+                    ((noOfSeconds * n) - this.successCount) + "",
+                    averageSuccessTime + "");
 
             // Close threads
             for (Object thread : threads) ((LoadTestThread) thread).destroy();
@@ -156,8 +155,7 @@ public class LoadTest {
     /**
      * Displays the usage message
      */
-    private static void printUsage(WinstoneResourceBundle resources)
-            throws IOException {
+    private static void printUsage(WinstoneResourceBundle resources) {
         System.out.println(resources.getString("LoadTest.Usage"));
     }
 

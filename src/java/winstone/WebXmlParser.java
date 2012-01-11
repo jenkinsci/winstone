@@ -168,7 +168,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
     public InputSource resolveEntity(String publicName, String url)
             throws SAXException, IOException {
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WebXmlParser.ResolvingEntity",
-                new String[] { publicName, url });
+                publicName, url);
         for (String[] aLOCAL_ENTITY_TABLE : LOCAL_ENTITY_TABLE) {
             if (((aLOCAL_ENTITY_TABLE[0] != null) && (publicName != null) &&
                     publicName.equals(aLOCAL_ENTITY_TABLE[0])) ||
@@ -203,8 +203,8 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
             throw exception;
         } else {
             Logger.log(Logger.WARNING, Launcher.RESOURCES, "WebXmlParser.XMLParseError",
-                    new String[] { exception.getLineNumber() + "",
-                            exception.getMessage() });
+                    exception.getLineNumber() + "",
+                    exception.getMessage());
         }
     }
 
@@ -214,7 +214,7 @@ public class WebXmlParser implements EntityResolver, ErrorHandler {
 
     public void warning(SAXParseException exception) throws SAXException {
         Logger.log(Logger.WARNING, Launcher.RESOURCES, "WebXmlParser.XMLParseError",
-                new String[] { exception.getLineNumber() + "",
-                        exception.getMessage() });
+                exception.getLineNumber() + "",
+                exception.getMessage());
     }
 }

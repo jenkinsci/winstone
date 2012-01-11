@@ -112,7 +112,7 @@ public class WinstoneResponse implements HttpServletResponse {
         Map encMap = this.webAppConfig.getLocaleEncodingMap();
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, 
                 "WinstoneResponse.LookForLocaleEncoding",
-                new String[] {localeString, encMap + ""});
+                localeString, encMap + "");
 
         String fullMatch = (String) encMap.get(localeString);
         if (fullMatch != null) {
@@ -123,7 +123,7 @@ public class WinstoneResponse implements HttpServletResponse {
             localeString = loc.getLanguage();
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, 
                     "WinstoneResponse.LookForLocaleEncoding",
-                    new String[] {localeString, encMap + ""});
+                    localeString, encMap + "");
             String match = (String) encMap.get(localeString);
             if (match != null) {
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, 
@@ -312,7 +312,7 @@ public class WinstoneResponse implements HttpServletResponse {
     /**
      * Writes out the http header for a single cookie
      */
-    public String writeCookie(Cookie cookie) throws IOException {
+    public String writeCookie(Cookie cookie) {
         
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WinstoneResponse.WritingCookie", cookie + "");
         StringBuffer out = new StringBuffer();
@@ -356,13 +356,13 @@ public class WinstoneResponse implements HttpServletResponse {
             if (cookie.getMaxAge() > 0) {
                 long expiryMS = System.currentTimeMillis()
                         + (1000 * (long) cookie.getMaxAge());
-                String expiryDate = null;
+                String expiryDate;
                 synchronized (VERSION0_DF) {
                     expiryDate = VERSION0_DF.format(new Date(expiryMS));
                 }
                 out.append("; Expires=").append(expiryDate);
             } else if (cookie.getMaxAge() == 0) {
-                String expiryDate = null;
+                String expiryDate;
                 synchronized (VERSION0_DF) {
                     expiryDate = VERSION0_DF.format(new Date(5000));
                 }
@@ -377,7 +377,7 @@ public class WinstoneResponse implements HttpServletResponse {
     }
 
     private static String formatHeaderDate(Date dateIn) {
-        String date = null;
+        String date;
         synchronized (HTTP_DF) {
             date = HTTP_DF.format(dateIn);
         }
@@ -582,11 +582,11 @@ public class WinstoneResponse implements HttpServletResponse {
 
     public void addHeader(String name, String value) {
         if (isIncluding()) {
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderInInclude", 
-                    new String[] {name, value});  
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderInInclude",
+                    name, value);
         } else if (isCommitted()) {
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderAfterCommitted", 
-                    new String[] {name, value});  
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderAfterCommitted",
+                    name, value);
         } else if (value != null) {
             if (name.equals(CONTENT_TYPE_HEADER)) {
                 StringBuffer remainderHeader = new StringBuffer();
@@ -611,11 +611,11 @@ public class WinstoneResponse implements HttpServletResponse {
 
     public void setHeader(String name, String value) {
         if (isIncluding()) {
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderInInclude", 
-                    new String[] {name, value});  
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderInInclude",
+                    name, value);
         } else if (isCommitted()) {
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderAfterCommitted", 
-                    new String[] {name, value});
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.HeaderAfterCommitted",
+                    name, value);
         } else {
             boolean found = false;
             for (int n = 0; (n < this.headers.size()); n++) {
@@ -772,12 +772,12 @@ public class WinstoneResponse implements HttpServletResponse {
     public void sendError(int sc, String msg) throws IOException {
         if (isIncluding()) {
             Logger.log(Logger.ERROR, Launcher.RESOURCES, "IncludeResponse.Error",
-                    new String[] { "" + sc, msg });
+                    "" + sc, msg);
             return;
         }
         
         Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                "WinstoneResponse.SendingError", new String[] { "" + sc, msg });
+                "WinstoneResponse.SendingError", "" + sc, msg);
 
         if ((this.webAppConfig != null) && (this.req != null)) {
             

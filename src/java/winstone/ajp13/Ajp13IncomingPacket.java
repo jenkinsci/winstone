@@ -162,8 +162,8 @@ public class Ajp13IncomingPacket {
 
             this.attributes.put(attName, attValue);
             Logger.log(Logger.FULL_DEBUG, Ajp13Listener.AJP_RESOURCES,
-                    "Ajp13IncomingPacket.Attribute", new String[] { attName,
-                            attValue });
+                    "Ajp13IncomingPacket.Attribute", attName,
+                    attValue);
         }
         Logger.log(Logger.FULL_DEBUG, Ajp13Listener.AJP_RESOURCES,
                 "Ajp13IncomingPacket.SuccessfullyReadRequest", ""

@@ -73,8 +73,8 @@ public class SimpleAccessLogger implements AccessLogger {
         this.outStream = new FileOutputStream(file, true);
         this.outWriter = new PrintWriter(this.outStream, true);
         
-        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init", 
-                new String[] {this.fileName, patternType});
+        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
+                this.fileName, patternType);
     }
     
     public void log(String originalURL, WinstoneRequest request, WinstoneResponse response) {
@@ -82,7 +82,7 @@ public class SimpleAccessLogger implements AccessLogger {
         int status = response.getErrorStatusCode() == null ? response.getStatus() 
                 : response.getErrorStatusCode();
         int size = response.getWinstoneOutputStream().getBytesCommitted();
-        String date = null;
+        String date;
         synchronized (DF) {
             date = DF.format(new Date());
         }

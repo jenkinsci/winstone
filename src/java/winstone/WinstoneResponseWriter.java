@@ -78,8 +78,8 @@ public class WinstoneResponseWriter extends PrintWriter {
                 ((this.outputStream.getOutputStreamLength() + this.bytesBuffered) >= 
                         Integer.parseInt(contentLengthHeader))) {
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "WinstoneResponseWriter.AutoFlush",
-                    new String[] {contentLengthHeader,
-                    (this.outputStream.getOutputStreamLength() + this.bytesBuffered) + ""});
+                    contentLengthHeader,
+                    (this.outputStream.getOutputStreamLength() + this.bytesBuffered) + "");
             flush();
         }
     }

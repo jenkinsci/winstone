@@ -47,15 +47,15 @@ public class HostGroup {
             initHost(webappsDir, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             this.defaultHostName = DEFAULT_HOSTNAME;
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete", 
-                    new String[] {this.hostConfigs.size() + "", this.hostConfigs.keySet() + ""});
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
+                    this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
         }
         // Otherwise multi-webapp mode
         else {
             initMultiHostDir(hostDir, cluster, objectPool, commonLibCL,
                     commonLibCLPaths, args);
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete", 
-                    new String[] {this.hostConfigs.size() + "", this.hostConfigs.keySet() + ""});
+            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete",
+                    this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
         }
     }
 

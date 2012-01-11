@@ -146,8 +146,7 @@ public class ServletConfiguration implements javax.servlet.ServletConfig,
             WebAppConfiguration.addJspServletParams(this.initParameters);
         }
         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                "ServletConfiguration.DeployedInstance", new String[] {
-                        this.servletName, this.classFile });
+                "ServletConfiguration.DeployedInstance", this.servletName, this.classFile);
     }
     
     public void ensureInitialization() {

@@ -150,7 +150,7 @@ public class Launcher implements Runnable {
                         Constructor clusterConstructor = clusterClass
                                 .getConstructor(new Class[]{Map.class, Integer.class});
                         this.cluster = (Cluster) clusterConstructor
-                                .newInstance(args, new Integer(this.controlPort));
+                                .newInstance(args, this.controlPort);
                     } catch (ClassNotFoundException err) {
                         Logger.log(Logger.DEBUG, RESOURCES, "Launcher.ClusterNotFound");
                     } catch (Throwable err) {
@@ -248,9 +248,9 @@ public class Launcher implements Runnable {
             }
 
             Logger.log(Logger.INFO, RESOURCES, "Launcher.StartupOK",
-                    new String[] {RESOURCES.getString("ServerVersion"),
-                                    (this.controlPort > 0 ? "" + this.controlPort
-                                            : RESOURCES.getString("Launcher.ControlDisabled"))});
+                    RESOURCES.getString("ServerVersion"),
+                    (this.controlPort > 0 ? "" + this.controlPort
+                            : RESOURCES.getString("Launcher.ControlDisabled")));
 
             // Enter the main loop
             while (!interrupted) {
@@ -428,7 +428,7 @@ public class Launcher implements Runnable {
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
                     tempWarfile.getAbsolutePath());
             OutputStream out = new FileOutputStream(tempWarfile, true);
-            int read = 0;
+            int read;
             byte buffer[] = new byte[2048];
             while ((read = embeddedWarfile.read(buffer)) != -1) {
                 out.write(buffer, 0, read);
@@ -448,7 +448,7 @@ public class Launcher implements Runnable {
         int logLevel = WebAppConfiguration.intArg(args, "debug", Logger.INFO);
         boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
-        OutputStream logStream = null;
+        OutputStream logStream;
         if (args.get("logfile") != null) {
             logStream = new FileOutputStream((String) args.get("logfile"));
         } else if (WebAppConfiguration.booleanArg(args, "logToStdErr", false)) {

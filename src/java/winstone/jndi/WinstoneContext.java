@@ -173,14 +173,14 @@ public class WinstoneContext implements Context {
 
             else if (thisValue == null)
                 throw new NameNotFoundException(ContainerJNDIManager.JNDI_RESOURCES.getString(
-                        "WinstoneContext.NameNotFound", thisName.toString()));
+                        "WinstoneContext.NameNotFound", thisName));
 
             // If it's not in this level and what we found is not a context,
             // complain
             else if (!(thisValue instanceof Context))
                 throw new NotContextException(ContainerJNDIManager.JNDI_RESOURCES.getString(
                         "WinstoneContext.NotContext", new String[] {
-                                thisName.toString(),
+                        thisName,
                                 thisValue.getClass().getName() }));
 
             // Open the context, perform a lookup, then close the context we
@@ -221,7 +221,7 @@ public class WinstoneContext implements Context {
             return this.parent.list(name);
         // If empty name, return a copy of this Context
         else if (searchName.isEmpty()) {
-            NamingEnumeration e = null;
+            NamingEnumeration e;
             synchronized (this.contextLock) {
                 e = new WinstoneNameEnumeration(this.bindings);
             }
@@ -261,7 +261,7 @@ public class WinstoneContext implements Context {
             return this.parent.list(name);
         // If empty name, return a copy of this Context
         else if (searchName.isEmpty()) {
-            NamingEnumeration e = null;
+            NamingEnumeration e;
             synchronized (this.contextLock) {
                 e = new WinstoneBindingEnumeration(this.bindings,
                         this.environment, this);
@@ -453,7 +453,7 @@ public class WinstoneContext implements Context {
                 }
         }
 
-        Context childContext = null;
+        Context childContext;
         synchronized (this.contextLock) {
             if (this.bindings.get(childName.get(0)) != null)
                 throw new NamingException(ContainerJNDIManager.JNDI_RESOURCES.getString(

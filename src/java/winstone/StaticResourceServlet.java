@@ -70,7 +70,7 @@ public class StaticResourceServlet extends HttpServlet {
             throws ServletException, IOException {
         boolean isInclude = (request.getAttribute(INCLUDE_SERVLET_PATH) != null);
         boolean isForward = (request.getAttribute(FORWARD_SERVLET_PATH) != null);
-        String path = null;
+        String path;
 
         if (isInclude)
             path = (String) request.getAttribute(INCLUDE_SERVLET_PATH);
@@ -83,8 +83,7 @@ public class StaticResourceServlet extends HttpServlet {
 
         long cachedResDate = request.getDateHeader(CACHED_RESOURCE_DATE_HEADER);
         Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                "StaticResourceServlet.PathRequested", new String[] {
-                        getServletConfig().getServletName(), path });
+                "StaticResourceServlet.PathRequested", getServletConfig().getServletName(), path);
 
         // Check for the resource
         File res = path.equals("") ? this.webRoot : new File(
@@ -98,7 +97,7 @@ public class StaticResourceServlet extends HttpServlet {
         // Check we are below the webroot
         else if (!isDescendant(this.webRoot, res, this.webRoot)) {
             Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "StaticResourceServlet.OutsideWebroot",
-                    new String[] {res.getCanonicalPath(), this.webRoot.toString()});
+                    res.getCanonicalPath(), this.webRoot.toString());
             response.sendError(HttpServletResponse.SC_FORBIDDEN, Launcher.RESOURCES
                     .getString("StaticResourceServlet.PathInvalid", path));
         }
@@ -236,7 +235,7 @@ public class StaticResourceServlet extends HttpServlet {
      * Generate a list of the files in this directory
      */
     private void generateDirectoryList(HttpServletRequest request,
-            HttpServletResponse response, String path) throws ServletException,
+            HttpServletResponse response, String path) throws
             IOException {
         // Get the file list
         File dir = path.equals("") ? this.webRoot : new File(

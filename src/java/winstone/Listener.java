@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 
 /**
  * Interface that defines the necessary methods for being a connection listener
@@ -39,7 +38,7 @@ public interface Listener {
      */
     public void allocateRequestResponse(Socket socket, InputStream inSocket,
             OutputStream outSocket, RequestHandlerThread handler,
-            boolean iAmFirst) throws SocketException, IOException;
+            boolean iAmFirst) throws IOException;
 
     /**
      * Called by the request handler thread, because it needs specific shutdown
@@ -49,7 +48,7 @@ public interface Listener {
     public void deallocateRequestResponse(RequestHandlerThread handler,
             WinstoneRequest req, WinstoneResponse rsp,
             WinstoneInputStream inData, WinstoneOutputStream outData)
-            throws IOException;
+    ;
 
     /**
      * Called by the request handler thread, because it needs specific shutdown
@@ -78,5 +77,5 @@ public interface Listener {
      */
     public boolean processKeepAlive(WinstoneRequest request,
             WinstoneResponse response, InputStream inSocket)
-            throws IOException, InterruptedException;
+    ;
 }

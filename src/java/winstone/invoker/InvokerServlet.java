@@ -8,7 +8,6 @@ package winstone.invoker;
 
 import java.io.IOException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -69,8 +68,7 @@ public class InvokerServlet extends HttpServlet {
     /**
      * Get an instance of the servlet configuration object
      */
-    protected ServletConfiguration getInvokableInstance(String servletName)
-            throws ServletException, IOException {
+    protected ServletConfiguration getInvokableInstance(String servletName) {
         ServletConfiguration sc = null;
         synchronized (this.mountedInstances) {
             if (this.mountedInstances.containsKey(servletName)) {
@@ -88,9 +86,8 @@ public class InvokerServlet extends HttpServlet {
                         new Hashtable(), -1);
                 this.mountedInstances.put(servletName, sc);
                 Logger.log(Logger.DEBUG, INVOKER_RESOURCES,
-                        "InvokerServlet.MountingServlet", new String[] {
-                                servletName,
-                                getServletConfig().getServletName() });
+                        "InvokerServlet.MountingServlet", servletName,
+                        getServletConfig().getServletName());
                 // just to trigger the servlet.init()
                 sc.ensureInitialization(); 
             } catch (Throwable err) {
@@ -104,7 +101,7 @@ public class InvokerServlet extends HttpServlet {
             throws ServletException, IOException {
         boolean isInclude = (req.getAttribute(INCLUDE_PATH_INFO) != null);
 //        boolean isForward = (req.getAttribute(FORWARD_PATH_INFO) != null);
-        String servletName = null;
+        String servletName;
 
         if (isInclude)
             servletName = (String) req.getAttribute(INCLUDE_PATH_INFO);

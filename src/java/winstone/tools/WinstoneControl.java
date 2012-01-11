@@ -95,7 +95,7 @@ public class WinstoneControl {
     /**
      * Displays the usage message
      */
-    private static void printUsage() throws IOException {
+    private static void printUsage() {
         System.out.println(TOOLS_RESOURCES.getString("WinstoneControl.Usage"));
     }
 }
