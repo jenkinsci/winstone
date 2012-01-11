@@ -103,6 +103,15 @@ public class WinstoneRequest implements HttpServletRequest {
     protected String localAddr;
     protected String localName;
     protected int localPort;
+    /**
+     * If true, it indicates that the request body was already consumed because of the call to {@link #getParameterMap()}
+     * (or its sibling), which requires implicit form parameter parsing.
+     * 
+     * If false, it indicates that the request body shall not be consumed by the said method, because the application
+     * already called {@link #getInputStream()} and showed the intent to parse the request body on its own.
+     *
+     * If null, it indicates that we haven't come to that decision.
+     */
     protected Boolean parsedParameters;
     protected Map requestedSessionIds;
     protected Map currentSessionIds;
@@ -510,20 +519,12 @@ public class WinstoneRequest implements HttpServletRequest {
         if (getContentLength() > 0) {
             try {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.ForceBodyParsing");
-                // If body not parsed
-                if ((this.parsedParameters == null) || 
-                        (this.parsedParameters.equals(Boolean.FALSE))) {
-                    // read full stream length
-                    try {
-                        InputStream in = getInputStream();
-                        byte buffer[] = new byte[2048];
-                        while (in.read(buffer) != -1);
-                    } catch (IllegalStateException err) {
-                        Reader in = getReader();
-                        char buffer[] = new char[2048];
-                        while (in.read(buffer) != -1);
-                    }
-                }
+
+                // if there's any input that we haven't consumed, throw them away, so that the next request parsing
+                // will start from the right position.
+                byte buffer[] = new byte[2048];
+                while ((this.inputData.read(buffer))!=-1)
+                    ;
             } catch (IOException err) {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WinstoneResponse.ErrorForceBodyParsing", err);
             }
