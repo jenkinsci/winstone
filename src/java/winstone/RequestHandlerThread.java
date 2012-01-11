@@ -205,6 +205,7 @@ public class RequestHandlerThread implements Runnable {
                         "RequestHandlerThread.RequestError", err);
             }
 
+            socket = null;
             this.objectPool.releaseRequestHandler(this);
 
             if (!interrupted) {
@@ -212,8 +213,10 @@ public class RequestHandlerThread implements Runnable {
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "RequestHandlerThread.EnterWaitState");
                 try {
+                    // wait for another request to come
                     synchronized (this) {
-                        this.wait();
+                        while(socket==null)
+                            this.wait();
                     }
                 } catch (InterruptedException err) {
                     interrupted = true;
@@ -283,13 +286,11 @@ public class RequestHandlerThread implements Runnable {
     /**
      * Assign a socket to the handler
      */
-    public void commenceRequestHandling(Socket socket, Listener listener) {
+    public synchronized void commenceRequestHandling(Socket socket, Listener listener) {
         this.listener = listener;
         this.socket = socket;
         if (this.thread.isAlive())
-            synchronized (this) {
-                this.notifyAll();
-            }
+            this.notifyAll();
         else
             this.thread.start();
     }
