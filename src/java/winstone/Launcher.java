@@ -53,7 +53,7 @@ public class Launcher implements Runnable {
     private int controlPort;
     private HostGroup hostGroup;
     private ObjectPool objectPool;
-    private List listeners;
+    private final List listeners = new ArrayList();
     private Map args;
     private Cluster cluster;
     private JNDIManager globalJndiManager;
@@ -199,7 +199,6 @@ public class Launcher implements Runnable {
                     (File []) commonLibCLPaths.toArray(new File[0]), args);
 
             // Create connectors (http, https and ajp)
-            this.listeners = new ArrayList();
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
             try {
@@ -356,7 +355,8 @@ public class Launcher implements Runnable {
         this.objectPool.destroy();
         if (this.cluster != null)
             this.cluster.destroy();
-        this.hostGroup.destroy();
+        if (this.hostGroup!=null)
+            this.hostGroup.destroy();
         if (this.globalJndiManager != null) {
             this.globalJndiManager.tearDown();
         }
