@@ -1558,7 +1558,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             return this.getErrorDispatcherByCode( uriInsideWebapp,
                     HttpServletResponse.SC_BAD_REQUEST,
                     Launcher.RESOURCES.getString("WebAppConfig.InvalidURI", uriInsideWebapp),
-                    null);
+                    new IllegalArgumentException("method="+request.getMethod()+"\nprotocol="+request.getProtocol()));
         } else if (this.contextStartupError != null) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw, true);
