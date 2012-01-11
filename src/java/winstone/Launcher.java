@@ -151,8 +151,6 @@ public class Launcher implements Runnable {
                                 .getConstructor(new Class[]{Map.class, Integer.class});
                         this.cluster = (Cluster) clusterConstructor
                                 .newInstance(args, this.controlPort);
-                    } catch (ClassNotFoundException err) {
-                        Logger.log(Logger.DEBUG, RESOURCES, "Launcher.ClusterNotFound");
                     } catch (Throwable err) {
                         Logger.log(Logger.WARNING, RESOURCES, "Launcher.ClusterStartupError", err);
                     }
@@ -168,9 +166,6 @@ public class Launcher implements Runnable {
                             Map.class, List.class, ClassLoader.class });
                     this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(args, null, commonLibCL);
                     this.globalJndiManager.setup();
-                } catch (ClassNotFoundException err) {
-                    Logger.log(Logger.DEBUG, RESOURCES,
-                            "Launcher.JNDIDisabled");
                 } catch (Throwable err) {
                     Logger.log(Logger.ERROR, RESOURCES,
                             "Launcher.JNDIError", "", err);

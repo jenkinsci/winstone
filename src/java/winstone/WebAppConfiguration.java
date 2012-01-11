@@ -699,9 +699,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                         .newInstance(loginConfigNode,
                                 constraintNodes, rolesAllowed,
                                 authenticationRealm);
-            } catch (ClassNotFoundException err) {
-                Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                        "WebAppConfig.AuthDisabled", authMethod);
             } catch (Throwable err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES,
                         "WebAppConfig.AuthError", new String[] { authClassName, "" }, err);
@@ -720,9 +717,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                 this.jndiManager = (JNDIManager) jndiMgrConstr.newInstance(null, envEntryNodes, this.loader);
                 if (this.jndiManager != null)
                     this.jndiManager.setup();
-            } catch (ClassNotFoundException err) {
-                Logger.log(Logger.DEBUG, Launcher.RESOURCES,
-                        "WebAppConfig.JNDIDisabled");
             } catch (Throwable err) {
                 Logger.log(Logger.ERROR, Launcher.RESOURCES,
                         "WebAppConfig.JNDIError", "", err);
