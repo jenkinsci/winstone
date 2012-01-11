@@ -59,9 +59,7 @@ public class RequestHandlerThread implements Runnable {
      * The main thread execution code.
      */
     public void run() {
-        
-        boolean interrupted = false;
-        while (!interrupted) {
+        while (true) {
             // Start request processing
             InputStream inSocket = null;
             OutputStream outSocket = null;
@@ -73,7 +71,7 @@ public class RequestHandlerThread implements Runnable {
 
                 // The keep alive loop - exiting from here means the connection has closed
                 boolean continueFlag = true;
-                while (continueFlag && !interrupted) {
+                while (continueFlag) {
                     try {
                         long requestId = System.currentTimeMillis();
                         this.listener.allocateRequestResponse(socket, inSocket,
@@ -208,24 +206,22 @@ public class RequestHandlerThread implements Runnable {
             socket = null;
             this.objectPool.releaseRequestHandler(this);
 
-            if (!interrupted) {
-                // Suspend this thread until we get assigned and woken up
-                Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "RequestHandlerThread.EnterWaitState");
-                try {
-                    // wait for another request to come
-                    synchronized (this) {
-                        while(socket==null)
-                            this.wait();
-                    }
-                } catch (InterruptedException err) {
-                    interrupted = true;
+            // Suspend this thread until we get assigned and woken up
+            Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
+                    "RequestHandlerThread.EnterWaitState");
+            try {
+                // wait for another request to come
+                synchronized (this) {
+                    while(socket==null)
+                        this.wait();
                 }
-                Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                        "RequestHandlerThread.WakingUp");
+            } catch (InterruptedException err) {
+                Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "RequestHandlerThread.ThreadExit");
+                return;
             }
+            Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
+                    "RequestHandlerThread.WakingUp");
         }
-        Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "RequestHandlerThread.ThreadExit");
     }
 
     /**
