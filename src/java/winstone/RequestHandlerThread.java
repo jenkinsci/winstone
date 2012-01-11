@@ -199,8 +199,10 @@ public class RequestHandlerThread implements Runnable {
                             outSocket); // shut sockets
                 } catch (Throwable errClose) {
                 }
-                Logger.log(Logger.ERROR, Launcher.RESOURCES,
-                        "RequestHandlerThread.RequestError", err);
+                if (!(err instanceof ClientSocketException)) {
+                    Logger.log(Logger.ERROR, Launcher.RESOURCES,
+                            "RequestHandlerThread.RequestError", err);
+                }
             }
 
             socket = null;
