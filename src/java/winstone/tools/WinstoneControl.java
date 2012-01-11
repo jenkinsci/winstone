@@ -11,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Map;
+import java.util.logging.Level;
 
 import winstone.Launcher;
 import winstone.Logger;
@@ -37,7 +38,7 @@ public class WinstoneControl {
 
     public static OInt CONTROL_PORT = Option.integer("controlPort");
     public static OInt PORT = Option.integer("port");
-    public static OInt DEBUG = Option.integer("debug",5);
+    public static OInt DEBUG = Option.integer("debug", Level.INFO.intValue());
     public static OString HOST = Option.string("host", "localhost");
 
 

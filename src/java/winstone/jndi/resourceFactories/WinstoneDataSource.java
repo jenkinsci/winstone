@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.sql.DataSource;
 
@@ -428,7 +429,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         }
     }
     
-    private void log(int level, String msgKey, Throwable err) {
+    private void log(Level level, String msgKey, Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey));
             if (err != null) {
@@ -439,7 +440,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         }
     }
     
-    private void log(int level, String msgKey, String arg, Throwable err) {
+    private void log(Level level, String msgKey, String arg, Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey, arg));
             if (err != null) {
@@ -450,7 +451,7 @@ public class WinstoneDataSource implements DataSource, Runnable {
         }
     }
     
-    private void log(int level, String msgKey, String arg[], Throwable err) {
+    private void log(Level level, String msgKey, String arg[], Throwable err) {
         if (getLogWriter() != null) {
             getLogWriter().println(DS_RESOURCES.getString(msgKey, arg));
             if (err != null) {

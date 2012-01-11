@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * Implements the main launcher daemon thread. This is the class that gets
@@ -440,7 +441,7 @@ public class Launcher implements Runnable {
     
     public static void initLogger(Map args) throws IOException {
         // Reset the log level
-        int logLevel = WebAppConfiguration.intArg(args, "debug", Logger.INFO);
+        int logLevel = WebAppConfiguration.intArg(args, "debug", Logger.INFO.intValue());
         boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
@@ -452,7 +453,7 @@ public class Launcher implements Runnable {
             logStream = System.out;
         }
 //        Logger.init(logLevel, logStream, showThrowingLineNo, showThrowingThread);
-        Logger.init(logLevel, logStream, showThrowingThread);
+        Logger.init(Level.parse(String.valueOf(logLevel)), logStream, showThrowingThread);
     }
 
     protected static void printUsage() {

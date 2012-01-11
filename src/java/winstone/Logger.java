@@ -9,14 +9,12 @@ package winstone;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * A utility class for logging event and status messages. It maintains a
@@ -27,43 +25,45 @@ import java.util.Map;
  * @version $Id: Logger.java,v 1.8 2006/11/09 06:01:43 rickknowles Exp $
  */
 public class Logger {
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator"); 
     
     public final static String DEFAULT_STREAM = "Winstone";
-    public static int MIN = 1;
-    public static int ERROR = 2;
-    public static int WARNING = 3;
-    public static int INFO = 5;
-    public static int SPEED = 6;
-    public static int DEBUG = 7;
-    public static int FULL_DEBUG = 8;
-    public static int MAX = 9;
+    public static Level MIN = Level.OFF;
+    public static Level ERROR = Level.SEVERE;
+    public static Level WARNING = Level.WARNING;
+    public static Level INFO = Level.INFO;
+    public static Level SPEED = Level.FINE;
+    public static Level DEBUG = Level.FINER;
+    public static Level FULL_DEBUG = Level.FINEST;
+    public static Level MAX = Level.ALL;
 
     protected static Boolean semaphore = true;
     protected static boolean initialised = false;
     protected static Writer defaultStream;
     protected static Map namedStreams;
 //    protected static Collection nullStreams;
-    protected static int currentDebugLevel;
     protected final static DateFormat sdfLog = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     protected static boolean showThrowingThread;
 
     /**
      * Initialises default streams
      */
-    public static void init(int level) {
+    public static void init(Level level) {
         init(level, System.out, false);
     }
 
+    public static void init(int level) {
+        init(Level.parse(String.valueOf(level)));
+    }
+    
     /**
      * Initialises default streams
      */
-    public static void init(int level, OutputStream defaultStream, 
+    public static void init(Level level, OutputStream defaultStream, 
             boolean showThrowingThreadArg) {
         synchronized (semaphore) {
             if (!initialised) { // recheck in case we were blocking on another init
                 initialised = false;
-                currentDebugLevel = level;
+                LOGGER.setLevel(level);
                 namedStreams = new HashMap();
 //                nullStreams = new ArrayList();
                 initialised = true;
@@ -135,7 +135,7 @@ public class Logger {
         if (!initialised) {
             init(level);
         } else synchronized (semaphore) {
-            currentDebugLevel = level;
+            LOGGER.setLevel(Level.parse(String.valueOf(level)));
         }
     }
 
@@ -143,117 +143,91 @@ public class Logger {
      * Writes a log message to the requested stream, and immediately flushes
      * the contents of the stream.
      */
-    private static void logInternal(String streamName, String message, Throwable error) {
-        
+    private static void logInternal(Level level, String message, Throwable error) {
         if (!initialised) {
             init(INFO);
         }
         
-        Writer stream = getStreamByName(streamName);
-        if (stream != null) {
-            Writer fullMessage = new StringWriter();
-            String date;
-            synchronized (sdfLog) {
-                date = sdfLog.format(new Date());
-            }
-            try {
-                fullMessage.write("[");
-                fullMessage.write(streamName);
-                fullMessage.write(" ");
-                fullMessage.write(date);
-                fullMessage.write("] - ");
-                if (showThrowingThread) {
-                    fullMessage.write("[");
-                    fullMessage.write(Thread.currentThread().getName());
-                    fullMessage.write("] - ");
-                }
-                fullMessage.write(message);
-                if (error != null) {
-                    fullMessage.write(LINE_SEPARATOR);
-                    PrintWriter pw = new PrintWriter(fullMessage);
-                    error.printStackTrace(pw);
-                    pw.flush();
-                }
-                fullMessage.write(LINE_SEPARATOR);
-                
-                stream.write(fullMessage.toString());
-                stream.flush();
-            } catch (IOException err) {
-                System.err.println(Launcher.RESOURCES.getString("Logger.StreamWriteError", message));
-                err.printStackTrace(System.err);
-            }
+        String msg = "";
+        if (showThrowingThread) {
+            msg = "["+Thread.currentThread().getName()+"] - ";
         }
+        msg += message;
+        
+        LOGGER.log(level,msg,error);
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey), null);
+            logInternal(level, resources.getString(messageKey), null);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey, Throwable error) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey), error);
+            logInternal(level, resources.getString(messageKey), error);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey, Object param) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), null);
+            logInternal(level, resources.getString(messageKey, param), null);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey, Object... params) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), null);
+            logInternal(level, resources.getString(messageKey, params), null);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey, Object param, Throwable error) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, param), error);
+            logInternal(level, resources.getString(messageKey, param), error);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String messageKey, Object params[], Throwable error) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(DEFAULT_STREAM, resources.getString(messageKey, params), error);
+            logInternal(level, resources.getString(messageKey, params), error);
         }
     }
 
-    public static void log(int level, WinstoneResourceBundle resources,
+    public static void log(Level level, WinstoneResourceBundle resources,
             String streamName, String messageKey, Object params[], Throwable error) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(streamName, resources.getString(messageKey, params), error);
+            logInternal(level, resources.getString(messageKey, params), error);
         }
     }
 
-    public static void logDirectMessage(int level, String streamName, String message, 
+    public static void logDirectMessage(Level level, String streamName, String message, 
             Throwable error) {
-        if (currentDebugLevel < level) {
+        if (!LOGGER.isLoggable(level)) {
             return;
         } else {
-            logInternal(streamName, message, error);
+            logInternal(level, message, error);
         }
     }
+
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("winstone");
 }
