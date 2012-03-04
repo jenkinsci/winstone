@@ -15,7 +15,7 @@ public class URIUtil {
      * this method preserves the leading and trailing '/'.
      */
     static String canonicalPath(String path) {
-        List r = new ArrayList(Arrays.asList(path.split("/+")));
+        List r = new ArrayList(Arrays.asList(path.split("[/\\\\]+")));
         for (int i=0; i<r.size(); ) {
             String cur = (String)r.get(i);
             if (cur.length()==0 || cur.equals(".")) {
