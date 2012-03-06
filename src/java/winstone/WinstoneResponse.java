@@ -14,10 +14,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -66,6 +67,12 @@ public class WinstoneResponse implements HttpServletResponse {
     private String explicitEncoding;
     private String implicitEncoding;
     private List cookies;
+
+    /**
+     * Of {@link #cookies}, ones that should be marked as "HttpOnly".
+     * See http://en.wikipedia.org/wiki/HTTP_cookie#HttpOnly_cookie
+     */
+    private Set httpOnlyCookies;
     
     private Locale locale;
     private String protocol;
@@ -79,6 +86,7 @@ public class WinstoneResponse implements HttpServletResponse {
         
         this.headers = new ArrayList();
         this.cookies = new ArrayList();
+        this.httpOnlyCookies = new HashSet();
 
         this.statusCode = SC_OK;
         this.locale = null; //Locale.getDefault();
@@ -97,6 +105,7 @@ public class WinstoneResponse implements HttpServletResponse {
         this.outputWriter = null;
         this.headers.clear();
         this.cookies.clear();
+        this.httpOnlyCookies.clear();
         this.protocol = null;
         this.reqKeepAliveHeader = null;
 
@@ -287,6 +296,7 @@ public class WinstoneResponse implements HttpServletResponse {
                     cookie.setPath(req.getWebAppConfig().getContextPath().equals("") ? "/"
                             : req.getWebAppConfig().getContextPath());
                     this.cookies.add(cookie); // don't call addCookie because we might be including
+                    this.httpOnlyCookies.add(cookie);
                 }
             }
         }
@@ -302,6 +312,7 @@ public class WinstoneResponse implements HttpServletResponse {
                 cookie.setVersion(0); //req.isSecure() ? 1 : 0);
                 cookie.setPath(prefix.equals("") ? "/" : prefix);
                 this.cookies.add(cookie); // don't call addCookie because we might be including
+                this.httpOnlyCookies.add(cookie);
             }
         }
         
@@ -373,6 +384,8 @@ public class WinstoneResponse implements HttpServletResponse {
             if (cookie.getSecure())
                 out.append("; Secure");
         }
+        if (httpOnlyCookies.contains(cookie))
+            out.append("; HttpOnly");
         return out.toString();
     }
 
@@ -533,6 +546,7 @@ public class WinstoneResponse implements HttpServletResponse {
             this.statusCode = SC_OK;
             this.headers.clear();
             this.cookies.clear();
+            this.httpOnlyCookies.clear();
         }
     }
 
