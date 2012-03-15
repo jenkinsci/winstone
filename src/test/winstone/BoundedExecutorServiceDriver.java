@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class BoundedExecutorServiceTest extends TestCase {
+public class BoundedExecutorServiceDriver extends TestCase {
     public static void main(String[] args) throws Exception {
         ExecutorService es = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
                 5L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
