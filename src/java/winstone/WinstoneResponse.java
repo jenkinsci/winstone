@@ -238,7 +238,7 @@ public class WinstoneResponse implements HttpServletResponse {
         // Need this block for WebDAV support. "Connection:close" header is ignored
         String lengthHeader = getHeader(CONTENT_LENGTH_HEADER);
         if ((lengthHeader == null) && (this.statusCode >= 300)) {
-            int bodyBytes = this.outputStream.getOutputStreamLength();
+            long bodyBytes = this.outputStream.getOutputStreamLength();
             if (getBufferSize() > bodyBytes) {
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, 
                         "WinstoneResponse.ForcingContentLength", "" + bodyBytes);
@@ -460,7 +460,7 @@ public class WinstoneResponse implements HttpServletResponse {
     }
 
     public int getBufferSize() {
-        return this.outputStream.getBufferSize();
+        return (int)this.outputStream.getBufferSize();
     }
 
     public String getCharacterEncoding() {

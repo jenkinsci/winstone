@@ -25,9 +25,9 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
     private static final byte[] CR_LF = "\r\n".getBytes();
     protected OutputStream outStream;
-    protected int bufferSize;
-    protected int bufferPosition;
-    protected int bytesCommitted;
+    protected long bufferSize;
+    protected long bufferPosition;
+    protected long bytesCommitted;
     protected ByteArrayOutputStream buffer;
     protected boolean committed;
     protected boolean bodyOnly;
@@ -52,7 +52,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         this.owner = response;
     }
 
-    public int getBufferSize() {
+    public long getBufferSize() {
         return this.bufferSize;
     }
 
@@ -68,11 +68,11 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         return this.committed;
     }
 
-    public int getOutputStreamLength() {
+    public long getOutputStreamLength() {
         return this.bytesCommitted + this.bufferPosition;
     }
 
-    public int getBytesCommitted() {
+    public long getBytesCommitted() {
         return this.bytesCommitted;
     }
     
@@ -90,7 +90,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         }
         String contentLengthHeader = this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
         if ((contentLengthHeader != null) && 
-                (this.bytesCommitted >= Integer.parseInt(contentLengthHeader))) {
+                (this.bytesCommitted >= Long.parseLong(contentLengthHeader))) {
             return;
         }
 //        System.out.println("Out: " + this.bufferPosition + " char=" + (char)oneChar);
@@ -104,7 +104,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         }
         String contentLengthHeader = this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
         if ((contentLengthHeader != null) &&
-                (this.bytesCommitted+len > Integer.parseInt(contentLengthHeader))) {
+                (this.bytesCommitted+len > Long.parseLong(contentLengthHeader))) {
             return;
         }
 
@@ -119,7 +119,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             commit();
         } else if ((contentLengthHeader != null) &&
                 ((this.bufferPosition + this.bytesCommitted)
-                        >= Integer.parseInt(contentLengthHeader))) {
+                        >= Long.parseLong(contentLengthHeader))) {
             commit();
         }
     }
@@ -171,14 +171,14 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         byte content[] = this.buffer.toByteArray();
 //        winstone.ajp13.Ajp13Listener.packetDump(content, content.length);
 //        this.buffer.writeTo(this.outStream);
-        int commitLength = content.length;
+        long commitLength = content.length;
         String contentLengthHeader = this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER);
         if (contentLengthHeader != null) {
-            commitLength = Math.min(Integer.parseInt(contentLengthHeader)
-                    - this.bytesCommitted, content.length);
+            commitLength = Math.min (Long.parseLong(contentLengthHeader)
+                    - this.bytesCommitted, (long)content.length);
         }
         if (commitLength > 0) {
-            this.outStream.write(content, 0, commitLength);
+            this.outStream.write(content, 0, (int)commitLength);
         }
         this.outStream.flush();
 
@@ -223,7 +223,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
         if (!isCommitted() && !this.disregardMode && !this.closed &&
                 (this.owner.getHeader(WinstoneResponse.CONTENT_LENGTH_HEADER) == null)) {
             if ((this.owner != null) && !this.bodyOnly) {
-                this.owner.setContentLength(getOutputStreamLength());
+                this.owner.setContentLength((int)getOutputStreamLength());
             }
         }
         flush();
