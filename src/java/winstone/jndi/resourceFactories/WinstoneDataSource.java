@@ -468,4 +468,16 @@ public class WinstoneDataSource implements DataSource, Runnable {
                 "" + this.usedRealConnections.size(), 
                 "" + this.unusedRealConnections.size()});
     }
+
+	@Override
+	public <T> T unwrap(Class<T> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isWrapperFor(Class<?> iface) throws SQLException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
