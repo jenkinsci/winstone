@@ -81,7 +81,7 @@ public class SimpleAccessLogger implements AccessLogger {
         String uriLine = request.getMethod() + " " + originalURL + " " + request.getProtocol();
         int status = response.getErrorStatusCode() == null ? response.getStatus() 
                 : response.getErrorStatusCode();
-        int size = response.getWinstoneOutputStream().getBytesCommitted();
+        long size = response.getWinstoneOutputStream().getBytesCommitted();
         String date;
         synchronized (DF) {
             date = DF.format(new Date());
