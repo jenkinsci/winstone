@@ -27,6 +27,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -290,9 +291,9 @@ public class WebAppConfiguration implements ServletContext, Comparator {
          
         // init mimeTypes set
         this.mimeTypes = new Hashtable();
+        this.mimeTypes.putAll(loadBuiltinMimeTypes());
         String[] typeList = new String[] {
-                Launcher.RESOURCES.getString("WebAppConfig.DefaultMimeTypes"),
-                Option.MIME_TYPES.get(startupArgs)
+            Option.MIME_TYPES.get(startupArgs)
         };
         for (String allTypes : typeList) {
             if (allTypes == null) continue;
@@ -902,6 +903,23 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             Arrays.sort(autoStarters);
             for (Object autoStarter : autoStarters) {
                 ((ServletConfiguration) autoStarter).ensureInitialization();
+            }
+        }
+    }
+
+    private Properties loadBuiltinMimeTypes() {
+        InputStream in = getClass().getResourceAsStream("mime.properties");
+        try {
+            Properties props = new Properties();
+            props.load(in);
+            return props;
+        } catch (IOException e) {
+            throw new Error("Failed to load the built-in MIME types",e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // ignore
             }
         }
     }
