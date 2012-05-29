@@ -59,6 +59,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -111,6 +112,26 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-enforcer-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>enforce</goal>
+                  </goals>
+                  <configuration>
+                    <rules>
+                      <requireJavaVersion>
+                        <version>(1.6,1.7)</version>
+                      </requireJavaVersion>
+                    </rules>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
