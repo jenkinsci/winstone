@@ -30,9 +30,8 @@ import java.util.concurrent.TimeUnit;
 public class ObjectPool {
     private static final long FLUSH_PERIOD = 60000L;
     
-    private int STARTUP_REQUEST_HANDLERS_IN_POOL = 5;
-    private int MAX_IDLE_REQUEST_HANDLERS_IN_POOL = 20;
-    private int MAX_REQUEST_HANDLERS_IN_POOL = 200;
+    private final int maxIdleRequestHandlersInPool;
+    private final int maxConcurrentRequests;
     private long RETRY_PERIOD = 1000;
     private int START_REQUESTS_IN_POOL = 10;
     private int MAX_REQUESTS_IN_POOL = 1000;
@@ -55,11 +54,11 @@ public class ObjectPool {
     public ObjectPool(Map args) throws IOException {
         this.simulateModUniqueId = Option.SIMULATE_MOD_UNIQUE_ID.get(args);
         this.saveSessions = Option.USE_SAVED_SESSIONS.get(args);
-        this.STARTUP_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_STARTUP.get(args);
-        this.MAX_REQUEST_HANDLERS_IN_POOL     = Option.HANDLER_COUNT_MAX.get(args);
-        this.MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_MAX_IDLE.get(args);
+//        this.STARTUP_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_STARTUP.get(args);
+        this.maxConcurrentRequests = Option.HANDLER_COUNT_MAX.get(args);
+        this.maxIdleRequestHandlersInPool = Option.HANDLER_COUNT_MAX_IDLE.get(args);
 
-        ExecutorService es = new ThreadPoolExecutor(MAX_IDLE_REQUEST_HANDLERS_IN_POOL, Integer.MAX_VALUE,
+        ExecutorService es = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
                 new SynchronousQueue<Runnable>(),
                 new ThreadFactory() {
@@ -74,7 +73,7 @@ public class ObjectPool {
                         return thread;
                     }
                 });
-        requestHandler = new BoundedExecutorService(es,MAX_REQUEST_HANDLERS_IN_POOL);
+        requestHandler = new BoundedExecutorService(es, maxConcurrentRequests);
 
         // Build the request/response pools
         this.unusedRequestPool = new ArrayList();

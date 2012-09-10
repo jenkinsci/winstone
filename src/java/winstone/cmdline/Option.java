@@ -76,9 +76,23 @@ public class Option<T> {
 
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
 
+    /**
+     * Currently unused.
+     */
     public static final OInt HANDLER_COUNT_STARTUP =integer("handlerCountStartup",5);
-    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",1000);
-    public static final OInt HANDLER_COUNT_MAX_IDLE=integer("handlerCountMaxIdle",50);
+    /**
+     * How many requests do we handle concurrently?
+     *
+     * If the system gets really loaded, too many concurrent threads will create vicious cycles
+     * and make everyone slow (or worst case choke every request by OOME), so better to err
+     * on the conservative side (and have inbound connections wait in the queue)
+     */
+    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",20);
+    /**
+     * Leave this number of request handler threads in the pool even when they are idle.
+     * Other threads are destroyed when they are idle to free up resources.
+     */
+    public static final OInt HANDLER_COUNT_MAX_IDLE=integer("handlerCountMaxIdle",5);
 
     public static final OBoolean DIRECTORY_LISTINGS=bool("directoryListings",true);
     public static final OBoolean USE_JASPER=bool("useJasper",false);
