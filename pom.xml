@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>0.9.10-jenkins-38</version>
+  <version>0.9.10-jenkins-39</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
