@@ -55,6 +55,9 @@ public class ObjectPool {
     public ObjectPool(Map args) throws IOException {
         this.simulateModUniqueId = Option.SIMULATE_MOD_UNIQUE_ID.get(args);
         this.saveSessions = Option.USE_SAVED_SESSIONS.get(args);
+        this.STARTUP_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_STARTUP.get(args);
+        this.MAX_REQUEST_HANDLERS_IN_POOL     = Option.HANDLER_COUNT_MAX.get(args);
+        this.MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_MAX_IDLE.get(args);
 
         ExecutorService es = new ThreadPoolExecutor(MAX_IDLE_REQUEST_HANDLERS_IN_POOL, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
@@ -76,11 +79,6 @@ public class ObjectPool {
         // Build the request/response pools
         this.unusedRequestPool = new ArrayList();
         this.unusedResponsePool = new ArrayList();
-
-        // Get handler pool options
-        STARTUP_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_STARTUP.get(args);
-        MAX_REQUEST_HANDLERS_IN_POOL     = Option.HANDLER_COUNT_MAX.get(args);
-        MAX_IDLE_REQUEST_HANDLERS_IN_POOL = Option.HANDLER_COUNT_MAX_IDLE.get(args);
 
         // Initialise the request/response pools
         for (int n = 0; n < START_REQUESTS_IN_POOL; n++) {
