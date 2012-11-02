@@ -16,7 +16,6 @@ import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
@@ -24,6 +23,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import winstone.Logger;
 
@@ -290,19 +290,35 @@ public class WinstoneConnection implements Connection {
 		this.realConnection.setClientInfo (properties);
 	}
 
-	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		return null;
+        return this.realConnection.unwrap(iface);
 	}
 
-	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		return false;
+		return this.realConnection.isWrapperFor(iface);
 	}
 
-	@Override
 	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-		// TODO Auto-generated method stub
-		
+        this.realConnection.setTypeMap(map);
 	}
+
+    public void setSchema(String schema) throws SQLException {
+        this.realConnection.setSchema(schema);
+    }
+
+    public String getSchema() throws SQLException {
+        return this.realConnection.getSchema();
+    }
+
+    public void abort(Executor executor) throws SQLException {
+        this.realConnection.abort(executor);
+    }
+
+    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+        this.realConnection.setNetworkTimeout(executor,milliseconds);
+    }
+
+    public int getNetworkTimeout() throws SQLException {
+        return this.realConnection.getNetworkTimeout();
+    }
 }

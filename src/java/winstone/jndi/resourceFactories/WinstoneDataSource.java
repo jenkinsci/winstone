@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -460,6 +461,10 @@ public class WinstoneDataSource implements DataSource, Runnable {
         } else {
             Logger.log(level, DS_RESOURCES, msgKey, arg, err);
         }
+    }
+
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        return java.util.logging.Logger.getLogger("");
     }
 
     public String toString() {
