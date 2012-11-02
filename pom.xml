@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>0.9.10-jenkins-39</version>
+  <version>0.9.10-jenkins-39-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -19,11 +19,6 @@
       <url>http://www.sun.com/cddl/cddl.html</url>
     </license>
   </licenses>
-
-    <scm>  
-        <connection>scm:cvs:pserver:anonymous@winstone.cvs.sourceforge.net:/cvsroot/winstone</connection>
-        <url>http://winstone.cvs.sourceforge.net/winstone/winstone</url>
-    </scm>
 
     <build>
         <sourceDirectory>src/java</sourceDirectory>
@@ -149,7 +144,13 @@
       <url>http://repo.jenkins-ci.org/public/</url>
     </repository>
   </repositories>  
-  
+
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
+    <url>http://github.com/jenkinsci/winstone</url>
+  </scm>
+
     <dependencies>
       <dependency>
           <groupId>junit</groupId>
