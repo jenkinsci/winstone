@@ -610,7 +610,7 @@ public class WinstoneRequest implements HttpServletRequest {
             else if (name.equalsIgnoreCase(HOST_HEADER)) {
                 if (value.indexOf('[') != -1 && value.indexOf(']') != -1) {
                     //IPv6 host as per rfc2732
-                    this.serverName = value.substring(value.indexOf('[') + 1, value.indexOf(']'));
+                    this.serverName = value.substring(value.indexOf('['), value.indexOf(']')+1);
                     int nextColonPos = value.indexOf("]:");
                     if ((nextColonPos == -1) || (nextColonPos == value.length() - 1)) {
                         if (this.scheme != null) {

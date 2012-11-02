@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -287,14 +288,34 @@ public class HttpListener implements Listener, Runnable {
         req.setRemoteIP(socket.getInetAddress().getHostAddress());
         req.setRemotePort(socket.getPort());
         if (this.doHostnameLookups) {
-            req.setServerName(socket.getLocalAddress().getHostName());
+            req.setServerName(getHostName(socket.getLocalAddress()));
             req.setRemoteName(socket.getInetAddress().getHostName());
-            req.setLocalName(socket.getLocalAddress().getHostName());
+            req.setLocalName(getHostName(socket.getLocalAddress()));
         } else {
-            req.setServerName(socket.getLocalAddress().getHostAddress());
+            req.setServerName(getHostAddress(socket.getLocalAddress()));
             req.setRemoteName(socket.getInetAddress().getHostAddress());
-            req.setLocalName(socket.getLocalAddress().getHostAddress());
+            req.setLocalName(getHostAddress(socket.getLocalAddress()));
         }
+        // setRemoteName pairs with getRemoteHost(), and in Jetty
+        // this returns ::1 not [::1].
+        // but getServerName() and getLocalName() returns [::1] and not ::1.
+        // that's why setRemoteName() is left without the IPv6-aware wrapper method
+    }
+
+    private String getHostAddress(InetAddress adrs) {
+        if (adrs instanceof Inet6Address)
+            return '['+adrs.getHostAddress()+']';
+        else
+            return adrs.getHostAddress();
+    }
+
+    private String getHostName(InetAddress adrs) {
+        if (adrs instanceof Inet6Address) {
+            String n = adrs.getHostName();
+            if (n.indexOf(':')>=0)  return '['+n+']';
+            return n;
+        } else
+            return adrs.getHostName();
     }
 
     /**
