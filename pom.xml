@@ -121,7 +121,7 @@
                   <configuration>
                     <rules>
                       <requireJavaVersion>
-                        <version>[1,7,)</version>
+                        <version>[1.7,)</version>
                       </requireJavaVersion>
                     </rules>
                   </configuration>
