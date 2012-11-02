@@ -1,8 +1,8 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>0.9.10-jenkins-39-SNAPSHOT</version>
+  <version>0.9.10-jenkins-39</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -72,10 +72,10 @@
                         <configuration>
                             <tasks>
                                 <copy overwrite="true" todir="${project.build.directory}">
-                                    <fileset dir="${basedir}/src" includes="testwebapp/**"/>
+                                    <fileset dir="${basedir}/src" includes="testwebapp/**" />
                                 </copy>
                                 <copy overwrite="true" todir="${project.build.directory}/testwebapp/WEB-INF/classes">
-                                    <fileset dir="${project.build.testOutputDirectory}" includes="**"/>
+                                    <fileset dir="${project.build.testOutputDirectory}" includes="**" />
                                 </copy>
                             </tasks>
                         </configuration>
