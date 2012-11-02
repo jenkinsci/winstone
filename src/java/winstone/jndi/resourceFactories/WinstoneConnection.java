@@ -24,6 +24,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import winstone.Logger;
 
@@ -304,5 +305,26 @@ public class WinstoneConnection implements Connection {
 	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void abort(Executor executor) throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	public int getNetworkTimeout() throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	public String getSchema() throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	public void setNetworkTimeout(Executor executor, int milliseconds)
+			throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	public void setSchema(String schema) throws SQLException {
+		throw new SQLFeatureNotSupportedException();		
 	}
 }
