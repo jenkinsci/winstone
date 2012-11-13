@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
 import winstone.Logger;
+import winstone.URIUtil;
 import winstone.WinstoneException;
 import winstone.WinstoneOutputStream;
 
@@ -77,8 +77,8 @@ public class Ajp13OutputStream extends WinstoneOutputStream {
                 if (colonPos == -1)
                     throw new WinstoneException(Ajp13Listener.AJP_RESOURCES.getString(
                             "Ajp13OutputStream.NoColonHeader", header));
-                String headerName = header.substring(0, colonPos).trim();
-                String headerValue = header.substring(colonPos + 1).trim();
+                String headerName = URIUtil.noCRLF(header.substring(0, colonPos).trim());
+                String headerValue = URIUtil.noCRLF(header.substring(colonPos + 1).trim());
                 byte headerCode[] = (byte[]) headerCodes.get(headerName
                         .toLowerCase());
                 if (headerCode == null) {

@@ -10,7 +10,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.Stack;
 
 import javax.servlet.http.Cookie;
@@ -146,7 +145,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
 
             // Write headers and cookies
             for (String header : this.owner.getHeaders()) {
-                o.write(header.getBytes("8859_1"));
+                o.write(URIUtil.noCRLF(header).getBytes("8859_1"));
                 o.write(CR_LF);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                         "WinstoneOutputStream.Header", header);

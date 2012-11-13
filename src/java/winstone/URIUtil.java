@@ -2,8 +2,8 @@ package winstone;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -15,9 +15,9 @@ public class URIUtil {
      * this method preserves the leading and trailing '/'.
      */
     static String canonicalPath(String path) {
-        List r = new ArrayList(Arrays.asList(path.split("[/\\\\]+")));
+        List<String> r = new ArrayList<String>(Arrays.asList(path.split("[/\\\\]+")));
         for (int i=0; i<r.size(); ) {
-            String cur = (String)r.get(i);
+            String cur = r.get(i);
             if (cur.length()==0 || cur.equals(".")) {
                 // empty token occurs for example, "".split("/+") is [""]
                 r.remove(i);
@@ -66,5 +66,13 @@ public class URIUtil {
                 buf.append(ch);
         }
         return buf.toString();
+    }
+
+    /**
+     * Removes any occurrence of CR and LF in the text.
+     */
+    public static String noCRLF(String text) {
+        // so long as the value doesn't contain CR nor LF, don't really care how they get replaced
+        return text.replace('\r',' ').replace('\n',' ');
     }
 }
