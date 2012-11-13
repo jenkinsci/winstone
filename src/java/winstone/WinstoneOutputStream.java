@@ -145,8 +145,7 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
                     "WinstoneOutputStream.ResponseStatus", statusLine);
 
             // Write headers and cookies
-            for (Object o2 : this.owner.getHeaders()) {
-                String header = (String) o2;
+            for (String header : this.owner.getHeaders()) {
                 o.write(header.getBytes("8859_1"));
                 o.write(CR_LF);
                 Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,

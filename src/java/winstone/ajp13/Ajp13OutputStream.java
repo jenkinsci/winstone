@@ -72,8 +72,7 @@ public class Ajp13OutputStream extends WinstoneOutputStream {
             this.committed = true;
 
             ByteArrayOutputStream headerArrayStream = new ByteArrayOutputStream();
-            for (Object o1 : this.owner.getHeaders()) {
-                String header = (String) o1;
+            for (String header : this.owner.getHeaders()) {
                 int colonPos = header.indexOf(':');
                 if (colonPos == -1)
                     throw new WinstoneException(Ajp13Listener.AJP_RESOURCES.getString(

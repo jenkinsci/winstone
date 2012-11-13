@@ -63,7 +63,7 @@ public class WinstoneResponse implements HttpServletResponse {
     private WinstoneOutputStream outputStream;
     private PrintWriter outputWriter;
     
-    private List headers;
+    private List<String> headers;
     private String explicitEncoding;
     private String implicitEncoding;
     private List cookies;
@@ -84,7 +84,7 @@ public class WinstoneResponse implements HttpServletResponse {
      */
     public WinstoneResponse() {
         
-        this.headers = new ArrayList();
+        this.headers = new ArrayList<String>();
         this.cookies = new ArrayList();
         this.httpOnlyCookies = new HashSet();
 
@@ -171,7 +171,7 @@ public class WinstoneResponse implements HttpServletResponse {
         this.reqKeepAliveHeader = req.getHeader(KEEP_ALIVE_HEADER);
     }
 
-    public List getHeaders() {
+    public List<String> getHeaders() {
         return this.headers;
     }
 
@@ -580,8 +580,8 @@ public class WinstoneResponse implements HttpServletResponse {
     }
 
     public boolean containsHeader(String name) {
-        for (Object header : this.headers)
-            if (((String) header).startsWith(name))
+        for (String header : this.headers)
+            if (header.startsWith(name))
                 return true;
         return false;
     }
@@ -633,7 +633,7 @@ public class WinstoneResponse implements HttpServletResponse {
         } else {
             boolean found = false;
             for (int n = 0; (n < this.headers.size()); n++) {
-                String header = (String) this.headers.get(n);
+                String header = this.headers.get(n);
                 if (header.startsWith(name + ": ")) {
                     if (found) {
                         this.headers.remove(n);
@@ -669,7 +669,7 @@ public class WinstoneResponse implements HttpServletResponse {
     private void forceHeader(String name, String value) {
         boolean found = false;
         for (int n = 0; (n < this.headers.size()); n++) {
-            String header = (String) this.headers.get(n);
+            String header = this.headers.get(n);
             if (header.startsWith(name + ": ")) {
                 found = true;
                 this.headers.set(n, name + ": " + value);
