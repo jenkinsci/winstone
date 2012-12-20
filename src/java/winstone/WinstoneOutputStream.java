@@ -167,6 +167,9 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
             // Launcher.RESOURCES.getString("HttpProtocol.OutHeaders") + out.toString());
         }
         byte content[] = this.buffer.toByteArray();
+        this.buffer.reset();
+        this.bufferPosition = 0;
+
 //        winstone.ajp13.Ajp13Listener.packetDump(content, content.length);
 //        this.buffer.writeTo(this.outStream);
         long commitLength = content.length;
@@ -185,8 +188,6 @@ public class WinstoneOutputStream extends javax.servlet.ServletOutputStream {
                 "" + (this.bytesCommitted + commitLength));
 
         this.bytesCommitted += commitLength;
-        this.buffer.reset();
-        this.bufferPosition = 0;
     }
 
     public void reset() {
