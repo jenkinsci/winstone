@@ -8,9 +8,7 @@ package winstone;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
@@ -27,7 +25,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -208,9 +205,10 @@ public class WinstoneRequest implements HttpServletRequest {
      * Steps through the header array, searching for the first header matching
      */
     private String extractFirstHeader(String name) {
+        int len = name.length();
         for (String header : this.headers) {
-            if (header.toUpperCase(Locale.ENGLISH).startsWith(name.toUpperCase(Locale.ENGLISH) + ':')) {
-                return header.substring(name.length() + 1).trim(); // 1 for colon
+            if (header.length() > len && header.charAt(len) == ':' && header.regionMatches(true, 0, name, 0, len)) {
+                return header.substring(len + 1).trim(); // 1 for colon
             }
         }
         return null;
@@ -1202,12 +1200,12 @@ public class WinstoneRequest implements HttpServletRequest {
     }
 
     public Enumeration getHeaders(String name) {
+        int len = name.length();
         List headers = new ArrayList();
         for (String header : this.headers)
-            if (header.toUpperCase(Locale.ENGLISH).startsWith(
-                    name.toUpperCase(Locale.ENGLISH) + ':'))
+            if (header.length() > len && header.charAt(len) == ':' && header.regionMatches(true, 0, name, 0, len))
                 headers
-                        .add(header.substring(name.length() + 1)
+                        .add(header.substring(len + 1)
                                 .trim()); // 1 for colon
         return Collections.enumeration(headers);
     }
