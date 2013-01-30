@@ -15,6 +15,8 @@ public class WinstoneRequestTest {
         assertEquals("bar", r.getHeader("Foo"));
         assertEquals("bar", r.getHeader("foo"));
         assertEquals(null, r.getHeader("Foo:"));
+        assertEquals(null, r.getHeader("Fooz"));
+        assertEquals(null, r.getHeader("Fo"));
         assertEquals("true", r.getHeader("baz-quux"));
         Locale l = Locale.getDefault();
         Locale.setDefault(Locale.forLanguageTag("tr"));
@@ -24,6 +26,8 @@ public class WinstoneRequestTest {
         } finally {
             Locale.setDefault(l);
         }
+        assertEquals(Collections.emptyList(), Collections.list(r.getHeaders("includ")));
+        assertEquals(Collections.emptyList(), Collections.list(r.getHeaders("includes")));
     }
 
 }
