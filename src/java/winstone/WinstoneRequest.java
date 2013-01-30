@@ -209,7 +209,7 @@ public class WinstoneRequest implements HttpServletRequest {
      */
     private String extractFirstHeader(String name) {
         for (String header : this.headers) {
-            if (header.toUpperCase().startsWith(name.toUpperCase() + ':')) {
+            if (header.toUpperCase(Locale.ENGLISH).startsWith(name.toUpperCase(Locale.ENGLISH) + ':')) {
                 return header.substring(name.length() + 1).trim(); // 1 for colon
             }
         }
@@ -1204,8 +1204,8 @@ public class WinstoneRequest implements HttpServletRequest {
     public Enumeration getHeaders(String name) {
         List headers = new ArrayList();
         for (String header : this.headers)
-            if (header.toUpperCase().startsWith(
-                    name.toUpperCase() + ':'))
+            if (header.toUpperCase(Locale.ENGLISH).startsWith(
+                    name.toUpperCase(Locale.ENGLISH) + ':'))
                 headers
                         .add(header.substring(name.length() + 1)
                                 .trim()); // 1 for colon
