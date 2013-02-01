@@ -6,25 +6,16 @@
  */
 package winstone;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * Response for servlet
@@ -37,7 +28,7 @@ public class WinstoneResponse implements HttpServletResponse {
     private static final DateFormat HTTP_DF = new SimpleDateFormat(
             "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
     private static final DateFormat VERSION0_DF = new SimpleDateFormat(
-            "EEE, dd-MMM-yy HH:mm:ss z", Locale.US);
+            "EEE, dd-MMM-yyyy HH:mm:ss z", Locale.US);
     static {
         HTTP_DF.setTimeZone(TimeZone.getTimeZone("GMT"));
         VERSION0_DF.setTimeZone(TimeZone.getTimeZone("GMT"));
