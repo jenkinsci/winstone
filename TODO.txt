@@ -7,7 +7,6 @@ Long-term
        - url matching (evaluation of servletPath/pathInfo)
        - security / authentication
        - cluster resilience
-       - ajp13 connector
      - More complete manual/documentation
      - Publish apidocs
      - Eclipse plug-in ? internal launcher plus browser window, and project level config for 
