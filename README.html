@@ -199,7 +199,7 @@ Other options:
    --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
    --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
    --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
-   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default is 8009
+   --ajp13Port              = set the ajp13 listening port. -1 to disable, Default disabled
    --ajp13ListenAddress     = set the ajp13 listening address. Default is all interfaces
    --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
 
@@ -573,8 +573,7 @@ worker.ajp13.port=8009
 worker.ajp13.host=localhost
 worker.ajp13.type=ajp13
 </pre></li>
-        <li>Start up Winstone, ensuring that the --ajp13Port=8009 is in the startup args. It's set to this
-          by default, but it's worth confirming.</li>
+        <li>Start up Winstone, ensuring that the --ajp13Port=8009 is in the startup args.</li>
         <li>Start up Apache and try connecting to your webapp on the apache port, with the Winstone 
           URL prefix. If it doesn't work, try looking at the apache error.log file for hints. If you get hex dumps, mail
           them to the winstone-devel list, together with any stack traces winstone generated.</li>

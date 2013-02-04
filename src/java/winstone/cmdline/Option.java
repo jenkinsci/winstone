@@ -76,7 +76,7 @@ public class Option<T> {
     public static final OFile HTTPS_CERTIFICATE=file("httpsCertificate");
     public static final OFile HTTPS_PRIVATE_KEY=file("httpsPrivateKey");
 
-    public static final OInt AJP13_PORT=integer("ajp13"+_PORT,8009);
+    public static final OInt AJP13_PORT=integer("ajp13"+_PORT,-1);
     public static final OString AJP13_LISTEN_ADDRESS=string("ajp13"+_LISTEN_ADDRESS);
 
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
