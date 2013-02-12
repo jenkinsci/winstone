@@ -56,7 +56,12 @@ public class Option<T> {
     public static final OInt _PORT = integer("Port");
     public static final OString _LISTEN_ADDRESS = string("ListenAddress");
     public static final OBoolean _DO_HOSTNAME_LOOKUPS = bool("DoHostnameLookups",false);
-    
+    /**
+     * Number of milliseconds for the HTTP keep-alive to hang around until the next request is sent.
+     */
+    public static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
+
+
     public static final OInt HTTP_PORT=integer("http"+_PORT);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);
     public static final OBoolean HTTP_DO_HOSTNAME_LOOKUPS=bool("http"+ _DO_HOSTNAME_LOOKUPS,false);

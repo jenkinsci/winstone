@@ -35,7 +35,7 @@ public class HttpListener implements Listener, Runnable {
     protected static int CONNECTION_TIMEOUT = 60000;
     protected static int BACKLOG_COUNT = 5000;
     protected static boolean DEFAULT_HNL = false;
-    protected static int KEEP_ALIVE_TIMEOUT = 5000;
+    protected int keepAliveTimeout;
     protected static int KEEP_ALIVE_SLEEP = 20;
     protected static int KEEP_ALIVE_SLEEP_MAX = 500;
     protected HostGroup hostGroup;
@@ -62,6 +62,8 @@ public class HttpListener implements Listener, Runnable {
                 getConnectorName() + Option._LISTEN_ADDRESS, null);
         this.doHostnameLookups = WebAppConfiguration.booleanArg(args,
                 getConnectorName() + Option._DO_HOSTNAME_LOOKUPS, DEFAULT_HNL);
+        this.keepAliveTimeout = WebAppConfiguration.intArg(args,
+                        getConnectorName() + Option._KEEP_ALIVE_TIMEOUT, Option._KEEP_ALIVE_TIMEOUT.defaultValue);
     }
 
     public boolean start() throws IOException {
@@ -231,7 +233,7 @@ public class HttpListener implements Listener, Runnable {
 
         // Read the header line (because this is the first line of the request,
         // apply keep-alive timeouts to it if we are not the first request)
-        socket.setSoTimeout(KEEP_ALIVE_TIMEOUT);
+        socket.setSoTimeout(keepAliveTimeout);
 
         byte uriBuffer[] = null;
         try {
