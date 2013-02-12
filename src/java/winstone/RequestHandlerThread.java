@@ -55,6 +55,8 @@ public class RequestHandlerThread implements Runnable {
         OutputStream outSocket = null;
         boolean iAmFirst = true;
         try {
+            int requestCount = 0;
+
             // Get input/output streams
             inSocket = socket.getInputStream();
             outSocket = socket.getOutputStream();
@@ -72,9 +74,19 @@ public class RequestHandlerThread implements Runnable {
                                 rsp, inData, outData);
                         continue;
                     }
-                    String servletURI = this.listener.parseURI(this,
-                            this.req, this.rsp, this.inData, this.socket,
-                            iAmFirst);
+
+                    String servletURI;
+                    String oldName = Thread.currentThread().getName();
+                    Thread.currentThread().setName(String.format("%s : reading request #%d from %s",
+                            oldName, requestCount++, socket.getRemoteSocketAddress()));
+                    try {
+                        servletURI = this.listener.parseURI(this,
+                                this.req, this.rsp, this.inData, this.socket,
+                                iAmFirst);
+                    } finally {
+                        Thread.currentThread().setName(oldName);
+                    }
+
                     if (servletURI == null) {
                         Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
                                 "RequestHandlerThread.KeepAliveTimedOut", Thread.currentThread().getName());
