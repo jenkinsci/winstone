@@ -87,7 +87,7 @@ public class Option<T> {
      * and make everyone slow (or worst case choke every request by OOME), so better to err
      * on the conservative side (and have inbound connections wait in the queue)
      */
-    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",20);
+    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",40);
     /**
      * Leave this number of request handler threads in the pool even when they are idle.
      * Other threads are destroyed when they are idle to free up resources.

@@ -35,7 +35,7 @@ public class HttpListener implements Listener, Runnable {
     protected static int CONNECTION_TIMEOUT = 60000;
     protected static int BACKLOG_COUNT = 5000;
     protected static boolean DEFAULT_HNL = false;
-    protected static int KEEP_ALIVE_TIMEOUT = 10000;
+    protected static int KEEP_ALIVE_TIMEOUT = 5000;
     protected static int KEEP_ALIVE_SLEEP = 20;
     protected static int KEEP_ALIVE_SLEEP_MAX = 500;
     protected HostGroup hostGroup;
