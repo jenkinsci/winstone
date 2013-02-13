@@ -187,9 +187,11 @@ Other options:
    --httpPort               = set the http listening port. -1 to disable, Default is 8080
    --httpListenAddress      = set the http listening address. Default is all interfaces
    --httpDoHostnameLookups  = enable host name lookups on http connections. Default is false
+   --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms)?
    --httpsPort              = set the https listening port. -1 to disable, Default is disabled
    --httpsListenAddress     = set the https listening address. Default is all interfaces
    --httpsDoHostnameLookups = enable host name lookups on https connections. Default is false
+   --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms)?
    --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
    --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
    --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
