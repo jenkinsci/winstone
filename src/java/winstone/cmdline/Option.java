@@ -65,10 +65,12 @@ public class Option<T> {
     public static final OInt HTTP_PORT=integer("http"+_PORT);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);
     public static final OBoolean HTTP_DO_HOSTNAME_LOOKUPS=bool("http"+ _DO_HOSTNAME_LOOKUPS,false);
+    public static final OInt HTTP_KEEP_ALIVE_TIMEOUT=integer("http" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
 
     public static final OInt HTTPS_PORT=integer("https"+_PORT);
     public static final OString HTTPS_LISTEN_ADDRESS=string("https"+_LISTEN_ADDRESS);
     public static final OBoolean HTTPS_DO_HOSTNAME_LOOKUPS=bool("https"+ _DO_HOSTNAME_LOOKUPS,false);
+    public static final OInt HTTPS_KEEP_ALIVE_TIMEOUT=integer("https" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
     public static final OFile HTTPS_KEY_STORE=file("httpsKeyStore");
     public static final OString HTTPS_KEY_STORE_PASSWORD=string("httpsKeyStorePassword");
     public static final OString HTTPS_KEY_MANAGER_TYPE=string("httpsKeyManagerType","SunX509");
