@@ -158,8 +158,19 @@ public class Ajp13IncomingPacket {
                 attName = readString(di,encoding);
             }
 
-            String attValue = readString (di,encoding);
+            if (type==0x0B) {
+                int intValue = di.readShort();
+                // SSL key size is not used. Furthermore, the map
+                // is supposed to contain only Strings anyway. So:
+                // just ignore this.
+                // this.attributes.put(attName, attValue);
+                Logger.log(Logger.FULL_DEBUG, Ajp13Listener.AJP_RESOURCES,
+                        "Ajp13IncomingPacket.Attribute", attName,
+                        intValue);
+                continue;
+            }
 
+            String attValue = readString (di,encoding);
             this.attributes.put(attName, attValue);
             Logger.log(Logger.FULL_DEBUG, Ajp13Listener.AJP_RESOURCES,
                     "Ajp13IncomingPacket.Attribute", attName,
