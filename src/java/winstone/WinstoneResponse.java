@@ -240,7 +240,7 @@ public class WinstoneResponse implements HttpServletResponse {
         
         forceHeader(KEEP_ALIVE_HEADER, !closeAfterRequest() ? KEEP_ALIVE_OPEN : KEEP_ALIVE_CLOSE);
         String contentType = getHeader(CONTENT_TYPE_HEADER);
-        if (this.statusCode != SC_MOVED_TEMPORARILY) {
+        if (this.statusCode != SC_MOVED_TEMPORARILY && this.statusCode != SC_NOT_MODIFIED) {
             if (contentType == null) {
                 // Bypass normal encoding
                 forceHeader(CONTENT_TYPE_HEADER, "text/html;charset=" + getCharacterEncoding());
