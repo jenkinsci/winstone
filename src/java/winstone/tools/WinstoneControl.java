@@ -38,7 +38,21 @@ public class WinstoneControl {
 
     public static OInt CONTROL_PORT = Option.integer("controlPort");
     public static OInt PORT = Option.integer("port");
-    public static OInt DEBUG = Option.integer("debug", Level.INFO.intValue());
+    public static OInt DEBUG = new OInt("debug", 5) {
+        public int get(Map args) {
+            switch(super.get(args)) {
+                // before switching to java.util.Logging, winstone used a (1:9) range for log levels
+                case 1: return Logger.MIN.intValue();
+                case 2: return Logger.ERROR.intValue();
+                case 3: return Logger.WARNING.intValue();
+                case 4: return Logger.INFO.intValue();
+                case 6: return Logger.SPEED.intValue();
+                case 7: return Logger.DEBUG.intValue();
+                case 8: return Logger.FULL_DEBUG.intValue();
+                case 9: return Logger.MAX.intValue();
+                case 5:
+                default: return Logger.INFO.intValue();
+    }}};
     public static OString HOST = Option.string("host", "localhost");
 
 
