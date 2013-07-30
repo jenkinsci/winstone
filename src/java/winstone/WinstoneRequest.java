@@ -72,6 +72,8 @@ public class WinstoneRequest implements HttpServletRequest {
     static final String METHOD_POST = "POST";
     static final String POST_PARAMETERS = "application/x-www-form-urlencoded";
 
+    static final String FORWARDED_FOR = "X-Forwarded-For";
+
     protected Map attributes;
     protected Map parameters;
     protected Stack attributesStack;
@@ -646,6 +648,8 @@ public class WinstoneRequest implements HttpServletRequest {
                     if (encodingClause.startsWith("charset="))
                         this.encoding = encodingClause.substring(8);
                 }
+            } else if (name.equalsIgnoreCase(FORWARDED_FOR)) {
+                setRemoteIP(value);
             } else if (name.equalsIgnoreCase(IN_COOKIE_HEADER1)
                     || name.equalsIgnoreCase(IN_COOKIE_HEADER2))
                 parseCookieLine(value, cookieList);
