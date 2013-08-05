@@ -112,6 +112,7 @@ public class Option<T> {
     public static final OString MIME_TYPES=string("mimeTypes");
     public static final OInt MAX_PARAM_COUNT=integer("maxParamCount",-1);
     public static final OBoolean USAGE=bool("usage",false);
+    public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
     public static final OBoolean HELP=bool("help",false);
 
     public static final OBoolean USE_CLUSTER=bool("useCluster",false);
