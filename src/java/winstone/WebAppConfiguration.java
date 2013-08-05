@@ -149,6 +149,9 @@ public class WebAppConfiguration implements ServletContext, Comparator {
     private AuthenticationHandler authenticationHandler;
     private AuthenticationRealm authenticationRealm;
     private String welcomeFiles[];
+    /**
+     * Session time out in the # of minutes. -1 for default, and 0 for never.
+     */
     private Integer sessionTimeout;
     private Class[] errorPagesByExceptionKeysSorted;
     private Map errorPagesByException;
