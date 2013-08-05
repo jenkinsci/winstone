@@ -218,7 +218,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         boolean useInvoker = Option.USE_INVOKER.get(startupArgs);
         boolean useJNDI = Option.USE_JNDI.get(startupArgs);
         this.useSavedSessions = Option.USE_SAVED_SESSIONS.get(startupArgs);
-        
+        this.sessionTimeout = Option.SESSION_TIMEOUT.get(startupArgs);
+
         // Check jasper is available - simple tests
         if (useJasper) {
             try {
@@ -364,7 +365,8 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                         if ((timeoutElm.getNodeType() == Node.ELEMENT_NODE)
                                 && (timeoutElm.getNodeName().equals(ELEM_SESSION_TIMEOUT))) {
                             String timeoutStr = getTextFromNode(timeoutElm);
-                            if (!timeoutStr.equals("")) {
+                            if (!timeoutStr.equals("")
+				&& (this.sessionTimeout == -1)) {
                                 this.sessionTimeout = Integer.valueOf(timeoutStr);
                             }
                         }
@@ -1286,7 +1288,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         WinstoneSession ws = new WinstoneSession(sessionId);
         ws.setWebAppConfiguration(this);
         setSessionListeners(ws);
-        if (this.sessionTimeout == null) {
+        if (this.sessionTimeout == -1) {
             ws.setMaxInactiveInterval(60*60);   // 60 mins as the default
         } else if (this.sessionTimeout > 0) {
             ws.setMaxInactiveInterval(this.sessionTimeout * 60);
