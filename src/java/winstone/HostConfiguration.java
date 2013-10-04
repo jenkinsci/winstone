@@ -140,6 +140,20 @@ public class HostConfiguration {
     private WebAppContext create(File app, String prefix) {
         WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix) {
             @Override
+            public void preConfigure() throws Exception {
+                // to have WebAppClassLoader inherit from commonLibCL,
+                // we need to set it as the context classloader.
+                Thread t = Thread.currentThread();
+                ClassLoader ccl = t.getContextClassLoader();
+                t.setContextClassLoader(commonLibCL);
+                try {
+                    super.preConfigure();
+                } finally {
+                    t.setContextClassLoader(ccl);
+                }
+            }
+
+            @Override
             public void postConfigure() throws Exception {
                 super.postConfigure();
 
