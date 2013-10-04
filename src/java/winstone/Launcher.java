@@ -291,8 +291,6 @@ public class Launcher implements Runnable {
     public void shutdown() {
         // Release all listeners/pools/webapps
         this.objectPool.destroy();
-        if (this.hostGroup!=null)
-            this.hostGroup.destroy();
         if (this.globalJndiManager != null) {
             this.globalJndiManager.tearDown();
         }
@@ -393,7 +391,6 @@ public class Launcher implements Runnable {
             Option.WARFILE.put(args, tempWarfile.getAbsolutePath());
             Option.WARFILE.put(args, tempWebroot.getAbsolutePath());
             Option.WEBAPPS_DIR.remove(args);
-            Option.HOSTS_DIR.remove(args);
         }
     }
     

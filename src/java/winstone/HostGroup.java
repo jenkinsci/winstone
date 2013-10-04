@@ -63,17 +63,6 @@ public class HostGroup {
         return (HostConfiguration) this.hostConfigs.get(this.defaultHostName);
     }
     
-    public void destroy() {
-        Set hostnames = new HashSet(this.hostConfigs.keySet());
-        for (Object hostname1 : hostnames) {
-            String hostname = (String) hostname1;
-            HostConfiguration host = (HostConfiguration) this.hostConfigs.get(hostname);
-            host.destroy();
-            this.hostConfigs.remove(hostname);
-        }
-        this.hostConfigs.clear();
-    }
-    
     protected void initHost(File webappsDir, String hostname,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {

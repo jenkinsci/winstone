@@ -106,27 +106,6 @@ public class HostConfiguration {
         return this.hostname;
     }
     
-    /**
-     * Destroy this webapp instance. Kills the webapps, plus any servlets,
-     * attributes, etc
-     * 
-     * @param prefix The webapp to destroy
-     */
-    private void destroyWebApp(String prefix) {
-        WebAppContext webAppConfig = this.webapps.get(prefix);
-        if (webAppConfig != null) {
-            webAppConfig.stop();
-            this.webapps.remove(prefix);
-        }
-    }
-    
-    public void destroy() {
-        Set prefixes = new HashSet(this.webapps.keySet());
-        for (Object prefixe : prefixes) {
-            destroyWebApp((String) prefixe);
-        }
-    }
-    
     public void reloadWebApp(String prefix) {
         WebAppContext webApp = (WebAppContext) this.webapps.get(prefix);
         if (webApp != null) {
