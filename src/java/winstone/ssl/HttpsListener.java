@@ -6,23 +6,6 @@
  */
 package winstone.ssl;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.Socket;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.RSAPrivateKeySpec;
-import java.text.MessageFormat;
-import java.util.Enumeration;
-import java.util.Map;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
@@ -31,15 +14,34 @@ import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
-import winstone.HostGroup;
 import winstone.HttpListener;
 import winstone.Logger;
-import winstone.ObjectPool;
-import winstone.cmdline.Option;
 import winstone.WinstoneException;
-import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;
 import winstone.auth.BasicAuthenticationHandler;
+import winstone.cmdline.Option;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.RSAPrivateKeySpec;
+import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -188,31 +190,6 @@ public class HttpsListener extends HttpListener {
     @Override
     protected SelectChannelConnector createConnector(Server server) {
         return new SslSelectChannelConnector(getSSLContext());
-    }
-
-    /**
-     * Just a mapping of key sizes for cipher types. Taken indirectly from the
-     * TLS specs.
-     */
-    private Integer getKeySize(String cipherSuite) {
-        if (cipherSuite.indexOf("_WITH_NULL_") != -1)
-            return 0;
-        else if (cipherSuite.indexOf("_WITH_IDEA_CBC_") != -1)
-            return 128;
-        else if (cipherSuite.indexOf("_WITH_RC2_CBC_40_") != -1)
-            return 40;
-        else if (cipherSuite.indexOf("_WITH_RC4_40_") != -1)
-            return 40;
-        else if (cipherSuite.indexOf("_WITH_RC4_128_") != -1)
-            return 128;
-        else if (cipherSuite.indexOf("_WITH_DES40_CBC_") != -1)
-            return 40;
-        else if (cipherSuite.indexOf("_WITH_DES_CBC_") != -1)
-            return 56;
-        else if (cipherSuite.indexOf("_WITH_3DES_EDE_CBC_") != -1)
-            return 168;
-        else
-            return null;
     }
 
     /**
