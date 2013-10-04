@@ -32,7 +32,7 @@ import static org.eclipse.jetty.util.security.Credential.*;
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
-public class FileRealm extends HashLoginService implements AuthenticationRealm {
+public class FileRealm extends HashLoginService {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     
     final String DEFAULT_FILE_NAME = "users.xml";

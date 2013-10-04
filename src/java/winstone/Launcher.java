@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import winstone.cmdline.CmdLineParser;
@@ -142,7 +143,7 @@ public class Launcher implements Runnable {
 
             try {
                 // Build the realm
-                Class realmClass = Option.REALM_CLASS_NAME.get(args, AuthenticationRealm.class, commonLibCL);
+                Class realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
                 Constructor realmConstr = realmClass.getConstructor(new Class[] {Set.class, Map.class });
                 server.addBean(realmConstr.newInstance(args));
             } catch (Throwable err) {
