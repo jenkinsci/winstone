@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Connector;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
@@ -52,7 +53,7 @@ public class Launcher implements Runnable {
     private int controlPort;
     private HostGroup hostGroup;
     private ObjectPool objectPool;
-    private final List listeners = new ArrayList();
+    private final List<Connector> listeners = new ArrayList<Connector>();
     private Map args;
     private Cluster cluster;
     private JNDIManager globalJndiManager;
