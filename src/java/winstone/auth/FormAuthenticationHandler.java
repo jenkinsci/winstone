@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
-import winstone.WebAppConfiguration;
+import winstone.Temporary;
 import winstone.WinstoneRequest;
 
 /**
@@ -72,9 +72,9 @@ public class FormAuthenticationHandler extends BaseAuthenticationHandler {
                     if (formElm.getNodeType() != Node.ELEMENT_NODE)
                         continue;
                     else if (formElm.getNodeName().equals(ELEM_FORM_LOGIN_PAGE))
-                        loginPage = WebAppConfiguration.getTextFromNode(formElm);
+                        loginPage = Temporary.getTextFromNode(formElm);
                     else if (formElm.getNodeName().equals(ELEM_FORM_ERROR_PAGE))
-                        errorPage = WebAppConfiguration.getTextFromNode(formElm);
+                        errorPage = Temporary.getTextFromNode(formElm);
                 }
             }
         }

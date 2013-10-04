@@ -9,8 +9,6 @@ package winstone;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,7 +22,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,7 +29,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
@@ -162,22 +158,6 @@ public class WebAppConfiguration implements Comparator {
     private AccessLogger accessLogger;
     private Map filterMatchCache;
     private boolean useSavedSessions;
-
-    public static String getTextFromNode(Node node) {
-        if (node == null) {
-            return null;
-        }
-        Node child = node.getFirstChild();
-        if (child == null) {
-            return "";
-        }
-        String textNode = child.getNodeValue();
-        if (textNode == null) {
-            return "";
-        } else {
-            return textNode.trim();
-        }
-    }
 
     /**
      * Constructor. This parses the xml and sets up for basic routing
@@ -329,7 +309,7 @@ public class WebAppConfiguration implements Comparator {
                 String nodeName = child.getNodeName();
 
                 if (nodeName.equals(ELEM_DISPLAY_NAME))
-                    this.displayName = getTextFromNode(child);
+                    this.displayName = Temporary.getTextFromNode(child);
 
                 else if (nodeName.equals(ELEM_DISTRIBUTABLE))
                     distributable = true;
@@ -349,7 +329,7 @@ public class WebAppConfiguration implements Comparator {
                         Node timeoutElm = child.getChildNodes().item(m);
                         if ((timeoutElm.getNodeType() == Node.ELEMENT_NODE)
                                 && (timeoutElm.getNodeName().equals(ELEM_SESSION_TIMEOUT))) {
-                            String timeoutStr = getTextFromNode(timeoutElm);
+                            String timeoutStr = Temporary.getTextFromNode(timeoutElm);
                             if (!timeoutStr.equals("")
 				&& (this.sessionTimeout == -1)) {
                                 this.sessionTimeout = Integer.valueOf(timeoutStr);
@@ -365,7 +345,7 @@ public class WebAppConfiguration implements Comparator {
                         if ((roleElm.getNodeType() == Node.ELEMENT_NODE)
                                 && (roleElm.getNodeName()
                                         .equals(ELEM_ROLE_NAME)))
-                            rolesAllowed.add(getTextFromNode(roleElm));
+                            rolesAllowed.add(Temporary.getTextFromNode(roleElm));
                     }
                 }
 
@@ -394,7 +374,7 @@ public class WebAppConfiguration implements Comparator {
                         if ((listenerElm.getNodeType() == Node.ELEMENT_NODE)
                                 && (listenerElm.getNodeName()
                                         .equals(ELEM_LISTENER_CLASS)))
-                            listenerClass = getTextFromNode(listenerElm);
+                            listenerClass = Temporary.getTextFromNode(listenerElm);
                     }
                     if (listenerClass != null)
                         try {
@@ -427,9 +407,9 @@ public class WebAppConfiguration implements Comparator {
                             continue;
                         String mapNodeName = mapChild.getNodeName();
                         if (mapNodeName.equals(ELEM_SERVLET_NAME)) {
-                            name = getTextFromNode(mapChild);
+                            name = Temporary.getTextFromNode(mapChild);
                         } else if (mapNodeName.equals(ELEM_URL_PATTERN)) {
-                            mappings.add(getTextFromNode(mapChild));
+                            mappings.add(Temporary.getTextFromNode(mapChild));
                         }
                     }
                     for (Object mapping : mappings) {
@@ -454,13 +434,13 @@ public class WebAppConfiguration implements Comparator {
                             continue;
                         String mapNodeName = mapChild.getNodeName();
                         if (mapNodeName.equals(ELEM_FILTER_NAME)) {
-                            filterName = getTextFromNode(mapChild);
+                            filterName = Temporary.getTextFromNode(mapChild);
                         } else if (mapNodeName.equals(ELEM_SERVLET_NAME)) {
-                            mappings.add("srv:" + getTextFromNode(mapChild));
+                            mappings.add("srv:" + Temporary.getTextFromNode(mapChild));
                         } else if (mapNodeName.equals(ELEM_URL_PATTERN)) {
-                            mappings.add("url:" + getTextFromNode(mapChild));
+                            mappings.add("url:" + Temporary.getTextFromNode(mapChild));
                         } else if (mapNodeName.equals(ELEM_DISPATCHER)) {
-                            String dispatcherValue = getTextFromNode(mapChild);
+                            String dispatcherValue = Temporary.getTextFromNode(mapChild);
                             if (dispatcherValue.equals(DISPATCHER_REQUEST))
                                 onRequest = true;
                             else if (dispatcherValue.equals(DISPATCHER_FORWARD))
@@ -509,7 +489,7 @@ public class WebAppConfiguration implements Comparator {
                         Node welcomeFile = child.getChildNodes().item(m);
                         if ((welcomeFile.getNodeType() == Node.ELEMENT_NODE)
                                 && welcomeFile.getNodeName().equals(ELEM_WELCOME_FILE)) {
-                            String welcomeStr = getTextFromNode(welcomeFile);
+                            String welcomeStr = Temporary.getTextFromNode(welcomeFile);
                             if (!welcomeStr.equals("")) {
                                 localWelcomeFiles.add(welcomeStr);
                             }
@@ -530,11 +510,11 @@ public class WebAppConfiguration implements Comparator {
                             continue;
                         String errorChildName = errorChild.getNodeName();
                         if (errorChildName.equals(ELEM_ERROR_CODE))
-                            code = getTextFromNode(errorChild);
+                            code = Temporary.getTextFromNode(errorChild);
                         else if (errorChildName.equals(ELEM_EXCEPTION_TYPE))
-                            exception = getTextFromNode(errorChild);
+                            exception = Temporary.getTextFromNode(errorChild);
                         else if (errorChildName.equals(ELEM_ERROR_LOCATION))
-                            location = getTextFromNode(errorChild);
+                            location = Temporary.getTextFromNode(errorChild);
                     }
                     if ((code != null) && (location != null))
                         this.errorPagesByCode.put(code.trim(), location.trim());
@@ -562,10 +542,10 @@ public class WebAppConfiguration implements Comparator {
                             continue;
                         else if (mimeTypeNode.getNodeName().equals(
                                 ELEM_MIME_EXTENSION))
-                            extension = getTextFromNode(mimeTypeNode);
+                            extension = Temporary.getTextFromNode(mimeTypeNode);
                         else if (mimeTypeNode.getNodeName().equals(
                                 ELEM_MIME_TYPE))
-                            mimeType = getTextFromNode(mimeTypeNode);
+                            mimeType = Temporary.getTextFromNode(mimeTypeNode);
                     }
                     if ((extension != null) && (mimeType != null))
                         this.mimeTypes.put(extension.toLowerCase(), mimeType);
@@ -585,10 +565,10 @@ public class WebAppConfiguration implements Comparator {
                             continue;
                         else if (contextParamNode.getNodeName().equals(
                                 ELEM_PARAM_NAME))
-                            name = getTextFromNode(contextParamNode);
+                            name = Temporary.getTextFromNode(contextParamNode);
                         else if (contextParamNode.getNodeName().equals(
                                 ELEM_PARAM_VALUE))
-                            value = getTextFromNode(contextParamNode);
+                            value = Temporary.getTextFromNode(contextParamNode);
                     }
                     if ((name != null) && (value != null))
                         this.initParameters.put(name, value);
@@ -611,9 +591,9 @@ public class WebAppConfiguration implements Comparator {
                                 if (mappingChildNode.getNodeType() != Node.ELEMENT_NODE)
                                     continue;
                                 else if (mappingChildNode.getNodeName().equals(ELEM_LOCALE))
-                                    localeName = getTextFromNode(mappingChildNode);
+                                    localeName = Temporary.getTextFromNode(mappingChildNode);
                                 else if (mappingChildNode.getNodeName().equals(ELEM_ENCODING))
-                                    encoding = getTextFromNode(mappingChildNode);
+                                    encoding = Temporary.getTextFromNode(mappingChildNode);
                             }
                             if (!encoding.equals("") && !localeName.equals(""))
                                 this.localeEncodingMap.put(localeName, encoding);
@@ -631,7 +611,7 @@ public class WebAppConfiguration implements Comparator {
                                 Node urlPatternNode = propertyGroupNode.getChildNodes().item(l);
                                 if ((urlPatternNode.getNodeType() == Node.ELEMENT_NODE)
                                         && urlPatternNode.getNodeName().equals(ELEM_URL_PATTERN)) {
-                                    String jm = getTextFromNode(urlPatternNode);
+                                    String jm = Temporary.getTextFromNode(urlPatternNode);
                                     if (!jm.equals("")) {
                                         jspMappings.add(jm);
                                     }
@@ -648,7 +628,7 @@ public class WebAppConfiguration implements Comparator {
             String authMethod = null;
             for (int n = 0; n < loginConfigNode.getChildNodes().getLength(); n++) {
                 if (loginConfigNode.getChildNodes().item(n).getNodeName().equals("auth-method")) {
-                    authMethod = getTextFromNode(loginConfigNode.getChildNodes().item(n));
+                    authMethod = Temporary.getTextFromNode(loginConfigNode.getChildNodes().item(n));
                 }
             }
             // Load the appropriate auth class

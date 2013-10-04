@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
 
 import winstone.Logger;
 import winstone.Mapping;
-import winstone.WebAppConfiguration;
+import winstone.Temporary;
 
 /**
  * Models a restriction on a particular set of resources in the webapp.
@@ -55,7 +55,7 @@ public class SecurityConstraint {
             if (child.getNodeType() != Node.ELEMENT_NODE)
                 continue;
             else if (child.getNodeName().equals(ELEM_DISPLAY_NAME))
-                this.displayName = WebAppConfiguration.getTextFromNode(child);
+                this.displayName = Temporary.getTextFromNode(child);
             else if (child.getNodeName().equals(ELEM_WEB_RESOURCES)) {
                 String methodSet = null;
 
@@ -67,10 +67,10 @@ public class SecurityConstraint {
                     String resourceChildNodeName = resourceChild.getNodeName();
                     if (resourceChildNodeName.equals(ELEM_URL_PATTERN)) {
                         localUrlPatternList.add(Mapping.createFromURL(
-                                "Security", WebAppConfiguration.getTextFromNode(resourceChild)));
+                                "Security", Temporary.getTextFromNode(resourceChild)));
                     } else if (resourceChildNodeName.equals(ELEM_HTTP_METHOD)) {
                         methodSet = (methodSet == null ? "." : methodSet)
-                                + WebAppConfiguration.getTextFromNode(resourceChild) + ".";
+                                + Temporary.getTextFromNode(resourceChild) + ".";
                     }
                 }
                 localMethodSetList.add(methodSet == null ? ".ALL." : methodSet);
@@ -81,7 +81,7 @@ public class SecurityConstraint {
                     if ((roleChild.getNodeType() != Node.ELEMENT_NODE)
                             || !roleChild.getNodeName().equals(ELEM_ROLE_NAME))
                         continue;
-                    String roleName = WebAppConfiguration.getTextFromNode(roleChild);
+                    String roleName = Temporary.getTextFromNode(roleChild);
                     if (roleName.equals("*"))
                         localRolesAllowed.addAll(rolesAllowed);
                     else
@@ -93,7 +93,7 @@ public class SecurityConstraint {
                     Node roleChild = child.getChildNodes().item(k);
                     if ((roleChild.getNodeType() == Node.ELEMENT_NODE)
                             && roleChild.getNodeName().equals(ELEM_TRANSPORT_GUARANTEE))
-                        this.needsSSL = !WebAppConfiguration.getTextFromNode(roleChild)
+                        this.needsSSL = !Temporary.getTextFromNode(roleChild)
                                 .equalsIgnoreCase(GUARANTEE_NONE);
                 }
             }
