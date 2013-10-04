@@ -83,8 +83,8 @@ public class Launcher implements Runnable {
             this.controlPort =Option.CONTROL_PORT.get(args);
 
             // Check for java home
-            List jars = new ArrayList();
-            List commonLibCLPaths = new ArrayList();
+            List<URL> jars = new ArrayList<URL>();
+            List<File> commonLibCLPaths = new ArrayList<File>();
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
@@ -130,7 +130,7 @@ public class Launcher implements Runnable {
             } else {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
             }
-            ClassLoader commonLibCL = new URLClassLoader((URL[]) jars.toArray(new URL[jars.size()]),
+            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[jars.size()]),
                     getClass().getClassLoader());
 
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
@@ -145,8 +145,7 @@ public class Launcher implements Runnable {
                 try {
                     // Build the realm
                     Class jndiMgrClass = Option.CONTAINER_JNDI_CLASSNAME.get(args,JNDIManager.class,commonLibCL);
-                    Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] {
-                            Map.class, List.class, ClassLoader.class });
+                    Constructor jndiMgrConstr = jndiMgrClass.getConstructor(Map.class, List.class, ClassLoader.class);
                     this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(args, null, commonLibCL);
                     this.globalJndiManager.setup();
                 } catch (Throwable err) {
@@ -157,7 +156,7 @@ public class Launcher implements Runnable {
 
             // Open the web apps
             this.hostGroup = new HostGroup(this.objectPool, commonLibCL,
-                    (File []) commonLibCLPaths.toArray(new File[0]), args);
+                    commonLibCLPaths.toArray(new File[0]), args);
 
             // Create connectors (http, https and ajp)
             spawnListener(HTTP_LISTENER_CLASS);
