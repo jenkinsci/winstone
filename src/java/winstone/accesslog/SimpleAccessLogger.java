@@ -6,6 +6,14 @@
  */
 package winstone.accesslog;
 
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import winstone.Logger;
+import winstone.WinstoneResourceBundle;
+import winstone.cmdline.Option;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,19 +23,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.RequestLog;
-import org.eclipse.jetty.server.Response;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import winstone.AccessLogger;
-import winstone.Logger;
-import winstone.cmdline.Option;
-import winstone.WebAppConfiguration;
-import winstone.WinstoneResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Simulates an apache "combined" style logger, which logs User-Agent, Referer, etc
@@ -45,16 +40,14 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private static final String COMBINED = COMMON + " \"###referer###\" \"###userAgent###\"";
     private static final String RESIN = COMMON + " \"###userAgent###\"";
     
-//    private WebAppConfiguration webAppConfig;
     private OutputStream outStream;
     private PrintWriter outWriter;
     private String pattern;
     private String fileName;
     
-    public SimpleAccessLogger(WebAppConfiguration webAppConfig, Map startupArgs) 
+    public SimpleAccessLogger(String webAppName, Map startupArgs)
             throws IOException {
-//        this.webAppConfig = webAppConfig;
-        
+
         // Get pattern
         String patternType = Option.SIMPLE_ACCESS_LOGGER_FORMAT.get(startupArgs);
         if (patternType.equalsIgnoreCase("combined")) {
@@ -70,8 +63,8 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         // Get filename
         String filePattern =  Option.SIMPLE_ACCESS_LOGGER_FILE.get(startupArgs);
         this.fileName = WinstoneResourceBundle.globalReplace(filePattern, 
-                new String [][] {{"###host###", webAppConfig.getOwnerHostname()},
-                    {"###webapp###", webAppConfig.getContextName()}});
+                new String [][] {
+                    {"###webapp###", webAppName}});
         
         File file = new File(this.fileName);
         file.getParentFile().mkdirs();

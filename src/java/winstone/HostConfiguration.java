@@ -71,30 +71,32 @@ public class HostConfiguration {
             String prefix = Option.PREFIX.get(args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
-            handler = create(appFile, prefix);
+            handler = configureAccessLog(create(appFile, prefix),"webapp");
         }
         // Otherwise multi-webapp mode
         else {
             handler = initMultiWebappDir(webappsDir);
         }
 
-        handler = configureAccessLog(handler);
-
         server.setHandler(handler);
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
     }
 
-    private Handler configureAccessLog(Handler handler) {
+    /**
+     * @param webAppName
+     *      Unique name given to the access logger.
+     */
+    private Handler configureAccessLog(Handler handler, String webAppName) {
         try {
             Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
             if (loggerClass!=null) {
                 // Build the realm
                 Constructor loggerConstr = loggerClass.getConstructor(new Class[] {
-                        WebAppConfiguration.class, Map.class });
+                        String.class, Map.class });
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setHandler(handler);
-                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(this, args));
+                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(this, webAppName, args));
                 return rlh;
             } else {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
@@ -255,7 +257,7 @@ public class HostConfiguration {
                             try {
                                 WebAppContext context = create(aChildren, prefix);
                                 context.start();
-                                webApps.addHandler(context);
+                                webApps.addHandler(configureAccessLog(context,childName));
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
                                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
@@ -273,7 +275,7 @@ public class HostConfiguration {
                             WebAppContext context = create(
                                     getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
                             context.start();
-                            webApps.addHandler(context);
+                            webApps.addHandler(configureAccessLog(context,outputName));
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {
                             Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
