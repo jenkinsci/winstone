@@ -91,14 +91,6 @@ public class Ajp13Listener implements Listener {
     }
 
     /**
-     * Interrupts the listener thread. This will trigger a listener shutdown
-     * once the so timeout has passed.
-     */
-    public void destroy() {
-        this.interrupted = true;
-    }
-
-    /**
      * Called by the request handler thread, because it needs specific setup
      * code for this connection's protocol (ie construction of request/response
      * objects, in/out streams, etc).

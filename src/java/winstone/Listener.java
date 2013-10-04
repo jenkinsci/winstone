@@ -21,12 +21,6 @@ import java.net.Socket;
  */
 public interface Listener {
     /**
-     * Interrupts the listener thread. This will trigger a listener shutdown
-     * once the so timeout has passed.
-     */
-    public void destroy();
-    
-    /**
      * After the listener is loaded and initialized, this starts the thread
      * @param server
      */

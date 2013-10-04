@@ -51,7 +51,6 @@ public class Launcher implements Runnable {
     private int controlPort;
     private HostGroup hostGroup;
     private ObjectPool objectPool;
-    private final List<Listener> listeners = new ArrayList<Listener>();
     private Map args;
     private JNDIManager globalJndiManager;
 
@@ -193,9 +192,7 @@ public class Launcher implements Runnable {
             Listener listener = (Listener) listenerConstructor
                     .newInstance(args, this.objectPool,
                             this.hostGroup);
-            if (listener. start(server)) {
-                this.listeners.add(listener); // TODO: fix it
-            }
+            listener. start(server);
 //        } catch (ClassNotFoundException err) {
 //            Logger.log(Logger.INFO, RESOURCES,
 //                    "Launcher.ListenerNotFound", listenerClassName);
@@ -300,7 +297,6 @@ public class Launcher implements Runnable {
     
     public void shutdown() {
         // Release all listeners/pools/webapps
-        for (Object listener : this.listeners) ((Listener) listener).destroy();
         this.objectPool.destroy();
         if (this.hostGroup!=null)
             this.hostGroup.destroy();
