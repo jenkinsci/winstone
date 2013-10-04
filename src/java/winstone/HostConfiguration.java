@@ -37,17 +37,10 @@ import java.util.jar.JarFile;
  * @version $Id: HostConfiguration.java,v 1.8 2007/08/02 06:16:00 rickknowles Exp $
  */
 public class HostConfiguration {
-    
-    private static final long FLUSH_PERIOD = 60000L;
-    
-    private static final String WEB_INF = "WEB-INF";
-    private static final String WEB_XML = "web.xml";
-
     private final Server server;
     private String hostname;
     private Map args;
     private Map<String,WebAppContext> webapps;
-    private ObjectPool objectPool;
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
     private MimeTypes mimeTypes = new MimeTypes();
@@ -57,8 +50,7 @@ public class HostConfiguration {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
-        this.webapps = new Hashtable();
-        this.objectPool = objectPool;
+        this.webapps = new Hashtable<String,WebAppContext>();
         this.commonLibCL = commonLibCL;
         this.commonLibCLPaths = commonLibCLPaths;
         
