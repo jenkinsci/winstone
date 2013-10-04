@@ -165,6 +165,13 @@
           <version>1.6</version>
           <scope>test</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>9.0.0.v20130308</version>
+      </dependency>
+
   </dependencies>
 
 </project>
