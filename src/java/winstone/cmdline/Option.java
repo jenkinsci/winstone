@@ -58,12 +58,12 @@ public class Option<T> {
     public static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
 
 
-    public static final OInt HTTP_PORT=integer("http"+_PORT);
+    public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);
     public static final OBoolean HTTP_DO_HOSTNAME_LOOKUPS=bool("http"+ _DO_HOSTNAME_LOOKUPS,false);
     public static final OInt HTTP_KEEP_ALIVE_TIMEOUT=integer("http" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
 
-    public static final OInt HTTPS_PORT=integer("https"+_PORT);
+    public static final OInt HTTPS_PORT=integer("https"+_PORT,-1);
     public static final OString HTTPS_LISTEN_ADDRESS=string("https"+_LISTEN_ADDRESS);
     public static final OBoolean HTTPS_DO_HOSTNAME_LOOKUPS=bool("https"+ _DO_HOSTNAME_LOOKUPS,false);
     public static final OInt HTTPS_KEEP_ALIVE_TIMEOUT=integer("https" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);

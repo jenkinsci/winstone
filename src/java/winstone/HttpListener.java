@@ -31,7 +31,6 @@ import java.util.Map;
  * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
 public class HttpListener implements Listener {
-    protected static boolean DEFAULT_HNL = false;
     protected int keepAliveTimeout;
     protected boolean doHostnameLookups;
     protected int listenPort;
@@ -45,14 +44,10 @@ public class HttpListener implements Listener {
      */
     public HttpListener(Map args) {
         // Load resources
-        this.listenPort = Integer.parseInt(WebAppConfiguration.stringArg(args,
-                getConnectorName() + Option._PORT, "" + getDefaultPort()));
-        this.listenAddress = WebAppConfiguration.stringArg(args,
-                getConnectorName() + Option._LISTEN_ADDRESS, null);
-        this.doHostnameLookups = WebAppConfiguration.booleanArg(args,
-                getConnectorName() + Option._DO_HOSTNAME_LOOKUPS, DEFAULT_HNL);
-        this.keepAliveTimeout = WebAppConfiguration.intArg(args,
-                        getConnectorName() + Option._KEEP_ALIVE_TIMEOUT, Option._KEEP_ALIVE_TIMEOUT.defaultValue);
+        this.listenPort = Option.HTTP_PORT.get(args);
+        this.listenAddress = Option.HTTP_LISTEN_ADDRESS.get(args);
+        this.doHostnameLookups = Option.HTTP_DO_HOSTNAME_LOOKUPS.get(args);
+        this.keepAliveTimeout = Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args);
     }
 
     public boolean start(Server server) throws IOException {
@@ -68,26 +63,6 @@ public class HttpListener implements Listener {
         }
     }
 
-    /**
-     * The default port to use - this is just so that we can override for the
-     * SSL connector.
-     */
-    protected int getDefaultPort() {
-        return 8080;
-    }
-
-    /**
-     * The name to use when getting properties - this is just so that we can
-     * override for the SSL connector.
-     */
-    protected String getConnectorName() {
-        return getConnectorScheme();
-    }
-
-    protected String getConnectorScheme() {
-        return "http";
-    }
-    
     /**
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.

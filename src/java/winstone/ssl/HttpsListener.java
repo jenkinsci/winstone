@@ -72,6 +72,11 @@ public class HttpsListener extends HttpListener {
     public HttpsListener(Map args) throws IOException {
         super(args);
 
+        this.listenPort = Option.HTTPS_PORT.get(args);
+        this.listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
+        this.doHostnameLookups = Option.HTTPS_DO_HOSTNAME_LOOKUPS.get(args);
+        this.keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
+
         if (listenPort<0) {
             // not running HTTPS listener
             keystore = null;
@@ -169,22 +174,6 @@ public class HttpsListener extends HttpListener {
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
-    }
-
-    /**
-     * The default port to use - this is just so that we can override for the
-     * SSL connector.
-     */
-    protected int getDefaultPort() {
-        return -1; // https disabled by default
-    }
-
-    /**
-     * The name to use when getting properties - this is just so that we can
-     * override for the SSL connector.
-     */
-    protected String getConnectorScheme() {
-        return "https";
     }
 
     @Override
