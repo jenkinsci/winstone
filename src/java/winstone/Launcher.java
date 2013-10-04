@@ -162,13 +162,7 @@ public class Launcher implements Runnable {
             // Create connectors (http, https and ajp)
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
-            try {
-                Class.forName("javax.net.ServerSocketFactory");
-                spawnListener(HTTPS_LISTENER_CLASS);
-            } catch (ClassNotFoundException err) {
-                Logger.log(Logger.DEBUG, RESOURCES,
-                        "Launcher.NeedsJDK14", HTTPS_LISTENER_CLASS);
-            }
+            spawnListener(HTTPS_LISTENER_CLASS);
 
             this.controlThread = new Thread(this, RESOURCES.getString(
                     "Launcher.ThreadName", "" + this.controlPort));
