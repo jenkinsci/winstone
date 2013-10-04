@@ -24,7 +24,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
@@ -185,8 +186,8 @@ public class HttpsListener extends HttpListener {
     }
 
     @Override
-    protected ServerConnector createConnector(Server server) {
-        return new ServerConnector(server,getSSLContext());
+    protected SelectChannelConnector createConnector(Server server) {
+        return new SslSelectChannelConnector(getSSLContext());
     }
 
     /**

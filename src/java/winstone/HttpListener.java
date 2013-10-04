@@ -6,9 +6,8 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class HttpListener implements Listener {
         if (this.listenPort < 0) {
             return false;
         } else {
-            ServerConnector connector = createConnector(server);
+            SelectChannelConnector connector = createConnector(server);
             connector.setPort(listenPort);
             connector.setHost(this.listenAddress);
 
@@ -104,8 +103,8 @@ public class HttpListener implements Listener {
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.
      */
-    protected ServerConnector createConnector(Server server) {
-        return new ServerConnector(server,new HttpConnectionFactory());
+    protected SelectChannelConnector createConnector(Server server) {
+        return new SelectChannelConnector();
     }
 
     /**
