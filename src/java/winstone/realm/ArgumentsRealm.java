@@ -7,7 +7,6 @@
 package winstone.realm;
 
 import org.eclipse.jetty.security.HashLoginService;
-import winstone.AuthenticationRealm;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;

@@ -9,7 +9,6 @@ package winstone.realm;
 import org.eclipse.jetty.security.HashLoginService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import winstone.AuthenticationRealm;
 import winstone.Logger;
 import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
