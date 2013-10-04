@@ -9,6 +9,7 @@ package winstone.ssl;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
@@ -18,7 +19,6 @@ import winstone.ConnectorFactory;
 import winstone.Logger;
 import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
-import winstone.auth.BasicAuthenticationHandler;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -139,10 +139,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                     continue;
                 }
                 if (in) {
-                    char[] inBytes = line.toCharArray();
-                    byte[] outBytes = new byte[(inBytes.length*3)/4];
-                    int length = BasicAuthenticationHandler.decodeBase64(inBytes, outBytes, 0, inBytes.length, 0);
-                    baos.write(outBytes,0,length);
+                    baos.write(B64Code.decode(line));
                 }
             }
         } finally {

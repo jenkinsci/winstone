@@ -6,21 +6,18 @@
  */
 package winstone.tools;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Map;
-import java.util.logging.Level;
-
 import winstone.Launcher;
 import winstone.Logger;
-import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 import winstone.cmdline.Option.OInt;
 import winstone.cmdline.Option.OString;
+
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Map;
 
 /**
  * Included so that we can control winstone from the command line a little more
