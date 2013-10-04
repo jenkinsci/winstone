@@ -8,7 +8,7 @@ package winstone.ajp13;
 
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Server;
-import winstone.Listener;
+import winstone.ConnectorFactory;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -19,16 +19,16 @@ import java.util.Map;
  * launched by the command line, and owns the server socket, etc.
  * 
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: Ajp13Listener.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
+ * @version $Id: Ajp13ConnectorFactory.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
-public class Ajp13Listener implements Listener {
+public class Ajp13ConnectorFactory implements ConnectorFactory {
     private int listenPort;
     private String listenAddress;
 
     /**
      * Constructor
      */
-    public Ajp13Listener(Map args) {
+    public Ajp13ConnectorFactory(Map args) {
         this.listenPort = Option.AJP13_PORT.get(args);
         this.listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
     }

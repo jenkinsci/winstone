@@ -19,7 +19,7 @@ import java.net.Socket;
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
-public interface Listener {
+public interface ConnectorFactory {
     /**
      * After the listener is loaded and initialized, this starts the thread
      * @param server

@@ -14,7 +14,7 @@ import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
-import winstone.HttpListener;
+import winstone.HttpConnectorFactory;
 import winstone.Logger;
 import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
@@ -48,9 +48,9 @@ import java.util.Map;
  * launched by the command line, and owns the server socket, etc.
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: HttpsListener.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
+ * @version $Id: HttpsConnectorFactory.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
  */
-public class HttpsListener extends HttpListener {
+public class HttpsConnectorFactory extends HttpConnectorFactory {
     private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.ssl.LocalStrings");
     private final KeyStore keystore;
     private final char[] password;
@@ -69,7 +69,7 @@ public class HttpsListener extends HttpListener {
     /**
      * Constructor
      */
-    public HttpsListener(Map args) throws IOException {
+    public HttpsConnectorFactory(Map args) throws IOException {
         super(args);
 
         this.listenPort = Option.HTTPS_PORT.get(args);

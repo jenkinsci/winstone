@@ -11,15 +11,6 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InterruptedIOException;
-import java.io.OutputStream;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,21 +19,21 @@ import java.util.Map;
  * class is also used as the base class for the HTTPS listener.
  * 
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
+ * @version $Id: HttpConnectorFactory.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
-public class HttpListener implements Listener {
+public class HttpConnectorFactory implements ConnectorFactory {
     protected int keepAliveTimeout;
     protected boolean doHostnameLookups;
     protected int listenPort;
     protected String listenAddress;
 
-    protected HttpListener() {
+    protected HttpConnectorFactory() {
     }
 
     /**
      * Constructor
      */
-    public HttpListener(Map args) {
+    public HttpConnectorFactory(Map args) {
         // Load resources
         this.listenPort = Option.HTTP_PORT.get(args);
         this.listenAddress = Option.HTTP_LISTEN_ADDRESS.get(args);

@@ -11,7 +11,6 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
-import javax.servlet.http.HttpUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,9 +37,9 @@ import java.util.logging.Level;
  */
 public class Launcher implements Runnable {
     
-    static final String HTTP_LISTENER_CLASS = "winstone.HttpListener";
-    static final String HTTPS_LISTENER_CLASS = "winstone.ssl.HttpsListener";
-    static final String AJP_LISTENER_CLASS = "winstone.ajp13.Ajp13Listener";
+    static final String HTTP_LISTENER_CLASS = "winstone.HttpConnectorFactory";
+    static final String HTTPS_LISTENER_CLASS = "winstone.ssl.HttpsConnectorFactory";
+    static final String AJP_LISTENER_CLASS = "winstone.ajp13.Ajp13ConnectorFactory";
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
@@ -126,6 +125,11 @@ public class Launcher implements Runnable {
 
             this.objectPool = new ObjectPool(args);
 
+            int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
+            if (maxParameterCount>0) {
+                server.setAttribute("org.eclipse.jetty.server.Request.maxFormKeys",maxParameterCount);
+            }
+
             // Open the web apps
             this.hostGroup = new HostGroup(server, this.objectPool, commonLibCL,
                     commonLibCLPaths.toArray(new File[0]), args);
@@ -161,8 +165,8 @@ public class Launcher implements Runnable {
         try {
             Class listenerClass = Class.forName(listenerClassName);
             Constructor listenerConstructor = listenerClass.getConstructor(Map.class);
-            Listener listener = (Listener) listenerConstructor.newInstance(args);
-            listener. start(server);
+            ConnectorFactory connectorFactory = (ConnectorFactory) listenerConstructor.newInstance(args);
+            connectorFactory. start(server);
         } catch (Throwable err) {
             throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }
@@ -299,11 +303,6 @@ public class Launcher implements Runnable {
         }
 
 
-        int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
-        if (maxParameterCount>0) {
-            HttpUtils.MAX_PARAMETER_COUNT = maxParameterCount;
-        }
-        
         // Launch
         try {
             new Launcher(args);
