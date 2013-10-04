@@ -7,6 +7,7 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
@@ -162,6 +163,8 @@ public class Launcher implements Runnable {
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
+
+            server.setThreadPool(new ExecutorThreadPool(objectPool.getRequestHandler()));
 
             this.controlThread = new Thread(this, RESOURCES.getString(
                     "Launcher.ThreadName", "" + this.controlPort));
