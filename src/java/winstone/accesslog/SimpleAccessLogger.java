@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import winstone.AccessLogger;
@@ -34,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleAccessLogger.java,v 1.5 2006/03/24 17:24:19 rickknowles Exp $
  */
-public class SimpleAccessLogger extends AbstractLifeCycle implements AccessLogger {
+public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog {
 
     public static final WinstoneResourceBundle ACCESSLOG_RESOURCES = 
             new WinstoneResourceBundle("winstone.accesslog.LocalStrings");

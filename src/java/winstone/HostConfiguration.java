@@ -21,6 +21,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
@@ -86,14 +87,14 @@ public class HostConfiguration {
 
     private Handler configureAccessLog(Handler handler) {
         try {
-            Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args,AccessLogger.class, commonLibCL);
+            Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
             if (loggerClass!=null) {
                 // Build the realm
                 Constructor loggerConstr = loggerClass.getConstructor(new Class[] {
                         WebAppConfiguration.class, Map.class });
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setHandler(handler);
-                rlh.setRequestLog((AccessLogger) loggerConstr.newInstance(this, args));
+                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(this, args));
                 return rlh;
             } else {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
