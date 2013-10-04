@@ -11,11 +11,8 @@ import winstone.cmdline.Option;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Manages the references to individual hosts within the container. This object handles
@@ -35,8 +32,7 @@ public class HostGroup {
     private String defaultHostName;
     
     public HostGroup(
-            Server server,
-            ObjectPool objectPool, ClassLoader commonLibCL, 
+            Server server, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args) throws IOException {
         this.server = server;
 //        this.args = args;
@@ -46,7 +42,7 @@ public class HostGroup {
         File webappsDir = Option.WEBAPPS_DIR.get(args);
 
         // If host mode
-        initHost(webappsDir, DEFAULT_HOSTNAME, objectPool, commonLibCL,
+        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
                 commonLibCLPaths, args);
         this.defaultHostName = DEFAULT_HOSTNAME;
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
@@ -64,10 +60,10 @@ public class HostGroup {
     }
     
     protected void initHost(File webappsDir, String hostname,
-            ObjectPool objectPool, ClassLoader commonLibCL, 
-            File commonLibCLPaths[], Map args) throws IOException {
+                            ClassLoader commonLibCL,
+                            File commonLibCLPaths[], Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
-        HostConfiguration config = new HostConfiguration(server, hostname, objectPool, commonLibCL,
+        HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
                 commonLibCLPaths, args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }

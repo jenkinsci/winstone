@@ -45,8 +45,8 @@ public class HostConfiguration {
     private File commonLibCLPaths[];
     private MimeTypes mimeTypes = new MimeTypes();
 
-    public HostConfiguration(Server server, String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
-            File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
+    public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
+                             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;

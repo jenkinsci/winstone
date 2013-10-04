@@ -28,6 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -52,7 +57,7 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private ObjectPool objectPool;
+    private ExecutorService threadPool;
     private Map args;
 
     public final Server server = new Server();
@@ -125,7 +130,7 @@ public class Launcher implements Runnable {
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                     commonLibCLPaths.toString());
 
-            this.objectPool = new ObjectPool(args);
+            this.threadPool = createThreadPool();
 
             int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
             if (maxParameterCount>0) {
@@ -133,7 +138,7 @@ public class Launcher implements Runnable {
             }
 
             // Open the web apps
-            this.hostGroup = new HostGroup(server, this.objectPool, commonLibCL,
+            this.hostGroup = new HostGroup(server, commonLibCL,
                     commonLibCLPaths.toArray(new File[0]), args);
 
             // Create connectors (http, https and ajp)
@@ -150,7 +155,7 @@ public class Launcher implements Runnable {
                 throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
             }
 
-            server.setThreadPool(new ExecutorThreadPool(objectPool.getRequestHandler()));
+            server.setThreadPool(new ExecutorThreadPool(threadPool));
 
             this.controlThread = new Thread(this, RESOURCES.getString(
                     "Launcher.ThreadName", "" + this.controlPort));
@@ -164,6 +169,31 @@ public class Launcher implements Runnable {
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+    }
+
+    /**
+     * Used to handle requests.
+     */
+    private ExecutorService createThreadPool() {
+        int maxConcurrentRequests = Option.HANDLER_COUNT_MAX.get(args);
+        int maxIdleRequestHandlersInPool = Option.HANDLER_COUNT_MAX_IDLE.get(args);
+
+        ExecutorService es = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
+                new SynchronousQueue<Runnable>(),
+                new ThreadFactory() {
+                    private int threadIndex;
+                    public synchronized Thread newThread(Runnable r) {
+                        String threadName = Launcher.RESOURCES.getString(
+                                "RequestHandlerThread.ThreadName", "" + (++threadIndex));
+
+                        // allocate a thread to run on this object
+                        Thread thread = new Thread(r, threadName);
+                        thread.setDaemon(true);
+                        return thread;
+                    }
+                });
+        return new BoundedExecutorService(es, maxConcurrentRequests);
     }
 
     /**
@@ -201,7 +231,7 @@ public class Launcher implements Runnable {
 
             // Enter the main loop
             while (!interrupted) {
-//                this.objectPool.removeUnusedRequestHandlers();
+//                this.threadPool.removeUnusedRequestHandlers();
 //                this.hostGroup.invalidateExpiredSessions();
 
                 // Check for control request
@@ -275,7 +305,7 @@ public class Launcher implements Runnable {
     
     public void shutdown() {
         // Release all listeners/pools/webapps
-        this.objectPool.destroy();
+        this.threadPool.shutdown();
 
         if (this.controlThread != null) {
             this.controlThread.interrupt();
