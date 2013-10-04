@@ -157,6 +157,12 @@ public class Launcher implements Runnable {
 
             server.setThreadPool(new ExecutorThreadPool(threadPool));
 
+            try {
+                server.start();
+            } catch (Exception e) {
+                throw new IOException("Failed to start Jetty",e);
+            }
+
             this.controlThread = new Thread(this, RESOURCES.getString(
                     "Launcher.ThreadName", "" + this.controlPort));
             this.controlThread.setDaemon(false);
@@ -304,6 +310,12 @@ public class Launcher implements Runnable {
     }
     
     public void shutdown() {
+        try {
+            server.stop();
+        } catch (Exception e) {
+            Logger.log(Logger.INFO, RESOURCES, "Launcher.FailedShutdown", e);
+        }
+
         // Release all listeners/pools/webapps
         this.threadPool.shutdown();
 
