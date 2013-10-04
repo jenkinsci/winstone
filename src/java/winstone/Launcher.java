@@ -155,7 +155,7 @@ public class Launcher implements Runnable {
             }
 
             // Open the web apps
-            this.hostGroup = new HostGroup(this.objectPool, commonLibCL,
+            this.hostGroup = new HostGroup(server, this.objectPool, commonLibCL,
                     commonLibCLPaths.toArray(new File[0]), args);
 
             // Create connectors (http, https and ajp)

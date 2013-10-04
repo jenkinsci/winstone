@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Server;
 import winstone.cmdline.Option;
 
 import java.io.File;
@@ -27,14 +28,17 @@ import java.util.Set;
 public class HostGroup {
     
     private final static String DEFAULT_HOSTNAME = "default";
-    
-//    private Map args;
+    private final Server server;
+
+    //    private Map args;
     private Map hostConfigs;
     private String defaultHostName;
     
     public HostGroup(
+            Server server,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
+        this.server = server;
 //        this.args = args;
         this.hostConfigs = new Hashtable();
         
