@@ -67,8 +67,8 @@ public class HttpsListener extends HttpListener {
     /**
      * Constructor
      */
-    public HttpsListener(Map args, ObjectPool objectPool, HostGroup hostGroup) throws IOException {
-        super(args, objectPool, hostGroup);
+    public HttpsListener(Map args) throws IOException {
+        super(args);
 
         if (listenPort<0) {
             // not running HTTPS listener
@@ -188,39 +188,6 @@ public class HttpsListener extends HttpListener {
     @Override
     protected SelectChannelConnector createConnector(Server server) {
         return new SslSelectChannelConnector(getSSLContext());
-    }
-
-    /**
-     * Extracts the relevant socket stuff and adds it to the request object.
-     * This method relies on the base class for everything other than SSL
-     * related attributes
-     */
-    protected void parseSocketInfo(Socket socket, WinstoneRequest req)
-            throws IOException {
-        super.parseSocketInfo(socket, req);
-        if (socket instanceof SSLSocket) {
-            SSLSocket s = (SSLSocket) socket;
-            SSLSession ss = s.getSession();
-            if (ss != null) {
-                Certificate certChain[] = null;
-                try {
-                    certChain = ss.getPeerCertificates();
-                } catch (Throwable err) {/* do nothing */
-                }
-
-                if (certChain != null) {
-                    req.setAttribute("javax.servlet.request.X509Certificate",
-                            certChain);
-                    req.setAttribute("javax.servlet.request.cipher_suite", ss
-                            .getCipherSuite());
-                    req.setAttribute("javax.servlet.request.ssl_session",
-                            new String(ss.getId()));
-                    req.setAttribute("javax.servlet.request.key_size",
-                            getKeySize(ss.getCipherSuite()));
-                }
-            }
-            req.setIsSecure(true);
-        }
     }
 
     /**

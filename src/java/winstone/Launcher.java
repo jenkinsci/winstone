@@ -186,19 +186,10 @@ public class Launcher implements Runnable {
     protected void spawnListener(String listenerClassName) throws IOException {
         try {
             Class listenerClass = Class.forName(listenerClassName);
-            Constructor listenerConstructor = listenerClass
-                    .getConstructor(new Class[]{Map.class,
-                            ObjectPool.class, HostGroup.class});
-            Listener listener = (Listener) listenerConstructor
-                    .newInstance(args, this.objectPool,
-                            this.hostGroup);
+            Constructor listenerConstructor = listenerClass.getConstructor(Map.class);
+            Listener listener = (Listener) listenerConstructor.newInstance(args);
             listener. start(server);
-//        } catch (ClassNotFoundException err) {
-//            Logger.log(Logger.INFO, RESOURCES,
-//                    "Launcher.ListenerNotFound", listenerClassName);
         } catch (Throwable err) {
-//            Logger.log(Logger.ERROR, RESOURCES,
-//                    "Launcher.ListenerStartupError", listenerClassName, err);
             throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }
     }

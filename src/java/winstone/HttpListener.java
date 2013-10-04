@@ -33,8 +33,6 @@ import java.util.Map;
 public class HttpListener implements Listener {
     protected static boolean DEFAULT_HNL = false;
     protected int keepAliveTimeout;
-    protected HostGroup hostGroup;
-    protected ObjectPool objectPool;
     protected boolean doHostnameLookups;
     protected int listenPort;
     protected String listenAddress;
@@ -45,10 +43,8 @@ public class HttpListener implements Listener {
     /**
      * Constructor
      */
-    public HttpListener(Map args, ObjectPool objectPool, HostGroup hostGroup) {
+    public HttpListener(Map args) {
         // Load resources
-        this.hostGroup = hostGroup;
-        this.objectPool = objectPool;
         this.listenPort = Integer.parseInt(WebAppConfiguration.stringArg(args,
                 getConnectorName() + Option._PORT, "" + getDefaultPort()));
         this.listenAddress = WebAppConfiguration.stringArg(args,
@@ -98,45 +94,4 @@ public class HttpListener implements Listener {
      */
     protected SelectChannelConnector createConnector(Server server) {
         return new SelectChannelConnector();
-    }
-
-    protected void parseSocketInfo(Socket socket, WinstoneRequest req)
-            throws IOException {
-        Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.ParsingSocketInfo");
-        req.setScheme(getConnectorScheme());
-        req.setServerPort(socket.getLocalPort());
-        req.setLocalPort(socket.getLocalPort());
-        req.setLocalAddr(socket.getLocalAddress().getHostAddress());
-        req.setRemoteIP(socket.getInetAddress().getHostAddress());
-        req.setRemotePort(socket.getPort());
-        if (this.doHostnameLookups) {
-            req.setServerName(getHostName(socket.getLocalAddress()));
-            req.setRemoteName(socket.getInetAddress().getHostName());
-            req.setLocalName(getHostName(socket.getLocalAddress()));
-        } else {
-            req.setServerName(getHostAddress(socket.getLocalAddress()));
-            req.setRemoteName(socket.getInetAddress().getHostAddress());
-            req.setLocalName(getHostAddress(socket.getLocalAddress()));
-        }
-        // setRemoteName pairs with getRemoteHost(), and in Jetty
-        // this returns ::1 not [::1].
-        // but getServerName() and getLocalName() returns [::1] and not ::1.
-        // that's why setRemoteName() is left without the IPv6-aware wrapper method
-    }
-
-    private String getHostAddress(InetAddress adrs) {
-        if (adrs instanceof Inet6Address)
-            return '['+adrs.getHostAddress()+']';
-        else
-            return adrs.getHostAddress();
-    }
-
-    private String getHostName(InetAddress adrs) {
-        if (adrs instanceof Inet6Address) {
-            String n = adrs.getHostName();
-            if (n.indexOf(':')>=0)  return '['+n+']';
-            return n;
-        } else
-            return adrs.getHostName();
-    }
-}
+    }}
