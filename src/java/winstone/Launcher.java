@@ -53,7 +53,7 @@ public class Launcher implements Runnable {
     private int controlPort;
     private HostGroup hostGroup;
     private ObjectPool objectPool;
-    private final List<Connector> listeners = new ArrayList<Connector>();
+    private final List<Listener> listeners = new ArrayList<Listener>();
     private Map args;
     private JNDIManager globalJndiManager;
     
@@ -200,7 +200,7 @@ public class Launcher implements Runnable {
                     .newInstance(args, this.objectPool,
                             this.hostGroup);
             if (listener.start()) {
-                this.listeners.add((Connector)listener); // TODO: fix it
+                this.listeners.add(listener); // TODO: fix it
             }
 //        } catch (ClassNotFoundException err) {
 //            Logger.log(Logger.INFO, RESOURCES,
