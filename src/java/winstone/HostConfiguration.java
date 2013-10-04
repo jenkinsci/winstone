@@ -138,7 +138,17 @@ public class HostConfiguration {
     }
 
     private WebAppContext create(File app, String prefix) {
-        WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix);
+        WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix) {
+            @Override
+            public void postConfigure() throws Exception {
+                super.postConfigure();
+
+                // if specified, override the value in web.xml
+                int sessionTimeout = Option.SESSION_TIMEOUT.get(args);
+                if (sessionTimeout>0)
+                    getSessionHandler().getSessionManager().setMaxInactiveInterval(sessionTimeout * 60);
+            }
+        };
         wac.setMimeTypes(mimeTypes);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
