@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
@@ -73,7 +74,7 @@ public class HostConfiguration {
         }
 
         {// load additional mime types
-            this.mimeTypes.getMimeMap().putAll(loadBuiltinMimeTypes());
+            loadBuiltinMimeTypes();
             String types = Option.MIME_TYPES.get(args);
             if (types!=null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
@@ -94,12 +95,14 @@ public class HostConfiguration {
                 this.webapps.size() + "", this.webapps.keySet() + "");
     }
 
-    private Properties loadBuiltinMimeTypes() {
+    private void loadBuiltinMimeTypes() {
         InputStream in = getClass().getResourceAsStream("mime.properties");
         try {
             Properties props = new Properties();
             props.load(in);
-            return props;
+            for (Entry<Object, Object> e : props.entrySet()) {
+                mimeTypes.addMimeMapping(e.getKey().toString(),e.getValue().toString());
+            }
         } catch (IOException e) {
             throw new Error("Failed to load the built-in MIME types",e);
         } finally {
