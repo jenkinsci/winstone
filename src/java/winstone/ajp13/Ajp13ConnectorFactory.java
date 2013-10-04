@@ -22,27 +22,19 @@ import java.util.Map;
  * @version $Id: Ajp13ConnectorFactory.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
 public class Ajp13ConnectorFactory implements ConnectorFactory {
-    private int listenPort;
-    private String listenAddress;
+    public boolean start(Map args, Server server) throws IOException {
+        int listenPort = Option.AJP13_PORT.get(args);
+        String listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
 
-    /**
-     * Constructor
-     */
-    public Ajp13ConnectorFactory(Map args) {
-        this.listenPort = Option.AJP13_PORT.get(args);
-        this.listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
-    }
-
-    public boolean start(Server server) throws IOException {
-        if (this.listenPort < 0) {
+        if (listenPort < 0) {
             return false;
-        } else {
-            Ajp13SocketConnector connector = new Ajp13SocketConnector();
-            connector.setPort(listenPort);
-            connector.setHost(this.listenAddress);
-
-            server.addConnector(connector);
-            return true;
         }
+
+        Ajp13SocketConnector connector = new Ajp13SocketConnector();
+        connector.setPort(listenPort);
+        connector.setHost(listenAddress);
+
+        server.addConnector(connector);
+        return true;
     }
 }

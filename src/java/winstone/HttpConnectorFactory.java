@@ -22,32 +22,19 @@ import java.util.Map;
  * @version $Id: HttpConnectorFactory.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
 public class HttpConnectorFactory implements ConnectorFactory {
-    protected int keepAliveTimeout;
-    protected boolean doHostnameLookups;
-    protected int listenPort;
-    protected String listenAddress;
-
-    protected HttpConnectorFactory() {
-    }
-
-    /**
-     * Constructor
-     */
-    public HttpConnectorFactory(Map args) {
+    public boolean start(Map args, Server server) throws IOException {
         // Load resources
-        this.listenPort = Option.HTTP_PORT.get(args);
-        this.listenAddress = Option.HTTP_LISTEN_ADDRESS.get(args);
-        this.doHostnameLookups = Option.HTTP_DO_HOSTNAME_LOOKUPS.get(args);
-        this.keepAliveTimeout = Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args);
-    }
+        int listenPort = Option.HTTP_PORT.get(args);
+        String listenAddress = Option.HTTP_LISTEN_ADDRESS.get(args);
+        int keepAliveTimeout = Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args);
 
-    public boolean start(Server server) throws IOException {
-        if (this.listenPort < 0) {
+        if (listenPort < 0) {
             return false;
         } else {
             SelectChannelConnector connector = createConnector(server);
             connector.setPort(listenPort);
-            connector.setHost(this.listenAddress);
+            connector.setHost(listenAddress);
+            connector.setMaxIdleTime(keepAliveTimeout);
 
             server.addConnector(connector);
             return true;

@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -163,10 +162,8 @@ public class Launcher implements Runnable {
      */
     protected void spawnListener(String listenerClassName) throws IOException {
         try {
-            Class listenerClass = Class.forName(listenerClassName);
-            Constructor listenerConstructor = listenerClass.getConstructor(Map.class);
-            ConnectorFactory connectorFactory = (ConnectorFactory) listenerConstructor.newInstance(args);
-            connectorFactory. start(server);
+            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
+            connectorFactory. start(args, server);
         } catch (Throwable err) {
             throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }

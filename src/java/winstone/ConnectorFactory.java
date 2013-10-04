@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Map;
 
 /**
  * Interface that defines the necessary methods for being a connection listener
@@ -22,7 +23,8 @@ import java.net.Socket;
 public interface ConnectorFactory {
     /**
      * After the listener is loaded and initialized, this starts the thread
+     * @param args
      * @param server
      */
-    public boolean start(Server server) throws IOException;
+    public boolean start(Map args, Server server) throws IOException;
 }
