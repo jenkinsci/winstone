@@ -49,7 +49,7 @@ public class FileRealm implements AuthenticationRealm {
      * Constructor - this sets up an authentication realm, using the file
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public FileRealm(Set rolesAllowed, Map args) {
+    public FileRealm(Map args) {
         this.passwords = new Hashtable();
         this.roles = new Hashtable();
 
@@ -93,8 +93,7 @@ public class FileRealm implements AuthenticationRealm {
                         List rl = new ArrayList();
                         for (; st.hasMoreTokens();) {
                             String currentRole = st.nextToken();
-                            if (rolesAllowed.contains(currentRole))
-                                rl.add(currentRole);
+                            rl.add(currentRole);
                         }
                         Object roleArray[] = rl.toArray();
                         Arrays.sort(roleArray);

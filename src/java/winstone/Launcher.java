@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -25,6 +26,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -137,6 +139,15 @@ public class Launcher implements Runnable {
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
+
+            try {
+                // Build the realm
+                Class realmClass = Option.REALM_CLASS_NAME.get(args, AuthenticationRealm.class, commonLibCL);
+                Constructor realmConstr = realmClass.getConstructor(new Class[] {Set.class, Map.class });
+                server.addBean(realmConstr.newInstance(args));
+            } catch (Throwable err) {
+                throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
+            }
 
             server.setThreadPool(new ExecutorThreadPool(objectPool.getRequestHandler()));
 

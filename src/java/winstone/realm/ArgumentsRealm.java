@@ -38,7 +38,7 @@ public class ArgumentsRealm implements AuthenticationRealm {
      * Constructor - this sets up an authentication realm, using the arguments
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public ArgumentsRealm(Set rolesAllowed, Map args) {
+    public ArgumentsRealm(Map args) {
         this.passwords = new Hashtable();
         this.roles = new Hashtable();
 
@@ -56,8 +56,7 @@ public class ArgumentsRealm implements AuthenticationRealm {
                     List rl = new ArrayList();
                     for (; st.hasMoreTokens(); ) {
                         String currentRole = st.nextToken();
-                        if (rolesAllowed.contains(currentRole))
-                            rl.add(currentRole);
+                        rl.add(currentRole);
                     }
                     Object roleArray[] = rl.toArray();
                     Arrays.sort(roleArray);
