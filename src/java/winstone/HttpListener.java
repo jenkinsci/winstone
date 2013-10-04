@@ -31,20 +31,13 @@ import java.util.Map;
  * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
 public class HttpListener implements Listener {
-    protected static int LISTENER_TIMEOUT = 5000; // every 5s reset the
-                                                    // listener socket
-    protected static int CONNECTION_TIMEOUT = 60000;
-    protected static int BACKLOG_COUNT = 5000;
     protected static boolean DEFAULT_HNL = false;
     protected int keepAliveTimeout;
-    protected static int KEEP_ALIVE_SLEEP = 20;
-    protected static int KEEP_ALIVE_SLEEP_MAX = 500;
     protected HostGroup hostGroup;
     protected ObjectPool objectPool;
     protected boolean doHostnameLookups;
     protected int listenPort;
     protected String listenAddress;
-    protected boolean interrupted;
 
     protected HttpListener() {
     }
@@ -106,118 +99,6 @@ public class HttpListener implements Listener {
     protected SelectChannelConnector createConnector(Server server) {
         return new SelectChannelConnector();
     }
-    /**
-     * Called by the request handler thread, because it needs specific setup
-     * code for this connection's protocol (ie construction of request/response
-     * objects, in/out streams, etc).
-     * 
-     * This implementation parses incoming AJP13 packets, and builds an
-     * outputstream that is capable of writing back the response in AJP13
-     * packets.
-     */
-    public void allocateRequestResponse(Socket socket, InputStream inSocket,
-            OutputStream outSocket, RequestHandlerThread handler,
-            boolean iAmFirst) throws SocketException, IOException {
-        Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                "HttpListener.AllocatingRequest", Thread.currentThread()
-                        .getName());
-        socket.setSoTimeout(CONNECTION_TIMEOUT);
-
-        // Build input/output streams, plus request/response
-        WinstoneInputStream inData = new WinstoneInputStream(inSocket);
-        WinstoneOutputStream outData = new WinstoneOutputStream(outSocket, false);
-        WinstoneRequest req = this.objectPool.getRequestFromPool();
-        WinstoneResponse rsp = this.objectPool.getResponseFromPool();
-        outData.setResponse(rsp);
-        req.setInputStream(inData);
-        rsp.setOutputStream(outData);
-        rsp.setRequest(req);
-        // rsp.updateContentTypeHeader("text/html");
-        req.setHostGroup(this.hostGroup);
-
-        // Set the handler's member variables so it can execute the servlet
-        handler.setRequest(req);
-        handler.setResponse(rsp);
-        handler.setInStream(inData);
-        handler.setOutStream(outData);
-        
-        // If using this listener, we must set the server header now, because it
-        // must be the first header. Ajp13 listener can defer to the Apache Server
-        // header
-        rsp.setHeader("Server", Launcher.RESOURCES.getString("ServerVersion"));
-    }
-
-    /**
-     * Called by the request handler thread, because it needs specific shutdown
-     * code for this connection's protocol (ie releasing input/output streams,
-     * etc).
-     */
-    public void deallocateRequestResponse(RequestHandlerThread handler,
-            WinstoneRequest req, WinstoneResponse rsp,
-            WinstoneInputStream inData, WinstoneOutputStream outData) {
-        handler.setInStream(null);
-        handler.setOutStream(null);
-        handler.setRequest(null);
-        handler.setResponse(null);
-        if (req != null)
-            this.objectPool.releaseRequestToPool(req);
-        if (rsp != null)
-            this.objectPool.releaseResponseToPool(rsp);
-    }
-
-    public String parseURI(RequestHandlerThread handler, WinstoneRequest req,
-            WinstoneResponse rsp, WinstoneInputStream inData, Socket socket,
-            boolean iAmFirst) throws IOException {
-        parseSocketInfo(socket, req);
-
-        // Read the header line (because this is the first line of the request,
-        // apply keep-alive timeouts to it if we are not the first request)
-        socket.setSoTimeout(keepAliveTimeout);
-
-        byte uriBuffer[] = null;
-        try {
-            Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.WaitingForURILine");
-            uriBuffer = inData.readLine();
-        } catch (InterruptedIOException err) {
-            // keep alive timeout ? ignore if not first
-            if (iAmFirst) {
-                throw err;
-            } else {
-                return null;
-            }
-        } finally {
-            try {socket.setSoTimeout(CONNECTION_TIMEOUT);} catch (Throwable err) {}
-        }
-        handler.setRequestStartTime();
-
-        // Get header data (eg protocol, method, uri, headers, etc)
-        String uriLine = new String(uriBuffer);
-        if (uriLine.trim().equals(""))
-            throw new SocketException("Empty URI Line");
-        String servletURI = parseURILine(uriLine, req, rsp);
-        parseHeaders(req, inData);
-        rsp.extractRequestKeepAliveHeader(req);
-        int contentLength = req.getContentLength();
-        if (contentLength != -1)
-            inData.setContentLength(contentLength);
-        return servletURI;
-    }
-
-    /**
-     * Called by the request handler thread, because it needs specific shutdown
-     * code for this connection's protocol if the keep-alive period expires (ie
-     * closing sockets, etc).
-     * 
-     * This implementation simply shuts down the socket and streams.
-     */
-    public void releaseSocket(Socket socket, InputStream inSocket,
-            OutputStream outSocket) throws IOException {
-        // Logger.log(Logger.FULL_DEBUG, "Releasing socket: " +
-        // Thread.currentThread().getName());
-        inSocket.close();
-        outSocket.close();
-        socket.close();
-    }
 
     protected void parseSocketInfo(Socket socket, WinstoneRequest req)
             throws IOException {
@@ -257,102 +138,5 @@ public class HttpListener implements Listener {
             return n;
         } else
             return adrs.getHostName();
-    }
-
-    /**
-     * Tries to wait for extra requests on the same socket. If any are found
-     * before the timeout expires, it exits with a true, indicating a new
-     * request is waiting. If the protocol does not support keep-alives, or the
-     * request instructed us to close the connection, or the timeout expires,
-     * return a false, instructing the handler thread to begin shutting down the
-     * socket and relase itself.
-     */
-    public boolean processKeepAlive(WinstoneRequest request,
-            WinstoneResponse response, InputStream inSocket) {
-        // Try keep alive if allowed
-        boolean continueFlag = !response.closeAfterRequest();
-        return continueFlag;
-    }
-
-    /**
-     * Processes the uri line into it's component parts, determining protocol,
-     * method and uri
-     */
-    private String parseURILine(String uriLine, WinstoneRequest req,
-            WinstoneResponse rsp) {
-        Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES, "HttpListener.UriLine", uriLine.trim());
-        
-        // Method
-        int spacePos = uriLine.indexOf(' ');
-        if (spacePos == -1)
-            throw new WinstoneException(Launcher.RESOURCES.getString(
-                    "HttpListener.ErrorUriLine", uriLine));
-        String method = uriLine.substring(0, spacePos).toUpperCase();
-        String fullURI;
-
-        // URI
-        String remainder = uriLine.substring(spacePos + 1);
-        spacePos = remainder.indexOf(' ');
-        if (spacePos == -1) {
-            fullURI = trimHostName(remainder.trim());
-            req.setProtocol("HTTP/0.9");
-            rsp.setProtocol("HTTP/0.9");
-        } else {
-            fullURI = trimHostName(remainder.substring(0, spacePos).trim());
-            String protocol = remainder.substring(spacePos + 1).trim().toUpperCase();
-            if (!protocol.startsWith("HTTP/"))
-                protocol = "HTTP/1.0";  // didn't understand this protocol. this typically means the request line had extra space. assume 1.0
-            req.setProtocol(protocol);
-            rsp.setProtocol(protocol);
-        }
-
-        req.setMethod(method);
-        // req.setRequestURI(fullURI);
-        return fullURI;
-    }
-
-    private String trimHostName(String input) {
-        if (input == null)
-            return null;
-        else if (input.startsWith("/"))
-            return input;
-
-        int hostStart = input.indexOf("://");
-        if (hostStart == -1)
-            return input;
-        String hostName = input.substring(hostStart + 3);
-        int pathStart = hostName.indexOf('/');
-        if (pathStart == -1)
-            return "/";
-        else
-            return hostName.substring(pathStart);
-    }
-
-    /**
-     * Parse the incoming stream into a list of headers (stopping at the first
-     * blank line), then call the parseHeaders(req, list) method on that list.
-     */
-    public void parseHeaders(WinstoneRequest req, WinstoneInputStream inData)
-            throws IOException {
-        List headerList = new ArrayList();
-
-        if (!req.getProtocol().startsWith("HTTP/0")) {
-            // Loop to get headers
-            byte headerBuffer[] = inData.readLine();
-            String headerLine = new String(headerBuffer);
-
-            while (headerLine.trim().length() > 0) {
-                if (headerLine.indexOf(':') != -1) {
-                    headerList.add(headerLine.trim());
-                    Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                            "HttpListener.Header", headerLine.trim());
-                }
-                headerBuffer = inData.readLine();
-                headerLine = new String(headerBuffer);
-            }
-        }
-
-        // If no headers available, parse an empty list
-        req.parseHeaders(headerList);
     }
 }
