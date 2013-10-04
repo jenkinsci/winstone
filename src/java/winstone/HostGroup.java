@@ -32,7 +32,7 @@ public class HostGroup {
     private Map hostConfigs;
     private String defaultHostName;
     
-    public HostGroup(Cluster cluster,
+    public HostGroup(
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
 //        this.args = args;
@@ -44,7 +44,7 @@ public class HostGroup {
 
         // If host mode
         if (hostDir == null) {
-            initHost(webappsDir, DEFAULT_HOSTNAME, cluster, objectPool, commonLibCL,
+            initHost(webappsDir, DEFAULT_HOSTNAME, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             this.defaultHostName = DEFAULT_HOSTNAME;
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
@@ -52,7 +52,7 @@ public class HostGroup {
         }
         // Otherwise multi-webapp mode
         else {
-            initMultiHostDir(hostDir, cluster, objectPool, commonLibCL,
+            initMultiHostDir(hostDir, objectPool, commonLibCL,
                     commonLibCLPaths, args);
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete",
                     this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
@@ -80,16 +80,16 @@ public class HostGroup {
         this.hostConfigs.clear();
     }
     
-    protected void initHost(File webappsDir, String hostname, Cluster cluster,
+    protected void initHost(File webappsDir, String hostname,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
-        HostConfiguration config = new HostConfiguration(hostname, cluster, objectPool, commonLibCL, 
+        HostConfiguration config = new HostConfiguration(hostname, objectPool, commonLibCL,
                 commonLibCLPaths, args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }
     
-    protected void initMultiHostDir(File hostsDir, Cluster cluster,
+    protected void initMultiHostDir(File hostsDir,
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
         if (hostsDir == null) {
@@ -110,7 +110,7 @@ public class HostGroup {
                 // Mount directories as host dirs
                 if (aChildren.isDirectory()) {
                     if (!this.hostConfigs.containsKey(childName)) {
-                        initHost(aChildren, childName, cluster,
+                        initHost(aChildren, childName,
                                 objectPool, commonLibCL, commonLibCLPaths, args);
                     }
                 }

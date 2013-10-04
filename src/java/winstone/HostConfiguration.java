@@ -43,19 +43,17 @@ public class HostConfiguration implements Runnable {
     private String hostname;
     private Map args;
     private Map webapps;
-    private Cluster cluster;
     private ObjectPool objectPool;
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
     
     private Thread thread;
     
-    public HostConfiguration(String hostname, Cluster cluster, ObjectPool objectPool, ClassLoader commonLibCL, 
+    public HostConfiguration(String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
         this.hostname = hostname;
         this.args = args;
         this.webapps = new Hashtable();
-        this.cluster = cluster;
         this.objectPool = objectPool;
         this.commonLibCL = commonLibCL;
         this.commonLibCLPaths = commonLibCLPaths;
@@ -126,7 +124,7 @@ public class HostConfiguration implements Runnable {
         }
 
         // Instantiate the webAppConfig
-        return new WebAppConfiguration(this, this.cluster, webRoot
+        return new WebAppConfiguration(this, webRoot
                 .getCanonicalPath(), prefix, this.objectPool, this.args,
                 webXMLParentNode, this.commonLibCL,
                 this.commonLibCLPaths, contextName);

@@ -55,7 +55,6 @@ public class Launcher implements Runnable {
     private ObjectPool objectPool;
     private final List<Connector> listeners = new ArrayList<Connector>();
     private Map args;
-    private Cluster cluster;
     private JNDIManager globalJndiManager;
     
     /**
@@ -141,24 +140,6 @@ public class Launcher implements Runnable {
 
             this.objectPool = new ObjectPool(args);
 
-            // Optionally set up clustering if enabled and libraries are available
-            if (Option.USE_CLUSTER.get(args)) {
-                if (this.controlPort < 0) {
-                    Logger.log(Logger.INFO, RESOURCES,
-                            "Launcher.ClusterOffNoControlPort");
-                } else {
-                    try {
-                        Class clusterClass = Option.CLUSTER_CLASS_NAME.get(args, Cluster.class);
-                        Constructor clusterConstructor = clusterClass
-                                .getConstructor(new Class[]{Map.class, Integer.class});
-                        this.cluster = (Cluster) clusterConstructor
-                                .newInstance(args, this.controlPort);
-                    } catch (Throwable err) {
-                        Logger.log(Logger.WARNING, RESOURCES, "Launcher.ClusterStartupError", err);
-                    }
-                }
-            }
-
             // If jndi is enabled, run the container wide jndi populator
             if (useJNDI) {
                 try {
@@ -175,7 +156,7 @@ public class Launcher implements Runnable {
             }
 
             // Open the web apps
-            this.hostGroup = new HostGroup(this.cluster, this.objectPool, commonLibCL,
+            this.hostGroup = new HostGroup(this.objectPool, commonLibCL,
                     (File []) commonLibCLPaths.toArray(new File[0]), args);
 
             // Create connectors (http, https and ajp)
@@ -219,7 +200,7 @@ public class Launcher implements Runnable {
                     .newInstance(args, this.objectPool,
                             this.hostGroup);
             if (listener.start()) {
-                this.listeners.add(listener);
+                this.listeners.add((Connector)listener); // TODO: fix it
             }
 //        } catch (ClassNotFoundException err) {
 //            Logger.log(Logger.INFO, RESOURCES,
@@ -309,11 +290,6 @@ public class Launcher implements Runnable {
                 Logger.log(Logger.INFO, RESOURCES, "Launcher.ReloadRequestReceived", host + prefix);
                 HostConfiguration hostConfig = this.hostGroup.getHostByName(host);
                 hostConfig.reloadWebApp(prefix);
-            } else if (this.cluster != null) {
-                outSocket = csAccepted.getOutputStream();
-                this.cluster.clusterRequest((byte) reqType,
-                        inSocket, outSocket, csAccepted,
-                        this.hostGroup);
             }
         } finally {
             if (inControl != null) {
@@ -332,8 +308,6 @@ public class Launcher implements Runnable {
         // Release all listeners/pools/webapps
         for (Object listener : this.listeners) ((Listener) listener).destroy();
         this.objectPool.destroy();
-        if (this.cluster != null)
-            this.cluster.destroy();
         if (this.hostGroup!=null)
             this.hostGroup.destroy();
         if (this.globalJndiManager != null) {

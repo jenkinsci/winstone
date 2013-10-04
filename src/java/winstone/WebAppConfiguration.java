@@ -120,7 +120,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
     static final String JSP_SERVLET_CLASS = "org.apache.jasper.servlet.JspServlet";
     
     private HostConfiguration ownerHostConfig;
-    private Cluster cluster;
     private String webRoot;
     private String prefix;
     private String contextName;
@@ -199,7 +198,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
     /**
      * Constructor. This parses the xml and sets up for basic routing
      */
-    public WebAppConfiguration(HostConfiguration ownerHostConfig, Cluster cluster, String webRoot,
+    public WebAppConfiguration(HostConfiguration ownerHostConfig, String webRoot,
             String prefix, ObjectPool objectPool, Map startupArgs, Node elm,
             ClassLoader parentClassLoader, File parentClassPaths[], String contextName) {
         if (!prefix.equals("") && !prefix.startsWith("/")) {
@@ -661,15 +660,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             }
         }
         
-        // If not distributable, remove the cluster reference
-        if (!distributable && (cluster != null)) {
-            Logger.log(Logger.INFO, Launcher.RESOURCES,
-                    "WebAppConfig.ClusterOffNotDistributable", this.contextName);
-        } else {
-            this.cluster = cluster;
-        }
-
-
         // Build the login/security role instance
         if (!constraintNodes.isEmpty() && (loginConfigNode != null)) {
             String authMethod = null;
@@ -1070,10 +1060,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         return this.welcomeFiles;
     }
 
-    public boolean isDistributable() {
-        return (this.cluster != null);
-    }
-
     public Map getFilterMatchCache() {
         return this.filterMatchCache;
     }
@@ -1320,16 +1306,7 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             return session;
         }
 
-        // If I'm distributable ... check remotely
-        if ((this.cluster != null) && !localOnly) {
-            session = this.cluster.askClusterForSession(sessionId, this);
-            if (session != null) {
-                this.sessions.put(sessionId, session);
-            }
-            return session;
-        } else {
-            return null;
-        }
+        return null;
     }
 
     /**

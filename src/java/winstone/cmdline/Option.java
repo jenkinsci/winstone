@@ -3,7 +3,6 @@ package winstone.cmdline;
 import winstone.Launcher;
 import winstone.WebAppConfiguration;
 import winstone.classLoader.WebappClassLoader;
-import winstone.cluster.SimpleCluster;
 import winstone.jndi.ContainerJNDIManager;
 import winstone.jndi.WebAppJNDIManager;
 import winstone.realm.ArgumentsRealm;
@@ -115,9 +114,6 @@ public class Option<T> {
     public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
     public static final OBoolean HELP=bool("help",false);
 
-    public static final OBoolean USE_CLUSTER=bool("useCluster",false);
-    public static final OClass CLUSTER_CLASS_NAME=clazz("clusterClassName", SimpleCluster.class);
-    public static final OString CLUSTER_NODES=string("clusterNodes");
     public static final OBoolean USE_JNDI=bool("useJNDI",false);
     public static final OClass CONTAINER_JNDI_CLASSNAME=clazz("containerJndiClassName",ContainerJNDIManager.class);
     public static final OClass WEBAPP_JNDI_CLASSNAME=clazz("webappJndiClassName", WebAppJNDIManager.class);

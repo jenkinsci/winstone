@@ -55,7 +55,6 @@ public class WinstoneSession implements HttpSession, Serializable {
     private HttpSessionAttributeListener sessionAttributeListeners[];
     private HttpSessionListener sessionListeners[];
     private HttpSessionActivationListener sessionActivationListeners[];
-    private boolean distributable;
     private Object sessionMonitor = true;
     private Set requestsUsingMe;
 
@@ -73,7 +72,6 @@ public class WinstoneSession implements HttpSession, Serializable {
 
     public void setWebAppConfiguration(WebAppConfiguration webAppConfig) {
         this.webAppConfig = webAppConfig;
-        this.distributable = webAppConfig.isDistributable();
     }
     
     public void sendCreatedNotifies() {
@@ -154,12 +152,6 @@ public class WinstoneSession implements HttpSession, Serializable {
         if (this.isInvalidated) {
             throw new IllegalStateException(Launcher.RESOURCES.getString("WinstoneSession.InvalidatedSession"));
         }
-        // Check for serializability if distributable
-        if (this.distributable && (value != null)
-                && !(value instanceof java.io.Serializable))
-            throw new IllegalArgumentException(Launcher.RESOURCES.getString(
-                    "WinstoneSession.AttributeNotSerializable", new String[] {
-                            name, value.getClass().getName() }));
 
         // valueBound must be before binding
         if (value instanceof HttpSessionBindingListener) {
@@ -436,7 +428,6 @@ public class WinstoneSession implements HttpSession, Serializable {
         out.writeLong(lastAccessedTime);
         out.writeInt(maxInactivePeriod);
         out.writeBoolean(isNew);
-        out.writeBoolean(distributable);
 
         // Write the map, but first remove non-serializables
         Map copy = new HashMap(sessionData);
@@ -474,7 +465,6 @@ public class WinstoneSession implements HttpSession, Serializable {
         this.lastAccessedTime = in.readLong();
         this.maxInactivePeriod = in.readInt();
         this.isNew = in.readBoolean();
-        this.distributable = in.readBoolean();
 
         // Read the map
         this.sessionData = new Hashtable();
