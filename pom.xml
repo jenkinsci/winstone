@@ -172,6 +172,13 @@
         <version>8.1.13.v20130916</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-ajp</artifactId>
+        <version>8.1.13.v20130916</version>
+      </dependency>
+
+
   </dependencies>
 
 </project>

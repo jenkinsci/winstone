@@ -23,7 +23,9 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import winstone.HostGroup;
 import winstone.Launcher;
 import winstone.Listener;
@@ -45,7 +47,7 @@ import winstone.WinstoneResponse;
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13Listener.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
-public class Ajp13Listener implements Listener, Runnable {
+public class Ajp13Listener implements Listener {
     public final static WinstoneResourceBundle AJP_RESOURCES = new WinstoneResourceBundle("winstone.ajp13.LocalStrings");
     
     private final static int LISTENER_TIMEOUT = 5000; // every 5s reset the listener socket
@@ -79,59 +81,12 @@ public class Ajp13Listener implements Listener, Runnable {
         if (this.listenPort < 0) {
             return false;
         } else {
-            ServerSocket ss;
-            try {
-                ss = this.listenAddress == null ? new ServerSocket(
-                        this.listenPort, BACKLOG_COUNT) : new ServerSocket(
-                        this.listenPort, BACKLOG_COUNT, InetAddress
-                                .getByName(this.listenAddress));
-            } catch (IOException e) {
-                throw (IOException)new IOException("Failed to listen on port "+listenPort).initCause(e);
-            }
-            ss.setSoTimeout(LISTENER_TIMEOUT);
-            Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.StartupOK",
-                    this.listenPort + "");
-            this.serverSocket = ss;
+            Ajp13SocketConnector connector = new Ajp13SocketConnector();
+            connector.setPort(listenPort);
+            connector.setHost(this.listenAddress);
 
-            this.interrupted = false;
-            Thread thread = new Thread(this, Launcher.RESOURCES.getString(
-                    "Listener.ThreadName", new String[] { "ajp13",
-                            "" + this.listenPort }));
-            thread.setDaemon(true);
-            thread.start();
+            server.addConnector(connector);
             return true;
-        }
-    }
-
-    /**
-     * The main run method. This handles the normal thread processing.
-     */
-    public void run() {
-        try {
-            // Enter the main loop
-            while (!interrupted) {
-                // Get the listener
-                Socket s;
-                try {
-                    s = serverSocket.accept();
-                } catch (java.io.InterruptedIOException err) {
-                    s = null;
-                }
-
-                // if we actually got a socket, process it. Otherwise go around
-                // again
-                if (s != null)
-                    this.objectPool.handleRequest(s, this);
-            }
-
-            // Close server socket
-            serverSocket.close();
-            serverSocket = null;
-
-            Logger.log(Logger.INFO, AJP_RESOURCES, "Ajp13Listener.ShutdownOK");
-        } catch (Throwable err) {
-            Logger.log(Logger.ERROR, AJP_RESOURCES,
-                    "Ajp13Listener.ShutdownError", err);
         }
     }
 
