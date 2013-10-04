@@ -1,0 +1,4 @@
+- scan Option fields and find ones that we should be supporting and reimplement them
+- ObjectPool is now an excessive abstraction around ExecutorService
+- test
+- probably some more dead code reduction
