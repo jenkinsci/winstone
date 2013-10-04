@@ -149,7 +149,7 @@ public class Launcher implements Runnable {
             try {
                 // Build the realm
                 Class realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
-                Constructor realmConstr = realmClass.getConstructor(new Class[] {Set.class, Map.class });
+                Constructor realmConstr = realmClass.getConstructor(Map.class);
                 server.addBean(realmConstr.newInstance(args));
             } catch (Throwable err) {
                 throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
