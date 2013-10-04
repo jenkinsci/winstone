@@ -6,7 +6,7 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
@@ -24,10 +24,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 
 /**
@@ -56,6 +54,8 @@ public class Launcher implements Runnable {
     private final List<Listener> listeners = new ArrayList<Listener>();
     private Map args;
     private JNDIManager globalJndiManager;
+
+    public final Server server = new Server();
     
     /**
      * Constructor - initialises the web app, object pools, control port and the
@@ -193,7 +193,7 @@ public class Launcher implements Runnable {
             Listener listener = (Listener) listenerConstructor
                     .newInstance(args, this.objectPool,
                             this.hostGroup);
-            if (listener.start()) {
+            if (listener.start(server)) {
                 this.listeners.add(listener); // TODO: fix it
             }
 //        } catch (ClassNotFoundException err) {

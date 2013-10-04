@@ -6,6 +6,8 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Server;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,8 +28,9 @@ public interface Listener {
     
     /**
      * After the listener is loaded and initialized, this starts the thread
+     * @param server
      */
-    public boolean start() throws IOException;
+    public boolean start(Server server) throws IOException;
 
     /**
      * Called by the request handler thread, because it needs specific setup

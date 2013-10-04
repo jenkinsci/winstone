@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Server;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class HttpListener implements Listener, Runnable {
                         getConnectorName() + Option._KEEP_ALIVE_TIMEOUT, Option._KEEP_ALIVE_TIMEOUT.defaultValue);
     }
 
-    public boolean start() throws IOException {
+    public boolean start(Server server) throws IOException {
         if (this.listenPort < 0) {
             return false;
         } else {

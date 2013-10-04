@@ -21,9 +21,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Server;
 import winstone.HostGroup;
 import winstone.Launcher;
 import winstone.Listener;
@@ -75,7 +75,7 @@ public class Ajp13Listener implements Listener, Runnable {
         this.listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
     }
 
-    public boolean start() throws IOException {
+    public boolean start(Server server) throws IOException {
         if (this.listenPort < 0) {
             return false;
         } else {
