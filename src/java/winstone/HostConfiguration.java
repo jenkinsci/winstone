@@ -31,7 +31,7 @@ import winstone.cmdline.Option;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostConfiguration.java,v 1.8 2007/08/02 06:16:00 rickknowles Exp $
  */
-public class HostConfiguration implements Runnable {
+public class HostConfiguration {
     
     private static final long FLUSH_PERIOD = 60000L;
     
@@ -45,9 +45,7 @@ public class HostConfiguration implements Runnable {
     private ObjectPool objectPool;
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
-    
-    private Thread thread;
-    
+
     public HostConfiguration(Server server, String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
         this.server = server;
@@ -76,11 +74,6 @@ public class HostConfiguration implements Runnable {
         }
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
-        
-        
-        this.thread = new Thread(this, "WinstoneHostConfigurationMgmt:" + this.hostname);
-        this.thread.setDaemon(true);
-        this.thread.start();
     }
 
     private WebAppContext create(File app, String prefix) {
@@ -132,29 +125,6 @@ public class HostConfiguration implements Runnable {
         for (Object prefixe : prefixes) {
             destroyWebApp((String) prefixe);
         }
-        if (this.thread != null) {
-            this.thread.interrupt();
-        }
-    }
-    
-    public void invalidateExpiredSessions() {
-        Set webapps = new HashSet(this.webapps.values());
-        for (Object webapp : webapps) {
-            ((WebAppConfiguration) webapp).invalidateExpiredSessions();
-        }
-    }
-
-    public void run() {
-        boolean interrupted = false;
-        while (!interrupted) {
-            try {
-                Thread.sleep(FLUSH_PERIOD);
-                invalidateExpiredSessions();
-            } catch (InterruptedException err) {
-                interrupted = true;
-            }
-        }
-        this.thread = null;
     }
     
     public void reloadWebApp(String prefix) {
