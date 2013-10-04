@@ -43,24 +43,14 @@ public class HostGroup {
         this.hostConfigs = new Hashtable();
         
         // Is this the single or multiple configuration ? Check args
-        File hostDir = Option.HOSTS_DIR.get(args);
         File webappsDir = Option.WEBAPPS_DIR.get(args);
 
         // If host mode
-        if (hostDir == null) {
-            initHost(webappsDir, DEFAULT_HOSTNAME, objectPool, commonLibCL,
-                    commonLibCLPaths, args);
-            this.defaultHostName = DEFAULT_HOSTNAME;
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
-                    this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
-        }
-        // Otherwise multi-webapp mode
-        else {
-            initMultiHostDir(hostDir, objectPool, commonLibCL,
-                    commonLibCLPaths, args);
-            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitMultiComplete",
-                    this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
-        }
+        initHost(webappsDir, DEFAULT_HOSTNAME, objectPool, commonLibCL,
+                commonLibCLPaths, args);
+        this.defaultHostName = DEFAULT_HOSTNAME;
+        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
+                this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
     }
 
     public HostConfiguration getHostByName(String hostname) {
@@ -91,37 +81,5 @@ public class HostGroup {
         HostConfiguration config = new HostConfiguration(hostname, objectPool, commonLibCL,
                 commonLibCLPaths, args, webappsDir);
         this.hostConfigs.put(hostname, config);
-    }
-    
-    protected void initMultiHostDir(File hostsDir,
-            ObjectPool objectPool, ClassLoader commonLibCL, 
-            File commonLibCLPaths[], Map args) throws IOException {
-        if (hostsDir == null) {
-            hostsDir = new File("hosts");
-        }
-        if (!hostsDir.exists()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirNotFound", hostsDir.getPath()));
-        } else if (!hostsDir.isDirectory()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsNotDirectory", hostsDir.getPath()));
-        } else {
-            File children[] = hostsDir.listFiles();
-            if ((children == null) || (children.length == 0)) {
-                throw new WinstoneException(Launcher.RESOURCES.getString("HostGroup.HostsDirIsEmpty", hostsDir.getPath()));
-            }
-            for (File aChildren : children) {
-                String childName = aChildren.getName();
-
-                // Mount directories as host dirs
-                if (aChildren.isDirectory()) {
-                    if (!this.hostConfigs.containsKey(childName)) {
-                        initHost(aChildren, childName,
-                                objectPool, commonLibCL, commonLibCLPaths, args);
-                    }
-                }
-                if ((defaultHostName == null) || childName.equals(DEFAULT_HOSTNAME)) {
-                    this.defaultHostName = childName;
-                }
-            }
-        }
     }
 }

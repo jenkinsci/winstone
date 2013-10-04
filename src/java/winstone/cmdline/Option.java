@@ -40,7 +40,6 @@ public class Option<T> {
     public static final OFile WEBROOT=file("webroot");
     public static final OFile WARFILE=file("warfile");
     public static final OFile WEBAPPS_DIR=file("webappsDir");
-    public static final OFile HOSTS_DIR=file("hostsDir");
     public static final OFile JAVA_HOME=file("javaHome");
     public static final OFile TOOLS_JAR=file("toolsJar");
     public static final OFile CONFIG=file("config");
