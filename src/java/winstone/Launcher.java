@@ -40,8 +40,8 @@ import java.util.logging.Level;
 public class Launcher implements Runnable {
     
     static final String HTTP_LISTENER_CLASS = "winstone.HttpConnectorFactory";
-    static final String HTTPS_LISTENER_CLASS = "winstone.ssl.HttpsConnectorFactory";
-    static final String AJP_LISTENER_CLASS = "winstone.ajp13.Ajp13ConnectorFactory";
+    static final String HTTPS_LISTENER_CLASS = "winstone.HttpsConnectorFactory";
+    static final String AJP_LISTENER_CLASS = "winstone.Ajp13ConnectorFactory";
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';

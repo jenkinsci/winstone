@@ -4,7 +4,7 @@
  * - the common development and distribution license (CDDL), v1.0; or
  * - the GNU Lesser General Public License, v2.1 or later
  */
-package winstone.ssl;
+package winstone;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -51,7 +51,7 @@ import java.util.Map;
  * @version $Id: HttpsConnectorFactory.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
  */
 public class HttpsConnectorFactory implements ConnectorFactory {
-    private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.ssl.LocalStrings");
+    private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private KeyStore keystore;
     private char[] password;
 

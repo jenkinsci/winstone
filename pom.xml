@@ -6,8 +6,7 @@
   <packaging>jar</packaging>
 
   <name>Winstone</name>
-  <url>http://winstone.sourceforge.net/</url>
-  <description>Winstone is a servlet container that was written out of a desire to provide servlet functionality without the bloat that full J2EE compliance introduces.</description>
+  <description>Winstone is a command line wrapper around Jetty</description>
 
   <licenses>
     <license>

@@ -4,7 +4,7 @@
  * - the common development and distribution license (CDDL), v1.0; or
  * - the GNU Lesser General Public License, v2.1 or later
  */
-package winstone.ajp13;
+package winstone;
 
 import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Server;
