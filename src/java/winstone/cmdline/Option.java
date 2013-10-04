@@ -1,7 +1,6 @@
 package winstone.cmdline;
 
 import winstone.Launcher;
-import winstone.classLoader.WebappClassLoader;
 import winstone.realm.ArgumentsRealm;
 
 import java.io.File;
@@ -99,7 +98,7 @@ public class Option<T> {
     public static final OBoolean DIRECTORY_LISTINGS=bool("directoryListings",true);
     public static final OBoolean USE_JASPER=bool("useJasper",false);
     public static final OBoolean USE_SERVLET_RELOADING=bool("useServletReloading",false);
-    public static final OClass PREFERRED_CLASS_LOADER=clazz("preferredClassLoader", WebappClassLoader.class);
+    public static final OClass PREFERRED_CLASS_LOADER=clazz("preferredClassLoader", Object.class);
     public static final OBoolean USE_INVOKER=bool("useInvoker",false);
     public static final OString INVOKER_PREFIX=string("invokerPrefix","/servlet/");
     public static final OBoolean SIMULATE_MOD_UNIQUE_ID=bool("simulateModUniqueId",false);
