@@ -6,18 +6,16 @@
  */
 package winstone.testCase.load;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import winstone.Logger;
-import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 
 import com.meterware.httpunit.WebConversation;
+import winstone.cmdline.Option;
 
 /**
  * This class is an attempt to benchmark performance under load for winstone. It
@@ -126,23 +124,15 @@ public class LoadTest {
             printUsage(resources);
             return;
         }
-        Logger.setCurrentDebugLevel(Integer.parseInt(WebAppConfiguration
-                .stringArg(options, "debug", "5")));
+        Logger.setCurrentDebugLevel(Integer.parseInt(Option.stringArg(options, "debug", "5")));
 
-        String url = WebAppConfiguration.stringArg(options, "url",
-                "http://localhost:8080/");
-        boolean keepAlive = WebAppConfiguration.booleanArg(options,
-                "keepAlive", true);
-        String startThreads = WebAppConfiguration.stringArg(options,
-                "startThreads", "20");
-        String endThreads = WebAppConfiguration.stringArg(options,
-                "endThreads", "1000");
-        String stepSize = WebAppConfiguration.stringArg(options, "stepSize",
-                "20");
-        String stepPeriod = WebAppConfiguration.stringArg(options,
-                "stepPeriod", "5000");
-        String gracePeriod = WebAppConfiguration.stringArg(options,
-                "gracePeriod", "5000");
+        String url = Option.stringArg(options, "url", "http://localhost:8080/");
+        boolean keepAlive = Option.booleanArg(options, "keepAlive", true);
+        String startThreads = Option.stringArg(options, "startThreads", "20");
+        String endThreads = Option.stringArg(options, "endThreads", "1000");
+        String stepSize = Option.stringArg(options, "stepSize", "20");
+        String stepPeriod = Option.stringArg(options, "stepPeriod", "5000");
+        String gracePeriod = Option.stringArg(options, "gracePeriod", "5000");
 
         LoadTest lt = new LoadTest(resources, url, keepAlive, Integer
                 .parseInt(startThreads), Integer.parseInt(endThreads), Integer

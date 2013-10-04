@@ -1,7 +1,6 @@
 package winstone.cmdline;
 
 import winstone.Launcher;
-import winstone.WebAppConfiguration;
 import winstone.classLoader.WebappClassLoader;
 import winstone.realm.ArgumentsRealm;
 
@@ -202,7 +201,7 @@ public class Option<T> {
         }
 
         public boolean get(Map args, boolean defaultValue) {
-            return WebAppConfiguration.booleanArg(args, name, defaultValue);
+            return booleanArg(args, name, defaultValue);
         }
     }
     
@@ -212,11 +211,11 @@ public class Option<T> {
         }
 
         public int get(Map args) {
-            return WebAppConfiguration.intArg(args, name, defaultValue);
+            return intArg(args, name, defaultValue);
         }
 
         public int get(Map args, int defaultValue) {
-            return WebAppConfiguration.intArg(args, name, defaultValue);
+            return intArg(args, name, defaultValue);
         }
     }
 
@@ -277,4 +276,21 @@ public class Option<T> {
 //            String[]
 //        }
 //    }
+
+    public static boolean booleanArg(Map args, String name, boolean defaultTrue) {
+        String value = (String) args.get(name);
+        if (defaultTrue)
+            return (value == null) || (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
+        else
+            return (value != null) && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
+    }
+
+    public static String stringArg(Map args, String name, String defaultValue) {
+        return (String) (args.get(name) == null ? defaultValue : args.get(name));
+    }
+
+    public static int intArg(Map args, String name, int defaultValue) {
+        return Integer.parseInt(stringArg(args, name, "" + defaultValue));
+    }
+
 }

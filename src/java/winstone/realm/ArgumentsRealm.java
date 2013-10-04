@@ -9,7 +9,6 @@ package winstone.realm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +18,6 @@ import winstone.AuthenticationPrincipal;
 import winstone.AuthenticationRealm;
 import winstone.Logger;
 import winstone.cmdline.Option;
-import winstone.WebAppConfiguration;
 import winstone.WinstoneResourceBundle;
 
 /**
@@ -50,7 +48,7 @@ public class ArgumentsRealm implements AuthenticationRealm {
                 String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
                 String password = (String) args.get(key);
 
-                String roleList = WebAppConfiguration.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
+                String roleList = Option.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 if (roleList.equals("")) {
                     Logger.log(Logger.WARNING, REALM_RESOURCES, "ArgumentsRealm.UndeclaredRoles", userName);
                 } else {

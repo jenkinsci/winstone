@@ -361,13 +361,13 @@ public class Launcher implements Runnable {
     
     public static void initLogger(Map args) throws IOException {
         // Reset the log level
-        int logLevel = WebAppConfiguration.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
+        int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
         boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
         if (args.get("logfile") != null) {
             logStream = new FileOutputStream((String) args.get("logfile"));
-        } else if (WebAppConfiguration.booleanArg(args, "logToStdErr", false)) {
+        } else if (Option.booleanArg(args, "logToStdErr", false)) {
             logStream = System.err;
         } else {
             logStream = System.out;

@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
@@ -161,22 +162,6 @@ public class WebAppConfiguration implements Comparator {
     private AccessLogger accessLogger;
     private Map filterMatchCache;
     private boolean useSavedSessions;
-    
-    public static boolean booleanArg(Map args, String name, boolean defaultTrue) {
-        String value = (String) args.get(name);
-        if (defaultTrue)
-            return (value == null) || (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
-        else
-            return (value != null) && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
-    }
-
-    public static String stringArg(Map args, String name, String defaultValue) {
-        return (String) (args.get(name) == null ? defaultValue : args.get(name));
-    }
-
-    public static int intArg(Map args, String name, int defaultValue) {
-        return Integer.parseInt(stringArg(args, name, "" + defaultValue));
-    }
 
     public static String getTextFromNode(Node node) {
         if (node == null) {
