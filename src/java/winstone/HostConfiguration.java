@@ -6,20 +6,7 @@
  */
 package winstone;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
+import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
@@ -27,6 +14,20 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Manages the references to individual webapps within the container. This object handles
@@ -49,6 +50,7 @@ public class HostConfiguration {
     private ObjectPool objectPool;
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
+    private MimeTypes mimeTypes = new MimeTypes();
 
     public HostConfiguration(Server server, String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
@@ -78,10 +80,45 @@ public class HostConfiguration {
             handler = initMultiWebappDir(webappsDir);
         }
 
+        {// load additional mime types
+            this.mimeTypes.getMimeMap().putAll(loadBuiltinMimeTypes());
+            String types = Option.MIME_TYPES.get(args);
+            if (types!=null) {
+                StringTokenizer mappingST = new StringTokenizer(types, ":", false);
+                for (; mappingST.hasMoreTokens(); ) {
+                    String mapping = mappingST.nextToken();
+                    int delimPos = mapping.indexOf('=');
+                    if (delimPos == -1)
+                        continue;
+                    String extension = mapping.substring(0, delimPos);
+                    String mimeType = mapping.substring(delimPos + 1);
+                    this.mimeTypes.addMimeMapping(extension.toLowerCase(), mimeType);
+                }
+            }
+        }
+
         server.setHandler(handler);
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
     }
+
+    private Properties loadBuiltinMimeTypes() {
+        InputStream in = getClass().getResourceAsStream("mime.properties");
+        try {
+            Properties props = new Properties();
+            props.load(in);
+            return props;
+        } catch (IOException e) {
+            throw new Error("Failed to load the built-in MIME types",e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+    }
+
 
     /**
      * @param webAppName
@@ -110,6 +147,7 @@ public class HostConfiguration {
 
     private WebAppContext create(File app, String prefix) {
         WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix);
+        wac.setMimeTypes(mimeTypes);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
     }
