@@ -56,7 +56,7 @@ import winstone.cmdline.Option;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WebAppConfiguration.java,v 1.55 2007/11/13 01:42:47 rickknowles Exp $
  */
-public class WebAppConfiguration implements ServletContext, Comparator {
+public class WebAppConfiguration implements Comparator {
 //    private static final String ELEM_DESCRIPTION = "description";
     private static final String ELEM_DISPLAY_NAME = "display-name";
     private static final String ELEM_SERVLET = "servlet";
@@ -218,7 +218,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         // Build switch values
         boolean useJasper = Option.USE_JASPER.get(startupArgs,true);
         boolean useInvoker = Option.USE_INVOKER.get(startupArgs);
-        boolean useJNDI = Option.USE_JNDI.get(startupArgs);
         this.useSavedSessions = Option.USE_SAVED_SESSIONS.get(startupArgs);
         this.sessionTimeout = Option.SESSION_TIMEOUT.get(startupArgs);
 
@@ -703,22 +702,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.NoWebXMLSecurityDefs");
         }
 
-        // Instantiate the JNDI manager
-        if (useJNDI) {
-            try {
-                // Build the realm
-                Class jndiMgrClass = Option.WEBAPP_JNDI_CLASSNAME.get(startupArgs, JNDIManager.class, parentClassLoader);
-                Constructor jndiMgrConstr = jndiMgrClass.getConstructor(new Class[] { 
-                        Map.class, List.class, ClassLoader.class });
-                this.jndiManager = (JNDIManager) jndiMgrConstr.newInstance(null, envEntryNodes, this.loader);
-                if (this.jndiManager != null)
-                    this.jndiManager.setup();
-            } catch (Throwable err) {
-                Logger.log(Logger.ERROR, Launcher.RESOURCES,
-                        "WebAppConfig.JNDIError", "", err);
-            }
-        }
-        
         try {
             Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(startupArgs,AccessLogger.class,parentClassLoader);
             if (loggerClass!=null) {
@@ -1425,11 +1408,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
         return 5;
     }
 
-    // Weird mostly deprecated crap to do with getting servlet instances
-    public javax.servlet.ServletContext getContext(String uri) {
-        return this.ownerHostConfig.getWebAppByURI(uri);
-    }
-
     public String getServletContextName() {
         return this.displayName;
     }
@@ -1509,103 +1487,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
             }
         }
         return null;
-    }
-
-    /**
-     * Creates the dispatcher that corresponds to a request level dispatch (ie
-     * the initial entry point). The difference here is that we need to set up
-     * the dispatcher so that on a forward, it executes the security checks and
-     * the request filters, while not setting any of the request attributes for
-     * a forward. Also, we can't return a null dispatcher in error case - instead 
-     * we have to return a dispatcher pre-init'd for showing an error page (eg 404).
-     * A null dispatcher is interpreted to mean a successful 302 has occurred. 
-     */
-    public RequestDispatcher getInitialDispatcher(String uriInsideWebapp,
-            WinstoneRequest request, WinstoneResponse response)
-            throws IOException {
-        if (!uriInsideWebapp.equals("") && !uriInsideWebapp.startsWith("/")) {
-            return this.getErrorDispatcherByCode( uriInsideWebapp,
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    Launcher.RESOURCES.getString("WebAppConfig.InvalidURI", uriInsideWebapp),
-                    new IllegalArgumentException("method="+request.getMethod()+"\nprotocol="+request.getProtocol()));
-        } else if (this.contextStartupError != null) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw, true);
-            this.contextStartupError.printStackTrace(pw);
-            return this.getErrorDispatcherByCode( uriInsideWebapp,
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    Launcher.RESOURCES.getString("WebAppConfig.ErrorDuringStartup", sw.toString()), 
-                    this.contextStartupError);
-        }
-
-        // Parse the url for query string, etc 
-        String queryString = "";
-        int questionPos = uriInsideWebapp.indexOf('?');
-        if (questionPos != -1) {
-            if (questionPos != uriInsideWebapp.length() - 1)
-                queryString = uriInsideWebapp.substring(questionPos + 1);
-            uriInsideWebapp = uriInsideWebapp.substring(0, questionPos);
-        }
-
-        // Return the dispatcher
-        StringBuffer servletPath = new StringBuffer();
-        StringBuffer pathInfo = new StringBuffer();
-        ServletConfiguration servlet = urlMatch(uriInsideWebapp, servletPath, pathInfo);
-        if (servlet != null) {
-            // If the default servlet was returned, we should check for welcome files
-            if (servlet.getServletName().equals(this.defaultServletName)) {
-                // Is path a directory ?
-                String directoryPath = servletPath.toString();
-                if (directoryPath.endsWith("/")) {
-                    directoryPath = directoryPath.substring(0, directoryPath.length() - 1);
-                }
-                if (directoryPath.startsWith("/")) {
-                    directoryPath = directoryPath.substring(1);
-                }
-
-                File res = new File(webRoot, directoryPath);
-                if (res.exists() && res.isDirectory() && 
-                        (request.getMethod().equals("GET") || request.getMethod().equals("HEAD"))) {
-                    // Check for the send back with slash case
-                    if (!servletPath.toString().endsWith("/")) {
-                        Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                                "WebAppConfig.FoundNonSlashDirectory", servletPath.toString());
-                        response.sendRedirect(this.prefix
-                                + servletPath.toString()
-                                + pathInfo.toString()
-                                + "/"
-                                + (queryString.equals("") ? "" : "?" + queryString));
-                        return null;
-                    }
-
-                    // Check for welcome files
-                    Logger.log(Logger.FULL_DEBUG, Launcher.RESOURCES,
-                            "WebAppConfig.CheckWelcomeFile", servletPath.toString()
-                                    + pathInfo.toString());
-                    String welcomeFile = matchWelcomeFiles(servletPath.toString()
-                            + pathInfo.toString(), request, queryString);
-                    if (welcomeFile != null) {
-                        response.sendRedirect(this.prefix + welcomeFile);
-//                                + servletPath.toString()
-//                                + pathInfo.toString()
-//                                + welcomeFile
-//                                + (queryString.equals("") ? "" : "?" + queryString));
-                        return null;
-                    }
-                }
-            }
-
-            RequestDispatcher rd = new RequestDispatcher(this, servlet);
-            rd.setForInitialDispatcher(servletPath.toString(), 
-                    pathInfo.toString().equals("") ? null : pathInfo.toString(), queryString,
-                    uriInsideWebapp, this.filterPatternsRequest, this.authenticationHandler);
-            return rd;
-        }
-        
-        // If we are here, return a 404
-        return this.getErrorDispatcherByCode(uriInsideWebapp, HttpServletResponse.SC_NOT_FOUND,
-                Launcher.RESOURCES.getString("StaticResourceServlet.PathNotFound", 
-                        uriInsideWebapp), null);
     }
 
     /**
@@ -1732,46 +1613,6 @@ public class WebAppConfiguration implements ServletContext, Comparator {
                                 queryString, statusCode, summaryMessage, 
                                 exception, errorURI, this.filterPatternsError);
                 return rd;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Check if any of the welcome files under this path are available. Returns the 
-     * name of the file if found, null otherwise. Returns the full internal webapp uri
-     */
-    private String matchWelcomeFiles(String path, WinstoneRequest request, String queryString) {
-        if (!path.endsWith("/")) {
-            path = path + "/";
-        }
-
-        String qs = (queryString.equals("") ? "" : "?" + queryString);
-        for (String welcomeFile1 : this.welcomeFiles) {
-            String welcomeFile = welcomeFile1;
-            while (welcomeFile.startsWith("/")) {
-                welcomeFile = welcomeFile.substring(1);
-            }
-            welcomeFile = path + welcomeFile;
-
-            String exact = (String) this.exactServletMatchMounts.get(welcomeFile);
-            if (exact != null) {
-                return welcomeFile + qs;
-            }
-
-            // Inexact folder mount check - note folder mounts only
-            for (Mapping urlPattern : this.patternMatches) {
-                if ((urlPattern.getPatternType() == Mapping.FOLDER_PATTERN)
-                        && urlPattern.match(welcomeFile, null, null)) {
-                    return welcomeFile + qs;
-                }
-            }
-
-            try {
-                if (getResource(welcomeFile) != null) {
-                    return welcomeFile + qs;
-                }
-            } catch (MalformedURLException err) {
             }
         }
         return null;

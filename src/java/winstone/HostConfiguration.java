@@ -82,32 +82,12 @@ public class HostConfiguration {
         return wac;
     }
 
-    public WebAppContext getWebAppByURI(String uri) {
-        if (uri == null) {
-            return null;
-        } else if (uri.equals("/") || uri.equals("")) {
-            return this.webapps.get("");
-        } else if (uri.startsWith("/")) {
-            String decoded = WinstoneRequest.decodeURLToken(uri);
-            String noLeadingSlash = decoded.substring(1);
-            int slashPos = noLeadingSlash.indexOf("/");
-            if (slashPos == -1) {
-                return (WebAppConfiguration) this.webapps.get(decoded);
-            } else {
-                return (WebAppConfiguration) this.webapps.get(
-                        decoded.substring(0, slashPos + 1));
-            }
-        } else {
-            return null;
-        }
-    }
-    
     public String getHostname() {
         return this.hostname;
     }
     
     public void reloadWebApp(String prefix) {
-        WebAppContext webApp = (WebAppContext) this.webapps.get(prefix);
+        WebAppContext webApp = this.webapps.get(prefix);
         if (webApp != null) {
             try {
                 webApp.stop();

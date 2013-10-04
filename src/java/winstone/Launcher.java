@@ -64,19 +64,6 @@ public class Launcher implements Runnable {
     public Launcher(Map args) throws IOException {
         boolean success=false;
         try {
-            boolean useJNDI = Option.USE_JNDI.get(args);
-
-            // Set jndi resource handler if not set (workaround for JamVM bug)
-            if (useJNDI) try {
-                Class ctxFactoryClass = Class.forName("winstone.jndi.java.javaURLContextFactory");
-                if (System.getProperty("java.naming.factory.initial") == null) {
-                    System.setProperty("java.naming.factory.initial", ctxFactoryClass.getName());
-                }
-                if (System.getProperty("java.naming.factory.url.pkgs") == null) {
-                    System.setProperty("java.naming.factory.url.pkgs", "winstone.jndi");
-                }
-            } catch (ClassNotFoundException err) {}
-
             Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
 
             this.args = args;
@@ -139,20 +126,6 @@ public class Launcher implements Runnable {
                     commonLibCLPaths.toString());
 
             this.objectPool = new ObjectPool(args);
-
-            // If jndi is enabled, run the container wide jndi populator
-            if (useJNDI) {
-                try {
-                    // Build the realm
-                    Class jndiMgrClass = Option.CONTAINER_JNDI_CLASSNAME.get(args,JNDIManager.class,commonLibCL);
-                    Constructor jndiMgrConstr = jndiMgrClass.getConstructor(Map.class, List.class, ClassLoader.class);
-                    this.globalJndiManager = (JNDIManager) jndiMgrConstr.newInstance(args, null, commonLibCL);
-                    this.globalJndiManager.setup();
-                } catch (Throwable err) {
-                    Logger.log(Logger.ERROR, RESOURCES,
-                            "Launcher.JNDIError", "", err);
-                }
-            }
 
             // Open the web apps
             this.hostGroup = new HostGroup(server, this.objectPool, commonLibCL,
@@ -324,7 +297,7 @@ public class Launcher implements Runnable {
         
         // Check for embedded warfile
         if (!Option.WEBROOT.isIn(args) && !Option.WARFILE.isIn(args)
-         && !Option.WEBAPPS_DIR.isIn(args) && !Option.HOSTS_DIR.isIn(args)) {
+         && !Option.WEBAPPS_DIR.isIn(args)) {
             printUsage();
             return;
         }

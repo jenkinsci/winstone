@@ -3,8 +3,6 @@ package winstone.cmdline;
 import winstone.Launcher;
 import winstone.WebAppConfiguration;
 import winstone.classLoader.WebappClassLoader;
-import winstone.jndi.ContainerJNDIManager;
-import winstone.jndi.WebAppJNDIManager;
 import winstone.realm.ArgumentsRealm;
 
 import java.io.File;
@@ -113,11 +111,6 @@ public class Option<T> {
     public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
     public static final OBoolean HELP=bool("help",false);
 
-    public static final OBoolean USE_JNDI=bool("useJNDI",false);
-    public static final OClass CONTAINER_JNDI_CLASSNAME=clazz("containerJndiClassName",ContainerJNDIManager.class);
-    public static final OClass WEBAPP_JNDI_CLASSNAME=clazz("webappJndiClassName", WebAppJNDIManager.class);
-    public static final OString JDNI_RESOURCE=string("jndi.resource.");
-    public static final OString JNDI_PARAM=string("jndi.param.");
     public static final OClass REALM_CLASS_NAME=clazz("realmClassName", ArgumentsRealm.class);
 
     public static final OString ARGUMENTS_REALM_PASSWORD=string("argumentsRealm.passwd.");
