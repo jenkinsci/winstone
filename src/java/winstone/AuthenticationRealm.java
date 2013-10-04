@@ -15,15 +15,4 @@ import org.eclipse.jetty.security.LoginService;
  * @version $Id: AuthenticationRealm.java,v 1.3 2006/12/09 03:56:41 rickknowles Exp $
  */
 public interface AuthenticationRealm extends LoginService {
-    /**
-     * Authenticate the user - do we know them ? Return a distinct id once we
-     * know them. Used by the BASIC and FORM authentication methods.
-     */
-    public AuthenticationPrincipal authenticateByUsernamePassword(
-            String userName, String password);
-
-    /**
-     * Retrieve an authenticated user. Used by the DIGEST and CLIENTCERT authentication methods.
-     */
-    public AuthenticationPrincipal retrieveUser(String userName);
 }

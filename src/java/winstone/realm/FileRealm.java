@@ -6,35 +6,33 @@
  */
 package winstone.realm;
 
+import org.eclipse.jetty.security.HashLoginService;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import winstone.AuthenticationRealm;
+import winstone.Logger;
+import winstone.WinstoneException;
+import winstone.WinstoneResourceBundle;
+import winstone.cmdline.Option;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import winstone.AuthenticationPrincipal;
-import winstone.AuthenticationRealm;
-import winstone.Logger;
-import winstone.cmdline.Option;
-import winstone.WinstoneException;
-import winstone.WinstoneResourceBundle;
+import static org.eclipse.jetty.util.security.Credential.*;
 
 /**
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
-public class FileRealm implements AuthenticationRealm {
+public class FileRealm extends HashLoginService implements AuthenticationRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     
     final String DEFAULT_FILE_NAME = "users.xml";
@@ -42,17 +40,12 @@ public class FileRealm implements AuthenticationRealm {
     final String ATT_USERNAME = "username";
     final String ATT_PASSWORD = "password";
     final String ATT_ROLELIST = "roles";
-    private Map passwords;
-    private Map roles;
 
     /**
      * Constructor - this sets up an authentication realm, using the file
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public FileRealm(Map args) {
-        this.passwords = new Hashtable();
-        this.roles = new Hashtable();
-
         // Get the filename and parse the xml doc
         File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
         if (realmFile==null)    realmFile = new File(DEFAULT_FILE_NAME);
@@ -60,6 +53,7 @@ public class FileRealm implements AuthenticationRealm {
             throw new WinstoneException(REALM_RESOURCES.getString(
                     "FileRealm.FileNotFound", realmFile.getPath()));
         try {
+            int count=0;
             InputStream inFile = new FileInputStream(realmFile);
             Document doc = this.parseStreamToXML(inFile);
             inFile.close();
@@ -90,20 +84,21 @@ public class FileRealm implements AuthenticationRealm {
                     else {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
-                        List rl = new ArrayList();
+                        List<String> rl = new ArrayList<String>();
                         for (; st.hasMoreTokens();) {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);
                         }
-                        Object roleArray[] = rl.toArray();
+                        String[] roleArray = rl.toArray(new String[rl.size()]);
                         Arrays.sort(roleArray);
-                        this.passwords.put(userName, password);
-                        this.roles.put(userName, Arrays.asList(roleArray));
+
+                        putUser(userName, getCredential(password), roleArray);
+                        count++;
                     }
                 }
             }
             Logger.log(Logger.DEBUG, REALM_RESOURCES, "FileRealm.Initialised",
-                    "" + this.passwords.size());
+                    "" + count);
         } catch (java.io.IOException err) {
             throw new WinstoneException(REALM_RESOURCES
                     .getString("FileRealm.ErrorLoading"), err);
@@ -130,32 +125,5 @@ public class FileRealm implements AuthenticationRealm {
             throw new WinstoneException(REALM_RESOURCES
                     .getString("FileRealm.XMLParseError"), errParser);
         }
-    }
-
-    /**
-     * Authenticate the user - do we know them ? Return a principal once we know
-     * them
-     */
-    public AuthenticationPrincipal authenticateByUsernamePassword(
-            String userName, String password) {
-        if ((userName == null) || (password == null))
-            return null;
-
-        String realPassword = (String) this.passwords.get(userName);
-        if (realPassword == null)
-            return null;
-        else if (!realPassword.equals(password))
-            return null;
-        else
-            return new AuthenticationPrincipal(userName, password,
-                    (List) this.roles.get(userName));
-    }
-
-    /**
-     * Retrieve an authenticated user
-     */
-    public AuthenticationPrincipal retrieveUser(String userName) {
-        return new AuthenticationPrincipal(userName, (String) this.passwords
-                .get(userName), (List) this.roles.get(userName));
     }
 }
