@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import winstone.AccessLogger;
 import winstone.Logger;
 import winstone.cmdline.Option;
@@ -33,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: SimpleAccessLogger.java,v 1.5 2006/03/24 17:24:19 rickknowles Exp $
  */
-public class SimpleAccessLogger implements AccessLogger {
+public class SimpleAccessLogger extends AbstractLifeCycle implements AccessLogger {
 
     public static final WinstoneResourceBundle ACCESSLOG_RESOURCES = 
             new WinstoneResourceBundle("winstone.accesslog.LocalStrings");
@@ -80,8 +81,8 @@ public class SimpleAccessLogger implements AccessLogger {
                 this.fileName, patternType);
     }
     
-    public void log(String originalURL, Request request, Response response) {
-        String uriLine = request.getMethod() + " " + originalURL + " " + request.getProtocol();
+    public void log(Request request, Response response) {
+        String uriLine = request.getMethod() + " " + request.getRequestURI() + " " + request.getProtocol();
         int status = response.getStatus();
         long size = response.getContentCount();
         String date;
@@ -104,8 +105,9 @@ public class SimpleAccessLogger implements AccessLogger {
     private static String nvl(String input) {
         return input == null ? "-" : input;
     }
-    
-    public void destroy() {
+
+    @Override
+    protected void doStop() throws Exception {
         Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Close", this.fileName);
         if (this.outWriter != null) {
             this.outWriter.flush();

@@ -7,10 +7,8 @@
 package winstone;
 
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Used for logging accesses, eg in Apache access_log style
@@ -18,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: AccessLogger.java,v 1.2 2006/02/28 07:32:47 rickknowles Exp $
  */
-public interface AccessLogger {
-    public void log(String originalURL, Request request, Response response);
-    public void destroy();
+public interface AccessLogger extends RequestLog {
+    public void log(Request request, Response response);
 }

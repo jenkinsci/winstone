@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -19,8 +20,10 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
@@ -60,20 +63,46 @@ public class HostConfiguration {
         File appFile = Option.WARFILE.get(args);
         if (appFile==null)
             appFile = Option.WEBROOT.get(args);
-        
+
+        Handler handler;
         // If single-webapp mode
         if (webappsDir == null && appFile != null) {
             String prefix = Option.PREFIX.get(args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
-            server.setHandler(create(appFile, prefix));
+            handler = create(appFile, prefix);
         }
         // Otherwise multi-webapp mode
         else {
-            initMultiWebappDir(webappsDir);
+            handler = initMultiWebappDir(webappsDir);
         }
+
+        handler = configureAccessLog(handler);
+
+        server.setHandler(handler);
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
+    }
+
+    private Handler configureAccessLog(Handler handler) {
+        try {
+            Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args,AccessLogger.class, commonLibCL);
+            if (loggerClass!=null) {
+                // Build the realm
+                Constructor loggerConstr = loggerClass.getConstructor(new Class[] {
+                        WebAppConfiguration.class, Map.class });
+                RequestLogHandler rlh = new RequestLogHandler();
+                rlh.setHandler(handler);
+                rlh.setRequestLog((AccessLogger) loggerConstr.newInstance(this, args));
+                return rlh;
+            } else {
+                Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
+            }
+        } catch (Throwable err) {
+            Logger.log(Logger.ERROR, Launcher.RESOURCES,
+                    "WebAppConfig.LoggerError", "", err);
+        }
+        return handler;
     }
 
     private WebAppContext create(File app, String prefix) {
@@ -199,9 +228,8 @@ public class HostConfiguration {
         dir.delete();
     }
 
-    protected void initMultiWebappDir(File webappsDir) {
+    protected ContextHandlerCollection initMultiWebappDir(File webappsDir) {
         ContextHandlerCollection webApps = new ContextHandlerCollection();
-        server.setHandler(webApps);
 
         if (webappsDir == null) {
             webappsDir = new File("webapps");
@@ -253,5 +281,7 @@ public class HostConfiguration {
                 }
             }
         }
+
+        return webApps;
     }
 }
