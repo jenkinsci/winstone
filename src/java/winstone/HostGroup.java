@@ -78,7 +78,7 @@ public class HostGroup {
             ObjectPool objectPool, ClassLoader commonLibCL, 
             File commonLibCLPaths[], Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
-        HostConfiguration config = new HostConfiguration(hostname, objectPool, commonLibCL,
+        HostConfiguration config = new HostConfiguration(server, hostname, objectPool, commonLibCL,
                 commonLibCLPaths, args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }

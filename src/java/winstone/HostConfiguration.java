@@ -11,19 +11,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
 /**
@@ -40,17 +38,19 @@ public class HostConfiguration implements Runnable {
     private static final String WEB_INF = "WEB-INF";
     private static final String WEB_XML = "web.xml";
 
+    private final Server server;
     private String hostname;
     private Map args;
-    private Map webapps;
+    private Map<String,WebAppContext> webapps;
     private ObjectPool objectPool;
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
     
     private Thread thread;
     
-    public HostConfiguration(String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
+    public HostConfiguration(Server server, String hostname, ObjectPool objectPool, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
+        this.server = server;
         this.hostname = hostname;
         this.args = args;
         this.webapps = new Hashtable();
@@ -59,17 +59,16 @@ public class HostConfiguration implements Runnable {
         this.commonLibCLPaths = commonLibCLPaths;
         
         // Is this the single or multiple configuration ? Check args
-        File warfile = Option.WARFILE.get(args);
-        File webroot = Option.WEBROOT.get(args);
+        File appFile = Option.WARFILE.get(args);
+        if (appFile==null)
+            appFile = Option.WEBROOT.get(args);
         
         // If single-webapp mode
-        if ((webappsDir == null) && ((warfile != null) || (webroot != null))) {
+        if (webappsDir == null && appFile != null) {
             String prefix = Option.PREFIX.get(args);
-            try {
-                this.webapps.put(prefix, initWebApp(prefix, getWebRoot(webroot, warfile), "webapp"));
-            } catch (IOException err) {
-                Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
-            }
+            if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
+                prefix = prefix.substring(0,prefix.length()-1);
+            server.setHandler(create(appFile, prefix));
         }
         // Otherwise multi-webapp mode
         else {
@@ -84,11 +83,17 @@ public class HostConfiguration implements Runnable {
         this.thread.start();
     }
 
-    public WebAppConfiguration getWebAppByURI(String uri) {
+    private WebAppContext create(File app, String prefix) {
+        WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix);
+        this.webapps.put(wac.getContextPath(),wac);
+        return wac;
+    }
+
+    public WebAppContext getWebAppByURI(String uri) {
         if (uri == null) {
             return null;
         } else if (uri.equals("/") || uri.equals("")) {
-            return (WebAppConfiguration) this.webapps.get("");
+            return this.webapps.get("");
         } else if (uri.startsWith("/")) {
             String decoded = WinstoneRequest.decodeURLToken(uri);
             String noLeadingSlash = decoded.substring(1);
@@ -104,32 +109,6 @@ public class HostConfiguration implements Runnable {
         }
     }
     
-    protected WebAppConfiguration initWebApp(String prefix, File webRoot, 
-            String contextName) throws IOException {
-        Node webXMLParentNode = null;
-        File webInfFolder = new File(webRoot, WEB_INF);
-        if (webInfFolder.exists()) {
-            File webXmlFile = new File(webInfFolder, WEB_XML);
-            if (webXmlFile.exists()) {
-                Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.ParsingWebXml");
-                Document webXMLDoc = new WebXmlParser(this.commonLibCL)
-                        .parseStreamToXML(webXmlFile);
-                if (webXMLDoc != null) {
-                    webXMLParentNode = webXMLDoc.getDocumentElement();
-                    Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.WebXmlParseComplete");
-                } else {
-                    Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.WebXmlParseFailed");
-                }
-            }
-        }
-
-        // Instantiate the webAppConfig
-        return new WebAppConfiguration(this, webRoot
-                .getCanonicalPath(), prefix, this.objectPool, this.args,
-                webXMLParentNode, this.commonLibCL,
-                this.commonLibCLPaths, contextName);
-    }
-    
     public String getHostname() {
         return this.hostname;
     }
@@ -141,9 +120,9 @@ public class HostConfiguration implements Runnable {
      * @param prefix The webapp to destroy
      */
     private void destroyWebApp(String prefix) {
-        WebAppConfiguration webAppConfig = (WebAppConfiguration) this.webapps.get(prefix);
+        WebAppContext webAppConfig = this.webapps.get(prefix);
         if (webAppConfig != null) {
-            webAppConfig.destroy();
+            webAppConfig.stop();
             this.webapps.remove(prefix);
         }
     }
@@ -179,21 +158,19 @@ public class HostConfiguration implements Runnable {
     }
     
     public void reloadWebApp(String prefix) {
-        WebAppConfiguration webAppConfig = (WebAppConfiguration) this.webapps.get(prefix);
-        if (webAppConfig != null) {
-            String webRoot = webAppConfig.getWebroot();
-            String contextName = webAppConfig.getContextName();
-            destroyWebApp(prefix);
+        WebAppContext webApp = (WebAppContext) this.webapps.get(prefix);
+        if (webApp != null) {
             try {
-                this.webapps.put(prefix, initWebApp(prefix, new File(webRoot), contextName));
-            } catch (Throwable err) {
-                Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
+                webApp.stop();
+                webApp.start();
+            } catch (Exception e) {
+                throw new WinstoneException("Failed to redeploy "+prefix,e);
             }
         } else {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.PrefixUnknown", prefix));
         }
-    }    
-    
+    }
+
     /**
      * Setup the webroot. If a warfile is supplied, extract any files that the
      * war file is newer than. If none is supplied, use the default temp
@@ -294,6 +271,9 @@ public class HostConfiguration implements Runnable {
     }
 
     protected void initMultiWebappDir(File webappsDir) {
+        ContextHandlerCollection webApps = new ContextHandlerCollection();
+        server.setHandler(webApps);
+
         if (webappsDir == null) {
             webappsDir = new File("webapps");
         }
@@ -315,8 +295,9 @@ public class HostConfiguration implements Runnable {
                         String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
                         if (!this.webapps.containsKey(prefix)) {
                             try {
-                                WebAppConfiguration webAppConfig = initWebApp(prefix, aChildren, childName);
-                                this.webapps.put(webAppConfig.getContextPath(), webAppConfig);
+                                WebAppContext context = create(aChildren, prefix);
+                                context.start();
+                                webApps.addHandler(context);
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
                                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
@@ -331,10 +312,10 @@ public class HostConfiguration implements Runnable {
                         File outputDir = new File(webappsDir, outputName);
                         outputDir.mkdirs();
                         try {
-                            WebAppConfiguration webAppConfig = initWebApp(prefix,
-                                    getWebRoot(new File(webappsDir, outputName),
-                                            aChildren), outputName);
-                            this.webapps.put(webAppConfig.getContextPath(), webAppConfig);
+                            WebAppContext context = create(
+                                    getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
+                            context.start();
+                            webApps.addHandler(context);
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {
                             Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
@@ -343,17 +324,5 @@ public class HostConfiguration implements Runnable {
                 }
             }
         }
-    }
-    
-    public WebAppConfiguration getWebAppBySessionKey(String sessionKey) {
-        List allwebapps = new ArrayList(this.webapps.values());
-        for (Object allwebapp : allwebapps) {
-            WebAppConfiguration webapp = (WebAppConfiguration) allwebapp;
-            WinstoneSession session = webapp.getSessionById(sessionKey, false);
-            if (session != null) {
-                return webapp;
-            }
-        }
-        return null;
     }
 }
