@@ -158,7 +158,6 @@ public class WebAppConfiguration implements Comparator {
     private Map localeEncodingMap;
     private String defaultServletName;
     private String errorServletName;
-    private JNDIManager jndiManager;
     private AccessLogger accessLogger;
     private Map filterMatchCache;
     private boolean useSavedSessions;

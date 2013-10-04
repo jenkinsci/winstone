@@ -53,7 +53,6 @@ public class Launcher implements Runnable {
     private HostGroup hostGroup;
     private ObjectPool objectPool;
     private Map args;
-    private JNDIManager globalJndiManager;
 
     public final Server server = new Server();
     
@@ -264,9 +263,6 @@ public class Launcher implements Runnable {
     public void shutdown() {
         // Release all listeners/pools/webapps
         this.objectPool.destroy();
-        if (this.globalJndiManager != null) {
-            this.globalJndiManager.tearDown();
-        }
 
         if (this.controlThread != null) {
             this.controlThread.interrupt();
