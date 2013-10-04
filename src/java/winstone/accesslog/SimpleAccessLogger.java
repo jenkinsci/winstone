@@ -16,13 +16,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import winstone.AccessLogger;
 import winstone.Logger;
 import winstone.cmdline.Option;
 import winstone.WebAppConfiguration;
-import winstone.WinstoneRequest;
 import winstone.WinstoneResourceBundle;
-import winstone.WinstoneResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Simulates an apache "combined" style logger, which logs User-Agent, Referer, etc
@@ -77,11 +80,10 @@ public class SimpleAccessLogger implements AccessLogger {
                 this.fileName, patternType);
     }
     
-    public void log(String originalURL, WinstoneRequest request, WinstoneResponse response) {
+    public void log(String originalURL, Request request, Response response) {
         String uriLine = request.getMethod() + " " + originalURL + " " + request.getProtocol();
-        int status = response.getErrorStatusCode() == null ? response.getStatus() 
-                : response.getErrorStatusCode();
-        long size = response.getWinstoneOutputStream().getBytesCommitted();
+        int status = response.getStatus();
+        long size = response.getContentCount();
         String date;
         synchronized (DF) {
             date = DF.format(new Date());
