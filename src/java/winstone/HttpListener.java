@@ -6,7 +6,9 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -15,7 +17,6 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.Map;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpListener.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
-public class HttpListener implements Listener, Runnable {
+public class HttpListener implements Listener {
     protected static int LISTENER_TIMEOUT = 5000; // every 5s reset the
                                                     // listener socket
     protected static int CONNECTION_TIMEOUT = 60000;
@@ -45,7 +46,6 @@ public class HttpListener implements Listener, Runnable {
     protected int listenPort;
     protected String listenAddress;
     protected boolean interrupted;
-    private ServerSocket serverSocket;
 
     protected HttpListener() {
     }
@@ -71,24 +71,15 @@ public class HttpListener implements Listener, Runnable {
         if (this.listenPort < 0) {
             return false;
         } else {
-            this.interrupted = false;
+            ServerConnector connector = createConnector(server);
+            connector.setPort(listenPort);
+            connector.setHost(this.listenAddress);
 
-            ServerSocket ss = getServerSocket();
-            ss.setSoTimeout(LISTENER_TIMEOUT);
-            Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.StartupOK",
-                    getConnectorName().toUpperCase(),
-                    this.listenPort + "");
-            this.serverSocket = ss;
-
-            Thread thread = new Thread(this, Launcher.RESOURCES.getString(
-                    "Listener.ThreadName", new String[] { getConnectorName(),
-                            "" + this.listenPort }));
-            thread.setDaemon(true);
-            thread.start();
+            server.addConnector(connector);
             return true;
         }
     }
-    
+
     /**
      * The default port to use - this is just so that we can override for the
      * SSL connector.
@@ -113,51 +104,8 @@ public class HttpListener implements Listener, Runnable {
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.
      */
-    protected ServerSocket getServerSocket() throws IOException {
-        try {
-            return this.listenAddress == null ? new ServerSocket(
-                    this.listenPort, BACKLOG_COUNT) : new ServerSocket(
-                    this.listenPort, BACKLOG_COUNT, InetAddress
-                            .getByName(this.listenAddress));
-        } catch (IOException e) {
-            throw (IOException)new IOException("Failed to listen on port "+listenPort).initCause(e);
-        }
-    }
-
-    /**
-     * The main run method. This continually listens for incoming connections,
-     * and allocates any that it finds to a request handler thread, before going
-     * back to listen again.
-     */
-    public void run() {
-        try {
-
-            // Enter the main loop
-            while (!interrupted) {
-                // Get the listener
-                Socket s;
-                try {
-                    s = serverSocket.accept();
-                } catch (java.io.InterruptedIOException err) {
-                    s = null;
-                }
-
-                // if we actually got a socket, process it. Otherwise go around
-                // again
-                if (s != null)
-                    this.objectPool.handleRequest(s, this);
-            }
-
-            // Close server socket
-            serverSocket.close();
-            serverSocket = null;
-
-            Logger.log(Logger.INFO, Launcher.RESOURCES, "HttpListener.ShutdownOK",
-                    getConnectorName().toUpperCase());
-        } catch (Throwable err) {
-            Logger.log(Logger.ERROR, Launcher.RESOURCES, "HttpListener.ShutdownError",
-                    getConnectorName().toUpperCase(), err);
-        }
+    protected ServerConnector createConnector(Server server) {
+        return new ServerConnector(server,new HttpConnectionFactory());
     }
 
     /**

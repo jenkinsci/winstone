@@ -8,8 +8,6 @@ package winstone.ssl;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.*;
 import java.security.cert.Certificate;
@@ -22,11 +20,12 @@ import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.CertAndKeyGen;
@@ -185,22 +184,9 @@ public class HttpsListener extends HttpListener {
         return "https";
     }
 
-    /**
-     * Gets a server socket - this gets as SSL socket instead of the standard
-     * socket returned in the base class.
-     */
-    protected ServerSocket getServerSocket() throws IOException {
-        // Just to make sure it's set before we start
-        SSLContext context = getSSLContext();
-        SSLServerSocketFactory factory = context.getServerSocketFactory();
-        SSLServerSocket ss = (SSLServerSocket) (this.listenAddress == null ? factory
-                .createServerSocket(this.listenPort, BACKLOG_COUNT)
-                : factory.createServerSocket(this.listenPort, BACKLOG_COUNT,
-                        InetAddress.getByName(this.listenAddress)));
-        ss.setEnableSessionCreation(true);
-        if (performClientAuth)
-            ss.setNeedClientAuth(true);
-        return ss;
+    @Override
+    protected ServerConnector createConnector(Server server) {
+        return new ServerConnector(server,getSSLContext());
     }
 
     /**
@@ -265,11 +251,11 @@ public class HttpsListener extends HttpListener {
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    public SSLContext getSSLContext() {
+    public SslContextFactory getSSLContext() {
         try {
             // Check the key manager factory
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(this.keyManagerType);
-            
+
             kmf.init(keystore, password);
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                     "HttpsListener.KeyCount", keystore.size() + "");
@@ -282,7 +268,11 @@ public class HttpsListener extends HttpListener {
 
             SSLContext context = SSLContext.getInstance("SSL");
             context.init(kmf.getKeyManagers(), null, null);
-            return context;
+
+            SslContextFactory ssl = new SslContextFactory();
+            ssl.setSslContext(context);
+            ssl.setNeedClientAuth(performClientAuth);
+            return ssl;
         } catch (Throwable err) {
             throw new WinstoneException(SSL_RESOURCES
                     .getString("HttpsListener.ErrorGettingContext"), err);

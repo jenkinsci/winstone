@@ -193,7 +193,7 @@ public class Launcher implements Runnable {
             Listener listener = (Listener) listenerConstructor
                     .newInstance(args, this.objectPool,
                             this.hostGroup);
-            if (listener.start(server)) {
+            if (listener. start(server)) {
                 this.listeners.add(listener); // TODO: fix it
             }
 //        } catch (ClassNotFoundException err) {
