@@ -8,6 +8,8 @@ package winstone;
 
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.log.JavaUtilLog;
+import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
@@ -327,6 +329,8 @@ public class Launcher implements Runnable {
      * listener thread. For now, just shut it down with a control-C.
      */
     public static void main(String argv[]) throws IOException {
+        Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
+
         Map args = getArgsFromCommandLine(argv);
         
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
