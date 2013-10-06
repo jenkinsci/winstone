@@ -1,11 +1,15 @@
 package winstone;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,26 +19,54 @@ import java.util.Map;
 public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
     @Test
     public void testHttps() throws Exception {
-        SSLSocketFactory d = HttpsURLConnection.getDefaultSSLSocketFactory();
-        try {
-            Map<String,String> args = new HashMap<String,String>();
-            args.put("warfile", "target/test-classes/test.war");
-            args.put("prefix", "/");
-            args.put("httpPort", "-1");
-            args.put("httpsPort", "59009");
-            args.put("httpsListenAddress", "localhost");
-            args.put("httpsPrivateKey", "src/ssl/server.key");
-            args.put("httpsCertificate", "src/ssl/server.crt");
-            winstone = new Launcher(args);
+        Map<String,String> args = new HashMap<String,String>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "-1");
+        args.put("httpsPort", "59009");
+        args.put("httpsListenAddress", "localhost");
+        args.put("httpsPrivateKey", "src/ssl/server.key");
+        args.put("httpsCertificate", "src/ssl/server.crt");
+        winstone = new Launcher(args);
 
-            new TrustManagerImpl().loadGlobally();
-            new URL("https://localhost:59009/CountRequestsServlet").openConnection(); // not sure why this is needed
+        assertConnectionRefused("127.0.0.2", 59009);
 
-            assertConnectionRefused("127.0.0.2", 59009);
-            makeRequest("https://localhost:59009/CountRequestsServlet");
-        } finally {
-            HttpsURLConnection.setDefaultSSLSocketFactory(d);
-        }
+        request(new TrustManagerImpl());
     }
 
+    private void request(X509TrustManager tm) throws Exception {
+        HttpsURLConnection con = (HttpsURLConnection)new URL("https://localhost:59009/CountRequestsServlet").openConnection();
+        con.setHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String s, SSLSession sslSession) {
+                return true;
+            }
+        });
+        SSLContext ssl = SSLContext.getInstance("SSL");
+        ssl.init(null, new X509TrustManager[] {tm}, null);
+        con.setSSLSocketFactory(ssl.getSocketFactory());
+        IOUtils.toString(con.getInputStream());
+    }
+
+    /**
+     * Without specifying the certificate and key, it uses the random key
+     */
+    @Test
+    public void testHttpsRandomCert() throws Exception {
+        Map<String,String> args = new HashMap<String,String>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "-1");
+        args.put("httpsPort", "59009");
+        winstone = new Launcher(args);
+
+
+        try {
+            request(new TrustManagerImpl());
+            fail("we should have generated a unique key");
+        } catch (SSLHandshakeException e) {
+            // expected
+        }
+
+        request(new TrustEveryoneManager());
+    }
 }
