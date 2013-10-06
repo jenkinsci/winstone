@@ -19,145 +19,145 @@
     </license>
   </licenses>
 
-    <build>
-        <sourceDirectory>src/java</sourceDirectory>
+  <build>
+    <sourceDirectory>src/java</sourceDirectory>
 
-        <resources>
-            <resource>
-                <directory>src/java</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-        </resources>
+    <resources>
+      <resource>
+        <directory>src/java</directory>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+    </resources>
 
-        <testSourceDirectory>src/test</testSourceDirectory>
+    <testSourceDirectory>src/test</testSourceDirectory>
 
-        <testResources>
-            <testResource>
-                <directory>src/test</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </testResource>
-        </testResources>
+    <testResources>
+      <testResource>
+        <directory>src/test</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-testwebapp</id>
-                        <phase>process-test-classes</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy overwrite="true" todir="${project.build.directory}">
-                                    <fileset dir="${basedir}/src" includes="testwebapp/**" />
-                                </copy>
-                                <copy overwrite="true" todir="${project.build.directory}/testwebapp/WEB-INF/classes">
-                                    <fileset dir="${project.build.testOutputDirectory}" includes="**" />
-                                </copy>
-                                <war destfile="${project.build.directory}/test-classes/test.war">
-                                  <fileset dir="${project.build.directory}/testwebapp"/>
-                                </war>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*NaughtyTest.java</exclude>
-                        <exclude>winstone/testCase/load/LoadTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <mainClass>winstone.Launcher</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-enforcer-plugin</artifactId>
-              <version>1.1</version>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>enforce</goal>
-                  </goals>
-                  <configuration>
-                    <rules>
-                      <requireJavaVersion>
-                        <version>[1.7,)</version>
-                      </requireJavaVersion>
-                    </rules>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>2.1</version>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-testwebapp</id>
+            <phase>process-test-classes</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
             <configuration>
-              <filters>
-                <filter>
-                  <artifact>org.eclipse.jetty.orbit:javax.servlet</artifact>
-                  <excludes>
-                    <exclude>META-INF/eclipse.inf</exclude>
-                    <exclude>META-INF/ECLIPSEF.*</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-              <!-- Jetty uses reflection in various places and that breaks relocation
-              <relocations>
-                <relocation>
-                  <pattern>org.eclipse.jetty</pattern>
-                  <shadedPattern>winstone.jetty</shadedPattern>
-                </relocation>
-              </relocations-->
+              <tasks>
+                <copy overwrite="true" todir="${project.build.directory}">
+                  <fileset dir="${basedir}/src" includes="testwebapp/**"/>
+                </copy>
+                <copy overwrite="true" todir="${project.build.directory}/testwebapp/WEB-INF/classes">
+                  <fileset dir="${project.build.testOutputDirectory}" includes="**"/>
+                </copy>
+                <war destfile="${project.build.directory}/test-classes/test.war">
+                  <fileset dir="${project.build.directory}/testwebapp"/>
+                </war>
+              </tasks>
             </configuration>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-    </build>
+          </execution>
+        </executions>
+      </plugin>
 
-    <distributionManagement>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*NaughtyTest.java</exclude>
+            <exclude>winstone/testCase/load/LoadTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <mainClass>winstone.Launcher</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[1.7,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>org.eclipse.jetty.orbit:javax.servlet</artifact>
+              <excludes>
+                <exclude>META-INF/eclipse.inf</exclude>
+                <exclude>META-INF/ECLIPSEF.*</exclude>
+              </excludes>
+            </filter>
+          </filters>
+          <!-- Jetty uses reflection in various places and that breaks relocation
+          <relocations>
+            <relocation>
+              <pattern>org.eclipse.jetty</pattern>
+              <shadedPattern>winstone.jetty</shadedPattern>
+            </relocation>
+          </relocations-->
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <distributionManagement>
     <repository>
       <id>maven.jenkins-ci.org</id>
       <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
@@ -177,58 +177,58 @@
     <url>http://github.com/jenkinsci/winstone</url>
   </scm>
 
-    <dependencies>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.4</version>
-        <scope>test</scope>
-      </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+      <scope>test</scope>
+    </dependency>
 
-      <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <version>4.11</version>
-          <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
 
-      <dependency>
-          <groupId>httpunit</groupId>
-          <artifactId>httpunit</artifactId>
-          <version>1.6</version>
-          <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+    <dependency>
+      <groupId>httpunit</groupId>
+      <artifactId>httpunit</artifactId>
+      <version>1.6</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-servlet</artifactId>
-        <version>8.1.13.v20130916</version>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>8.1.13.v20130916</version>
+    </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-webapp</artifactId>
-        <version>8.1.13.v20130916</version>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>8.1.13.v20130916</version>
+    </dependency>
 
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-ajp</artifactId>
-        <version>8.1.13.v20130916</version>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-ajp</artifactId>
+      <version>8.1.13.v20130916</version>
+    </dependency>
 
-      <dependency>
-        <groupId>org.kohsuke</groupId>
-        <artifactId>ajp-client</artifactId>
-        <version>1.0</version>
-        <scope>test</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.kohsuke</groupId>
+      <artifactId>ajp-client</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
