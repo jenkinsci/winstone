@@ -224,6 +224,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.eclipse.jetty.spdy</groupId>
+      <artifactId>spdy-jetty-http</artifactId>
+      <version>8.1.13.v20130916</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.kohsuke</groupId>
       <artifactId>ajp-client</artifactId>
       <version>1.0</version>

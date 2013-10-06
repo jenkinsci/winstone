@@ -9,16 +9,13 @@ package winstone;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
-import winstone.ConnectorFactory;
-import winstone.Logger;
-import winstone.WinstoneException;
-import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -117,13 +114,21 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
         }
 
-        SelectChannelConnector connector = new SslSelectChannelConnector(getSSLContext(args));
+        SelectChannelConnector connector = createConnector(args);
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
         connector.setMaxIdleTime(keepAliveTimeout);
         server.addConnector(connector);
 
         return true;
+    }
+
+    private SelectChannelConnector createConnector(Map args) {
+        SslContextFactory sslcf = getSSLContext(args);
+        if (Option.HTTPS_SPDY.get(args))
+            return new HTTPSPDYServerConnector(sslcf);
+        else
+            return new SslSelectChannelConnector(sslcf);
     }
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
