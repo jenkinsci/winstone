@@ -30,7 +30,7 @@ public class HostGroup {
     //    private Map args;
     private Map hostConfigs;
     private String defaultHostName;
-    
+
     public HostGroup(
             Server server, ClassLoader commonLibCL,
             File commonLibCLPaths[], Map args) throws IOException {

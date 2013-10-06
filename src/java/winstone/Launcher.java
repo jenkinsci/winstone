@@ -146,15 +146,6 @@ public class Launcher implements Runnable {
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
 
-            try {
-                // Build the realm
-                Class realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
-                Constructor realmConstr = realmClass.getConstructor(Map.class);
-                server.addBean(realmConstr.newInstance(args));
-            } catch (Throwable err) {
-                throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
-            }
-
             server.setThreadPool(new ExecutorThreadPool(threadPool));
 
             try {

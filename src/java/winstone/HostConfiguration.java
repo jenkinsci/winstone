@@ -7,6 +7,7 @@
 package winstone;
 
 import org.eclipse.jetty.http.MimeTypes;
+import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
@@ -45,6 +46,7 @@ public class HostConfiguration {
     private ClassLoader commonLibCL;
     private File commonLibCLPaths[];
     private MimeTypes mimeTypes = new MimeTypes();
+    private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
                              File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
@@ -54,7 +56,16 @@ public class HostConfiguration {
         this.webapps = new Hashtable<String,WebAppContext>();
         this.commonLibCL = commonLibCL;
         this.commonLibCLPaths = commonLibCLPaths;
-        
+
+        try {
+            // Build the realm
+            Class realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
+            Constructor realmConstr = realmClass.getConstructor(Map.class);
+            loginService = (LoginService) realmConstr.newInstance(args);
+        } catch (Throwable err) {
+            throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
+        }
+
         // Is this the single or multiple configuration ? Check args
         File appFile = Option.WARFILE.get(args);
         if (appFile==null)
@@ -165,6 +176,7 @@ public class HostConfiguration {
                     getSessionHandler().getSessionManager().setMaxInactiveInterval(sessionTimeout * 60);
             }
         };
+        wac.getSecurityHandler().setLoginService(loginService);
         wac.setMimeTypes(mimeTypes);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
