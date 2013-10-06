@@ -68,6 +68,9 @@
                                 <copy overwrite="true" todir="${project.build.directory}/testwebapp/WEB-INF/classes">
                                     <fileset dir="${project.build.testOutputDirectory}" includes="**" />
                                 </copy>
+                                <war destfile="${project.build.directory}/test-classes/test.war">
+                                  <fileset dir="${project.build.directory}/testwebapp"/>
+                                </war>
                             </tasks>
                         </configuration>
                     </execution>
