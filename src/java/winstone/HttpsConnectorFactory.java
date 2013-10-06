@@ -130,6 +130,12 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
                         .getConstructor(SslContextFactory.class)
                         .newInstance(sslcf);
+            } catch (NoClassDefFoundError e) {
+                if (e.getMessage().contains("org/eclipse/jetty/npn")) {
+                    // a typically error is to forget to run NPN
+                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsListener.MissingNPN"), e);
+                }
+                throw e;
             } catch (Exception e) {
                 throw new Error("Failed to enable SPDY connector",e);
             }
