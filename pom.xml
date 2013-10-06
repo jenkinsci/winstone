@@ -122,6 +122,66 @@
                 </execution>
               </executions>
             </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>org.eclipse.jetty.orbit:javax.servlet</artifact>
+                  <excludes>
+                    <exclude>META-INF/eclipse.inf</exclude>
+                    <exclude>META-INF/ECLIPSEF.*</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <relocations>
+                <relocation>
+                  <pattern>org.eclipse.jetty</pattern>
+                  <shadedPattern>winstone.jetty</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!--<plugin>-->
+            <!--<groupId>org.sonatype.plugins</groupId>-->
+            <!--<artifactId>jarjar-maven-plugin</artifactId>-->
+            <!--<version>1.3</version>-->
+            <!--<executions>-->
+              <!--<execution>-->
+                <!--<phase>package</phase>-->
+                <!--<goals>-->
+                  <!--<goal>jarjar</goal>-->
+                <!--</goals>-->
+                <!--<configuration>-->
+                  <!--<includes>-->
+                    <!--<include>org.eclipse.jetty:*</include>-->
+                    <!--<include>org.eclipse.jetty.orbit:*</include>-->
+                  <!--</includes>-->
+                  <!--<rules>-->
+                    <!--<rule>-->
+                      <!--<pattern>org.eclipse.jetty.**</pattern>-->
+                      <!--<result>winstone.jetty.@1</result>-->
+                    <!--</rule>-->
+                    <!--<keep>-->
+                      <!--<pattern>javax.**</pattern>-->
+                    <!--</keep>-->
+                  <!--</rules>-->
+                <!--</configuration>-->
+              <!--</execution>-->
+            <!--</executions>-->
+          <!--</plugin>-->
         </plugins>
     </build>
 
