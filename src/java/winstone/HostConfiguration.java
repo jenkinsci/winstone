@@ -124,11 +124,10 @@ public class HostConfiguration {
             Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
             if (loggerClass!=null) {
                 // Build the realm
-                Constructor loggerConstr = loggerClass.getConstructor(new Class[] {
-                        String.class, Map.class });
+                Constructor loggerConstr = loggerClass.getConstructor(String.class, Map.class);
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setHandler(handler);
-                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(this, webAppName, args));
+                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(webAppName, args));
                 return rlh;
             } else {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
