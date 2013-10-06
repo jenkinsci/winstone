@@ -9,7 +9,6 @@ package winstone;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
-import org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
@@ -125,9 +124,16 @@ public class HttpsConnectorFactory implements ConnectorFactory {
 
     private SelectChannelConnector createConnector(Map args) {
         SslContextFactory sslcf = getSSLContext(args);
-        if (Option.HTTPS_SPDY.get(args))
-            return new HTTPSPDYServerConnector(sslcf);
-        else
+        if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
+            try {
+                sslcf.setIncludeProtocols("TLSv1");
+                return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
+                        .getConstructor(SslContextFactory.class)
+                        .newInstance(sslcf);
+            } catch (Exception e) {
+                throw new Error("Failed to enable SPDY connector",e);
+            }
+        } else
             return new SslSelectChannelConnector(sslcf);
     }
 
