@@ -2,8 +2,6 @@ package winstone;
 
 import org.junit.Test;
 
-import java.net.Socket;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,12 +19,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpListenAddress", "127.0.0.2");
         winstone = new Launcher(args);
 
-        try {
-            new Socket("127.0.0.1",59009);
-            fail("shouldn't be listening on 127.0.0.1");
-        } catch (ConnectException e) {
-            // expected
-        }
+        assertConnectionRefused("127.0.0.1",59009);
 
         makeRequest("http://127.0.0.2:59009/CountRequestsServlet");
     }
