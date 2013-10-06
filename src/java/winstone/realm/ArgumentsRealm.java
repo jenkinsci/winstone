@@ -36,6 +36,7 @@ public class ArgumentsRealm extends HashLoginService {
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public ArgumentsRealm(Map args) {
+        setName("default");
         int count=0;
         for (Object o : args.keySet()) {
             String key = (String) o;
