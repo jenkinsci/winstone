@@ -1,0 +1,1 @@
+A key and a self-signed certificate for the domain name 'localhost'. Valid for 100 years.
