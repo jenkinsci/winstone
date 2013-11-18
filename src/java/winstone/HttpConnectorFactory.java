@@ -35,6 +35,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
             connector.setPort(listenPort);
             connector.setHost(listenAddress);
             connector.setMaxIdleTime(keepAliveTimeout);
+            connector.setForwarded(true);
 
             server.addConnector(connector);
             return true;
