@@ -11,8 +11,10 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
@@ -178,6 +180,11 @@ public class HostConfiguration {
         };
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setMimeTypes(mimeTypes);
+        SessionManager sm = wac.getSessionHandler().getSessionManager();
+        if (sm instanceof AbstractSessionManager) {
+            AbstractSessionManager asm = (AbstractSessionManager) sm;
+            asm.setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
+        }
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
     }
