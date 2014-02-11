@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class WinstoneRequest implements HttpServletRequest {
     protected static Random rnd = null;
     static {
         headerDF.setTimeZone(TimeZone.getTimeZone("GMT"));
-        rnd = new Random(System.currentTimeMillis());
+        rnd = new SecureRandom();
     }
 
     // Request header constants
