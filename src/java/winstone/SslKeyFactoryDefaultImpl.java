@@ -1,0 +1,65 @@
+package winstone;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.security.spec.RSAPrivateKeySpec;
+
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
+import sun.security.x509.CertAndKeyGen;
+import sun.security.x509.X500Name;
+
+public class SslKeyFactoryDefaultImpl implements SslKeyFactory {
+
+    public String getHttpsKeyManagerType() {
+        return "SunX509";
+    }
+
+    /**
+     * @Override
+     */
+    public KeyStore createKeyStore(char[] password) throws NoSuchAlgorithmException,
+            NoSuchProviderException, InvalidKeyException, IOException, CertificateException,
+            SignatureException, KeyStoreException {
+        CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
+        ckg.generate(1024);
+        PrivateKey privKey = ckg.getPrivateKey();
+
+        X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
+        X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
+
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(null);
+        keystore.setKeyEntry("hudson", privKey, password, new Certificate[] { cert });
+        return keystore;
+    }
+
+    /**
+     * @Override
+     */
+    public PrivateKey getPrivateKey(byte[] data) throws IOException, GeneralSecurityException {
+        DerInputStream dis = new DerInputStream(data);
+        DerValue[] seq = dis.getSequence(0);
+
+        // int v = seq[0].getInteger();
+        BigInteger mod = seq[1].getBigInteger();
+        // pubExpo
+        BigInteger privExpo = seq[3].getBigInteger();
+        // p1, p2, exp1, exp2, crtCoef
+
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(new RSAPrivateKeySpec(mod, privExpo));
+    }
+}
