@@ -11,10 +11,6 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.CertAndKeyGen;
-import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -26,15 +22,11 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Map;
@@ -51,6 +43,8 @@ public class HttpsConnectorFactory implements ConnectorFactory {
     private KeyStore keystore;
     private char[] password;
 
+    private   SslKeyFactory sslKeyStoreFactory = null;
+    
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.HTTPS_PORT.get(args);
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
@@ -61,7 +55,22 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             // not running HTTPS listener
             return false;
         }
-
+        Object obj = args.get("sslKeyStoreFactory");
+        if(obj == null ) {
+            final String vendor = System.getProperty("java.vendor");
+            obj = vendor != null && vendor.contains("IBM") ?  new SslKeyFactoryForIbmJdkDelegateImpl() : new SslKeyFactoryDefaultImpl();
+        }
+        try{
+        if(obj instanceof CharSequence){
+            obj = Class.forName(obj.toString()).newInstance(); 
+        }else if( obj instanceof Class ){
+            obj = ((Class)obj).newInstance();
+        }
+        }catch(Exception ex){
+            ex.printStackTrace();
+            throw new IllegalArgumentException(ex.getMessage(),ex);
+        }
+         sslKeyStoreFactory = (SslKeyFactory)obj; 
         try {
             File opensslCert = Option.HTTPS_CERTIFICATE.get(args);
             File opensslKey =  Option.HTTPS_PRIVATE_KEY.get(args);
@@ -98,16 +107,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 this.password = "changeit".toCharArray();
                 System.out.println("Using one-time self-signed certificate");
 
-                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
-                ckg.generate(1024);
-                PrivateKey privKey = ckg.getPrivateKey();
-
-                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
-
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+                keystore = sslKeyStoreFactory.createKeyStore(password);
             }
         } catch (GeneralSecurityException e) {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
@@ -143,7 +143,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             return new SslSelectChannelConnector(sslcf);
     }
 
-    private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
+    private  PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
         // TODO: should have more robust format error handling
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -162,19 +162,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         } finally {
             reader.close();
         }
-
-
-        DerInputStream dis = new DerInputStream(baos.toByteArray());
-        DerValue[] seq = dis.getSequence(0);
-
-        // int v = seq[0].getInteger();
-        BigInteger mod = seq[1].getBigInteger();
-        // pubExpo
-        BigInteger privExpo = seq[3].getBigInteger();
-        // p1, p2, exp1, exp2, crtCoef
-
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
+        return sslKeyStoreFactory.getPrivateKey(baos.toByteArray());
     }
 
     /**
@@ -184,7 +172,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
     SslContextFactory getSSLContext(Map args) {
         try {
             // Check the key manager factory
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args,sslKeyStoreFactory.getHttpsKeyManagerType()));
 
             kmf.init(keystore, password);
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
