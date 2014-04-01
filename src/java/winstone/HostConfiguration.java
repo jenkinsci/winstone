@@ -69,17 +69,16 @@ public class HostConfiguration {
         }
 
         // Is this the single or multiple configuration ? Check args
-        File appFile = Option.WARFILE.get(args);
-        if (appFile==null)
-            appFile = Option.WEBROOT.get(args);
+        File warfile = Option.WARFILE.get(args);
+        File webroot = Option.WEBROOT.get(args);
 
         Handler handler;
         // If single-webapp mode
-        if (webappsDir == null && appFile != null) {
+        if (webappsDir == null && ((warfile != null) || (webroot != null))) {
             String prefix = Option.PREFIX.get(args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
-            handler = configureAccessLog(create(appFile, prefix),"webapp");
+            handler = configureAccessLog(create(getWebRoot(webroot,warfile), prefix),"webapp");
         }
         // Otherwise multi-webapp mode
         else {
