@@ -116,6 +116,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         SelectChannelConnector connector = createConnector(args);
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
+        connector.setForwarded(true);
         connector.setMaxIdleTime(keepAliveTimeout);
         server.addConnector(connector);
 
