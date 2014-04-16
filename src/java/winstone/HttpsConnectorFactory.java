@@ -13,7 +13,6 @@ import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
-import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
@@ -94,20 +93,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 keystore.load(null);
                 keystore.setKeyEntry("hudson", key, password, new Certificate[]{cert});
             } else {
-                // use self-signed certificate
-                this.password = "changeit".toCharArray();
-                System.out.println("Using one-time self-signed certificate");
-
-                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
-                ckg.generate(1024);
-                PrivateKey privKey = ckg.getPrivateKey();
-
-                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
-
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+                throw new WinstoneException("SSL certificate not found, please specify a keystore or an OpenSSL certificate");
             }
         } catch (GeneralSecurityException e) {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
