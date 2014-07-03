@@ -189,7 +189,9 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             // the SslContextFactory will instantiate its own KeyManager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
 
-            kmf.init(keystore, password);
+            // In case the KeyStore password and the KeyPassword are not the same,
+            // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
+            kmf.init(keystore, Option.HTTPS_PRIVATE_KEY_PASSWORD.get(args).toCharArray());
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                     "HttpsListener.KeyCount", keystore.size() + "");
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
@@ -201,11 +203,11 @@ public class HttpsConnectorFactory implements ConnectorFactory {
 
             SslContextFactory ssl = new SslContextFactory();
 
-            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setKeyStore(keystore);
-            ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             ssl.setKeyStorePassword(Option.HTTPS_KEY_STORE_PASSWORD.get(args));
             ssl.setKeyManagerPassword(Option.HTTPS_PRIVATE_KEY_PASSWORD.get(args));
+            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
