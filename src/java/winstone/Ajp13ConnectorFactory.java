@@ -33,6 +33,8 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
         Ajp13SocketConnector connector = new Ajp13SocketConnector();
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
+        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
 
         server.addConnector(connector);
         return true;

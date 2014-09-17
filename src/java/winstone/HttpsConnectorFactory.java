@@ -118,6 +118,8 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         connector.setHost(listenAddress);
         connector.setForwarded(true);
         connector.setMaxIdleTime(keepAliveTimeout);
+        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
         server.addConnector(connector);
 
         return true;
