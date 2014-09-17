@@ -38,6 +38,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private static final DateFormat DF = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
     private static final String COMMON = "###ip### - ###user### ###time### \"###uriLine###\" ###status### ###size###";
     private static final String COMBINED = COMMON + " \"###referer###\" \"###userAgent###\"";
+    private static final String RPROXYCOMBINED = "###x-forwarded-for### " + COMBINED;
     private static final String RESIN = COMMON + " \"###userAgent###\"";
     
     private OutputStream outStream;
@@ -56,6 +57,8 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             this.pattern = COMMON;
         } else if (patternType.equalsIgnoreCase("resin")) {
             this.pattern = RESIN; 
+        } else if (patternType.equalsIgnoreCase("rproxycombined")) {
+            this.pattern = RPROXYCOMBINED;
         } else {
             this.pattern = patternType;
         }
@@ -84,6 +87,16 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             date = DF.format(new Date());
         }
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
+                {"###x-forwarded-for###", nvl(request.getHeader("X-Forwarded-For"))},
+                {"###x-forwarded-host###", nvl(request.getHeader("X-Forwarded-Host"))},
+                {"###x-forwarded-proto###", nvl(request.getHeader("X-Forwarded-Proto"))},
+                {"###x-forwarded-protocol###", nvl(request.getHeader("X-Forwarded-Protocol"))},
+                {"###x-forwarded-server###", nvl(request.getHeader("X-Forwarded-Server"))},
+                {"###x-forwarded-ssl###", nvl(request.getHeader("X-Forwarded-Ssl"))},
+                {"###x-requested-with###", nvl(request.getHeader("X-Requested-With"))},
+                {"###x-do-not-track###", nvl(request.getHeader("X-Do-Not-Track"))},
+                {"###dnt###", nvl(request.getHeader("DNT"))},
+                {"###via###", nvl(request.getHeader("Via"))},
                 {"###ip###", request.getRemoteHost()},
                 {"###user###", nvl(request.getRemoteUser())},
                 {"###time###", "[" + date + "]"},
