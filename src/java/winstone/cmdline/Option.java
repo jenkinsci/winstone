@@ -229,6 +229,15 @@ public class Option<T> {
         }
         
         public String get(Map args) {
+            return get(args,defaultValue);
+        }
+
+        public char[] getCharArray(Map args) {
+            String v = get(args);
+            return v!=null ? v.toCharArray() : null;
+        }
+
+        public String get(Map args, String defaultValue) {
             String v = (String)args.get(name);
             return v!=null ? v : defaultValue;
         }
