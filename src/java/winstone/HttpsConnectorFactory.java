@@ -184,10 +184,28 @@ public class HttpsConnectorFactory implements ConnectorFactory {
      */
     SslContextFactory getSSLContext(Map args) {
         try {
-            // Check the key manager factory
+            String privateKeyPassword;
+            
+            // There are many legacy setups in which the KeyStore password and the
+            // key password are identical and people will not even be aware that these
+            // are two different things
+            // Therefore if no httpsPrivateKeyPassword is explicitely set we try to
+            // use the KeyStore password also for the key password not to break
+            // backward compatibility
+            // Otherwise the following code will completely break the startup of
+            // Jenkins in case the --httpsPrivateKeyPassword parameter is not set
+            privateKeyPassword = Option.HTTPS_PRIVATE_KEY_PASSWORD.get(args)!=null ? 
+                    Option.HTTPS_PRIVATE_KEY_PASSWORD.get(args) : 
+                        Option.HTTPS_KEY_STORE_PASSWORD.get(args);  
+            
+            // Dump the content of the keystore if log level is FULL_DEBUG
+            // Note: The kmf is instantiated here only to access the keystore,
+            // the SslContextFactory will instantiate its own KeyManager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
 
-            kmf.init(keystore, password);
+            // In case the KeyStore password and the KeyPassword are not the same,
+            // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
+            kmf.init(keystore, privateKeyPassword.toCharArray());
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                     "HttpsListener.KeyCount", keystore.size() + "");
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
@@ -197,12 +215,14 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                         keystore.getCertificate(alias) + "");
             }
 
-            SSLContext context = SSLContext.getInstance("SSL");
-            context.init(kmf.getKeyManagers(), null, null);
-
             SslContextFactory ssl = new SslContextFactory();
-            ssl.setSslContext(context);
 
+            ssl.setKeyStore(keystore);
+            ssl.setKeyStorePassword(Option.HTTPS_KEY_STORE_PASSWORD.get(args));
+            ssl.setKeyManagerPassword(privateKeyPassword);
+            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
+            
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
              * If false, which is the default, don't do so.
