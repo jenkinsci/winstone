@@ -99,6 +99,15 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <mainClass>winstone.Launcher</mainClass>
             </manifest>
+            <manifestSections>
+              <manifestSection>
+                <name>org/eclipse/jetty/server/</name>
+                <manifestEntries>
+                  <Implementation-Vendor>Eclipse.org - Jetty</Implementation-Vendor>
+                  <Implementation-Version>winstone-${project.version}</Implementation-Version>
+                </manifestEntries>
+              </manifestSection>
+            </manifestSections>
           </archive>
         </configuration>
       </plugin>
