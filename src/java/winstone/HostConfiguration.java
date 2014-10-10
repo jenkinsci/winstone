@@ -18,12 +18,14 @@ import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
+import javax.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
@@ -180,6 +182,7 @@ public class HostConfiguration {
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setMimeTypes(mimeTypes);
         SessionManager sm = wac.getSessionHandler().getSessionManager();
+        sm.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE)); // disable URL-rewrite based session tracking, which leaks session ID. See JENKINS-22358
         if (sm instanceof AbstractSessionManager) {
             AbstractSessionManager asm = (AbstractSessionManager) sm;
             asm.setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
