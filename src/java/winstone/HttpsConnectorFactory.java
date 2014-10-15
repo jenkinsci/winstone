@@ -127,6 +127,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
             try {
                 sslcf.setIncludeProtocols("TLSv1");
+                sslcf.setExcludeProtocols("SSLv3");
                 return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
                         .getConstructor(SslContextFactory.class)
                         .newInstance(sslcf);
