@@ -129,7 +129,6 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
             try {
                 sslcf.setIncludeProtocols("TLSv1");
-                sslcf.setExcludeProtocols("SSLv3");
                 return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
                         .getConstructor(SslContextFactory.class)
                         .newInstance(sslcf);
@@ -222,7 +221,8 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             ssl.setKeyManagerPassword(privateKeyPassword);
             ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
-            
+            ssl.setExcludeProtocols("SSLv3");
+
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
              * If false, which is the default, don't do so.
