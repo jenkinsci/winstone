@@ -67,9 +67,11 @@ public class Option<T> {
     public static final OInt HTTPS_KEEP_ALIVE_TIMEOUT=integer("https" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
     public static final OFile HTTPS_KEY_STORE=file("httpsKeyStore");
     public static final OString HTTPS_KEY_STORE_PASSWORD=string("httpsKeyStorePassword");
+    public static final OString HTTPS_PRIVATE_KEY_PASSWORD=string("httpsPrivateKeyPassword");
     public static final OString HTTPS_KEY_MANAGER_TYPE=string("httpsKeyManagerType","SunX509");
     public static final OBoolean HTTPS_VERIFY_CLIENT=bool("httpsVerifyClient",false);
     public static final OFile HTTPS_CERTIFICATE=file("httpsCertificate");
+    public static final OString HTTPS_CERTIFICATE_ALIAS=string("httpsCertificateAlias");
     public static final OFile HTTPS_PRIVATE_KEY=file("httpsPrivateKey");
     public static final OBoolean HTTPS_SPDY=bool("spdy",false);
 
@@ -108,6 +110,8 @@ public class Option<T> {
     public static final OInt MAX_PARAM_COUNT=integer("maxParamCount",-1);
     public static final OBoolean USAGE=bool("usage",false);
     public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
+    public static final OInt REQUEST_HEADER_SIZE=integer("requestHeaderSize",8192); // default for jetty 8
+    public static final OInt REQUEST_BUFFER_SIZE=integer("requestBufferSize",16384); // default for jetty 8
     public static final OBoolean HELP=bool("help",false);
 
     public static final OClass REALM_CLASS_NAME=clazz("realmClassName", ArgumentsRealm.class);
@@ -225,6 +229,15 @@ public class Option<T> {
         }
         
         public String get(Map args) {
+            return get(args,defaultValue);
+        }
+
+        public char[] getCharArray(Map args) {
+            String v = get(args);
+            return v!=null ? v.toCharArray() : null;
+        }
+
+        public String get(Map args, String defaultValue) {
             String v = (String)args.get(name);
             return v!=null ? v : defaultValue;
         }

@@ -18,7 +18,6 @@ import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,7 +48,7 @@ import java.util.Map;
 public class HttpsConnectorFactory implements ConnectorFactory {
     private static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private KeyStore keystore;
-    private char[] password;
+    private String keystorePassword;
 
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.HTTPS_PORT.get(args);
@@ -66,7 +65,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             File opensslCert = Option.HTTPS_CERTIFICATE.get(args);
             File opensslKey =  Option.HTTPS_PRIVATE_KEY.get(args);
             File keyStore =    Option.HTTPS_KEY_STORE.get(args);
-            String pwd =         Option.HTTPS_KEY_STORE_PASSWORD.get(args);
+            String pwd =       Option.HTTPS_KEY_STORE_PASSWORD.get(args);
 
             if ((opensslCert!=null ^ opensslKey!=null))
                 throw new WinstoneException(MessageFormat.format("--{0} and --{1} need to be used together", Option.HTTPS_CERTIFICATE, Option.HTTPS_PRIVATE_KEY));
@@ -79,23 +78,23 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                     throw new WinstoneException(SSL_RESOURCES.getString(
                             "HttpsListener.KeyStoreNotFound", keyStore.getPath()));
 
-                this.password = pwd!=null ? pwd.toCharArray() : null;
+                this.keystorePassword = pwd;
 
                 keystore = KeyStore.getInstance("JKS");
-                keystore.load(new FileInputStream(keyStore), this.password);
+                keystore.load(new FileInputStream(keyStore), this.keystorePassword.toCharArray());
             } else if (opensslCert!=null) {
                 // load from openssl style key files
                 CertificateFactory cf = CertificateFactory.getInstance("X509");
                 Certificate cert = cf.generateCertificate(new FileInputStream(opensslCert));
                 PrivateKey key = readPEMRSAPrivateKey(new FileReader(opensslKey));
 
-                this.password = "changeit".toCharArray();
+                this.keystorePassword = "changeit";
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
-                keystore.setKeyEntry("hudson", key, password, new Certificate[]{cert});
+                keystore.setKeyEntry("hudson", key, keystorePassword.toCharArray(), new Certificate[]{cert});
             } else {
                 // use self-signed certificate
-                this.password = "changeit".toCharArray();
+                this.keystorePassword = "changeit";
                 System.out.println("Using one-time self-signed certificate");
 
                 CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
@@ -107,7 +106,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
 
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, password, new Certificate[]{cert});
+                keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
             }
         } catch (GeneralSecurityException e) {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
@@ -116,7 +115,10 @@ public class HttpsConnectorFactory implements ConnectorFactory {
         SelectChannelConnector connector = createConnector(args);
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
+        connector.setForwarded(true);
         connector.setMaxIdleTime(keepAliveTimeout);
+        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
         server.addConnector(connector);
 
         return true;
@@ -184,10 +186,26 @@ public class HttpsConnectorFactory implements ConnectorFactory {
      */
     SslContextFactory getSSLContext(Map args) {
         try {
-            // Check the key manager factory
+            String privateKeyPassword;
+            
+            // There are many legacy setups in which the KeyStore password and the
+            // key password are identical and people will not even be aware that these
+            // are two different things
+            // Therefore if no httpsPrivateKeyPassword is explicitely set we try to
+            // use the KeyStore password also for the key password not to break
+            // backward compatibility
+            // Otherwise the following code will completely break the startup of
+            // Jenkins in case the --httpsPrivateKeyPassword parameter is not set
+            privateKeyPassword = Option.HTTPS_PRIVATE_KEY_PASSWORD.get(args, keystorePassword);
+
+            // Dump the content of the keystore if log level is FULL_DEBUG
+            // Note: The kmf is instantiated here only to access the keystore,
+            // the SslContextFactory will instantiate its own KeyManager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
 
-            kmf.init(keystore, password);
+            // In case the KeyStore password and the KeyPassword are not the same,
+            // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
+            kmf.init(keystore, keystorePassword.toCharArray());
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                     "HttpsListener.KeyCount", keystore.size() + "");
             for (Enumeration e = keystore.aliases(); e.hasMoreElements();) {
@@ -197,12 +215,14 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                         keystore.getCertificate(alias) + "");
             }
 
-            SSLContext context = SSLContext.getInstance("SSL");
-            context.init(kmf.getKeyManagers(), null, null);
-
             SslContextFactory ssl = new SslContextFactory();
-            ssl.setSslContext(context);
 
+            ssl.setKeyStore(keystore);
+            ssl.setKeyStorePassword(keystorePassword);
+            ssl.setKeyManagerPassword(privateKeyPassword);
+            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
+            
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
              * If false, which is the default, don't do so.

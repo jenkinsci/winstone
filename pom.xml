@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>2.7-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -99,6 +99,15 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <mainClass>winstone.Launcher</mainClass>
             </manifest>
+            <manifestSections>
+              <manifestSection>
+                <name>org/eclipse/jetty/server/</name>
+                <manifestEntries>
+                  <Implementation-Vendor>Eclipse.org - Jetty</Implementation-Vendor>
+                  <Implementation-Version>winstone-${project.version}</Implementation-Version>
+                </manifestEntries>
+              </manifestSection>
+            </manifestSections>
           </archive>
         </configuration>
       </plugin>
@@ -178,6 +187,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>

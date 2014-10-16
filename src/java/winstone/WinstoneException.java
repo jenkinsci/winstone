@@ -6,9 +6,6 @@
  */
 package winstone;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 /**
  * Master exception within the servlet container. This is thrown whenever a
  * non-recoverable error occurs that we want to throw to the top of the
@@ -19,8 +16,6 @@ import java.io.PrintWriter;
  *          Exp $
  */
 public class WinstoneException extends RuntimeException {
-    private Throwable nestedError = null;
-
     /**
      * Create an exception with a useful message for the system administrator.
      * 
@@ -42,8 +37,7 @@ public class WinstoneException extends RuntimeException {
      *            The actual exception that occurred
      */
     public WinstoneException(String pMsg, Throwable pError) {
-        super(pMsg);
-        this.setNestedError(pError);
+        super(pMsg,pError);
     }
 
     /**
@@ -52,7 +46,7 @@ public class WinstoneException extends RuntimeException {
      * @return The nested error or exception
      */
     public Throwable getNestedError() {
-        return this.nestedError;
+        return getCause();
     }
 
     /**
@@ -62,26 +56,6 @@ public class WinstoneException extends RuntimeException {
      *            The nested error or exception
      */
     private void setNestedError(Throwable pError) {
-        this.nestedError = pError;
-    }
-
-    public void printStackTrace(PrintWriter p) {
-        if (this.nestedError != null)
-            this.nestedError.printStackTrace(p);
-        p.write("\n");
-        super.printStackTrace(p);
-    }
-
-    public void printStackTrace(PrintStream p) {
-        if (this.nestedError != null)
-            this.nestedError.printStackTrace(p);
-        p.println("\n");
-        super.printStackTrace(p);
-    }
-
-    public void printStackTrace() {
-        if (this.nestedError != null)
-            this.nestedError.printStackTrace();
-        super.printStackTrace();
+        initCause(pError);
     }
 }

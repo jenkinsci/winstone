@@ -18,12 +18,14 @@ import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
+import javax.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
@@ -69,17 +71,16 @@ public class HostConfiguration {
         }
 
         // Is this the single or multiple configuration ? Check args
-        File appFile = Option.WARFILE.get(args);
-        if (appFile==null)
-            appFile = Option.WEBROOT.get(args);
+        File warfile = Option.WARFILE.get(args);
+        File webroot = Option.WEBROOT.get(args);
 
         Handler handler;
         // If single-webapp mode
-        if (webappsDir == null && appFile != null) {
+        if (webappsDir == null && ((warfile != null) || (webroot != null))) {
             String prefix = Option.PREFIX.get(args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
-            handler = configureAccessLog(create(appFile, prefix),"webapp");
+            handler = configureAccessLog(create(getWebRoot(webroot,warfile), prefix),"webapp");
         }
         // Otherwise multi-webapp mode
         else {
@@ -181,6 +182,7 @@ public class HostConfiguration {
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setMimeTypes(mimeTypes);
         SessionManager sm = wac.getSessionHandler().getSessionManager();
+        sm.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE)); // disable URL-rewrite based session tracking, which leaks session ID. See JENKINS-22358
         if (sm instanceof AbstractSessionManager) {
             AbstractSessionManager asm = (AbstractSessionManager) sm;
             asm.setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
