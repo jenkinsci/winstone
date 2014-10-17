@@ -221,7 +221,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             ssl.setKeyManagerPassword(privateKeyPassword);
             ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
-            ssl.setExcludeProtocols("SSLv3", "SSLv2", "SSLv2Hello");
+            ssl.setExcludeProtocols("SSLv3");
 
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
