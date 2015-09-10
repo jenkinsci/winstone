@@ -333,7 +333,6 @@ public class HostConfiguration {
                         if (!this.webapps.containsKey(prefix)) {
                             try {
                                 WebAppContext context = create(aChildren, prefix);
-                                context.start();
                                 webApps.addHandler(configureAccessLog(context,childName));
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
@@ -351,7 +350,6 @@ public class HostConfiguration {
                         try {
                             WebAppContext context = create(
                                     getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
-                            context.start();
                             webApps.addHandler(configureAccessLog(context,outputName));
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {
