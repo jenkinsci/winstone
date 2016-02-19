@@ -16,6 +16,7 @@
  */
 package winstone;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kohsuke.ajp.client.SimpleAjpClient;
 import org.kohsuke.ajp.client.TesterAjpMessage;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author Kohsuke Kawaguchi
  */
 public class Ajp13ConnectorFactoryTest extends AbstractWinstoneTest {
-    @Test
+    @Test @Ignore("Jetty9 doesn't support AJP yet")
     public void ajp() throws Exception {
         Map<String,String> args = new HashMap<String,String>();
         args.put("warfile", "target/test-classes/test.war");
