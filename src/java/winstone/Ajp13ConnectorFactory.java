@@ -6,9 +6,7 @@
  */
 package winstone;
 
-import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Server;
-import winstone.ConnectorFactory;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -30,6 +28,9 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
             return false;
         }
 
+        throw new UnsupportedOperationException();
+
+        /* Jetty9 has no AJP support
         Ajp13SocketConnector connector = new Ajp13SocketConnector();
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
@@ -38,5 +39,6 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
 
         server.addConnector(connector);
         return true;
+        */
     }
 }

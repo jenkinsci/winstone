@@ -6,8 +6,11 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -31,13 +34,14 @@ public class HttpConnectorFactory implements ConnectorFactory {
         if (listenPort < 0) {
             return false;
         } else {
-            SelectChannelConnector connector = createConnector(server);
+            ServerConnector connector = createConnector(server);
             connector.setPort(listenPort);
             connector.setHost(listenAddress);
-            connector.setMaxIdleTime(keepAliveTimeout);
-            connector.setForwarded(true);
-            connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-            connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
+            connector.setIdleTimeout(keepAliveTimeout);
+
+            HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+            config.addCustomizer(new ForwardedRequestCustomizer());
+            config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
 
             server.addConnector(connector);
             return true;
@@ -48,6 +52,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.
      */
-    protected SelectChannelConnector createConnector(Server server) {
-        return new SelectChannelConnector();
-    }}
+    protected ServerConnector createConnector(Server server) {
+        return new ServerConnector(server);
+    }
+}

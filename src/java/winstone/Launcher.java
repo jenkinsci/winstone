@@ -62,8 +62,8 @@ public class Launcher implements Runnable {
     private ExecutorService threadPool;
     private Map args;
 
-    public final Server server = new Server();
-    
+    public final Server server;
+
     /**
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
@@ -133,6 +133,7 @@ public class Launcher implements Runnable {
                     commonLibCLPaths.toString());
 
             this.threadPool = createThreadPool();
+            this.server = new Server(new ExecutorThreadPool(threadPool));
 
             int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
             if (maxParameterCount>0) {
@@ -149,8 +150,6 @@ public class Launcher implements Runnable {
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
-
-            server.setThreadPool(new ExecutorThreadPool(threadPool));
 
             try {
                 server.start();

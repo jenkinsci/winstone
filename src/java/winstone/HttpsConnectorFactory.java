@@ -6,9 +6,11 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
@@ -112,26 +114,28 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
         }
 
-        SelectChannelConnector connector = createConnector(args);
+        ServerConnector connector = createConnector(server,args);
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
-        connector.setForwarded(true);
-        connector.setMaxIdleTime(keepAliveTimeout);
-        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
+        connector.setIdleTimeout(keepAliveTimeout);
+
+        HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        config.addCustomizer(new ForwardedRequestCustomizer());
+        config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+
         server.addConnector(connector);
 
         return true;
     }
 
-    private SelectChannelConnector createConnector(Map args) {
+    private ServerConnector createConnector(Server server, Map args) {
         SslContextFactory sslcf = getSSLContext(args);
         if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
             try {
                 sslcf.setIncludeProtocols("TLSv1");
-                return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
-                        .getConstructor(SslContextFactory.class)
-                        .newInstance(sslcf);
+                return (ServerConnector)Class.forName("org.eclipse.jetty.spdy.server.http.HTTPSPDYServerConnector")
+                        .getConstructor(Server.class, SslContextFactory.class)
+                        .newInstance(server,sslcf);
             } catch (NoClassDefFoundError e) {
                 if (e.getMessage().contains("org/eclipse/jetty/npn")) {
                     // a typically error is to forget to run NPN
@@ -142,7 +146,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 throw new Error("Failed to enable SPDY connector",e);
             }
         } else
-            return new SslSelectChannelConnector(sslcf);
+            return new ServerConnector(server,sslcf);
     }
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
