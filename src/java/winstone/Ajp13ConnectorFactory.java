@@ -28,7 +28,8 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
             return false;
         }
 
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(
+                RESOURCES.getString("Ajp13ConnectorFactory.NotSupported"));
 
         /* Jetty9 has no AJP support
         Ajp13SocketConnector connector = new Ajp13SocketConnector();
@@ -41,4 +42,6 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
         return true;
         */
     }
+
+    public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
 }
