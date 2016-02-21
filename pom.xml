@@ -221,27 +221,27 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.2.15.v20160210</version>
+      <version>${jetty.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>9.2.15.v20160210</version>
+      <version>${jetty.version}</version>
     </dependency>
 
     <!--  See https://github.com/eclipse/jetty.project/issues/134
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-ajp</artifactId>
-      <version>9.2.15.v20160210</version>
+      <version>${jetty.version}</version>
     </dependency>
     -->
 
     <dependency>
       <groupId>org.eclipse.jetty.spdy</groupId>
       <artifactId>spdy-http-server</artifactId>
-      <version>9.2.15.v20160210</version>
+      <version>${jetty.version}</version>
     </dependency>
 
     <dependency>
@@ -253,5 +253,8 @@
 
   </dependencies>
 
+  <properties>
+    <jetty.version>9.2.15.v20160210</jetty.version>
+  </properties>
 </project>
 
