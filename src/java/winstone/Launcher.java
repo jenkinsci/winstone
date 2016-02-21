@@ -6,7 +6,6 @@
  */
 package winstone;
 
-import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
@@ -21,7 +20,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Constructor;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -29,7 +27,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -429,9 +426,17 @@ public class Launcher implements Runnable {
     protected static void printUsage() {
         // if the caller overrides the usage, use that instead.
         String usage = USAGE;
-        if(usage==null)
-            usage = RESOURCES.getString("Launcher.UsageInstructions",
+
+        String header = RESOURCES.getString("Launcher.UsageInstructions.Header",
                 RESOURCES.getString("ServerVersion"));
+        String options = RESOURCES.getString("Launcher.UsageInstructions.Options");
+        String footer = RESOURCES.getString("Launcher.UsageInstructions.Options");
+
+        if(usage==null) {
+            usage = header+options+footer;
+        } else {
+            usage = usage.replace("{HEADER}",header).replace("{OPTIONS}",options).replace("{FOOTER}",footer);
+        }
         System.out.println(usage);
     }
 
