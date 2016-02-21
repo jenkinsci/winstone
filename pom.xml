@@ -244,13 +244,6 @@
       <version>${jetty.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.kohsuke</groupId>
-      <artifactId>ajp-client</artifactId>
-      <version>1.0</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <properties>

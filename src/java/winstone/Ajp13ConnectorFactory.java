@@ -31,6 +31,9 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
         throw new UnsupportedOperationException(
                 RESOURCES.getString("Ajp13ConnectorFactory.NotSupported"));
 
+        // if we are going to resurrect AJP support, look for Ajp13ConnectorFactoryTest in the history
+        // that you can resurrect as a test.
+
         /* Jetty9 has no AJP support
         Ajp13SocketConnector connector = new Ajp13SocketConnector();
         connector.setPort(listenPort);
