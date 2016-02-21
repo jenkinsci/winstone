@@ -55,7 +55,6 @@ public class HttpsConnectorFactory implements ConnectorFactory {
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.HTTPS_PORT.get(args);
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
-        boolean doHostnameLookups = Option.HTTPS_DO_HOSTNAME_LOOKUPS.get(args);
         int keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
 
         if (listenPort<0) {

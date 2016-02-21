@@ -41,7 +41,6 @@ public class Option<T> {
     public static final OFile CONFIG=file("config");
     public static final OString PREFIX=string("prefix","");
     public static final OFile COMMON_LIB_FOLDER=file("commonLibFolder");
-    public static final OFile LOGFILE=file("logfile");
     public static final OBoolean LOG_THROWING_LINE_NO=bool("logThrowingLineNo",false);
     public static final OBoolean LOG_THROWING_THREAD=bool("logThrowingThread",false);
     public static final OBoolean DEBUG=bool("debug",false);
@@ -49,7 +48,6 @@ public class Option<T> {
     // these are combined with protocol to form options
     public static final OInt _PORT = integer("Port");
     public static final OString _LISTEN_ADDRESS = string("ListenAddress");
-    public static final OBoolean _DO_HOSTNAME_LOOKUPS = bool("DoHostnameLookups",false);
     /**
      * Number of milliseconds for the HTTP keep-alive to hang around until the next request is sent.
      */
@@ -58,12 +56,10 @@ public class Option<T> {
 
     public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);
-    public static final OBoolean HTTP_DO_HOSTNAME_LOOKUPS=bool("http"+ _DO_HOSTNAME_LOOKUPS,false);
     public static final OInt HTTP_KEEP_ALIVE_TIMEOUT=integer("http" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
 
     public static final OInt HTTPS_PORT=integer("https"+_PORT,-1);
     public static final OString HTTPS_LISTEN_ADDRESS=string("https"+_LISTEN_ADDRESS);
-    public static final OBoolean HTTPS_DO_HOSTNAME_LOOKUPS=bool("https"+ _DO_HOSTNAME_LOOKUPS,false);
     public static final OInt HTTPS_KEEP_ALIVE_TIMEOUT=integer("https" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
     public static final OFile HTTPS_KEY_STORE=file("httpsKeyStore");
     public static final OString HTTPS_KEY_STORE_PASSWORD=string("httpsKeyStorePassword");
@@ -81,10 +77,6 @@ public class Option<T> {
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
 
     /**
-     * Currently unused.
-     */
-    public static final OInt HANDLER_COUNT_STARTUP =integer("handlerCountStartup",5);
-    /**
      * How many requests do we handle concurrently?
      *
      * If the system gets really loaded, too many concurrent threads will create vicious cycles
@@ -98,14 +90,7 @@ public class Option<T> {
      */
     public static final OInt HANDLER_COUNT_MAX_IDLE=integer("handlerCountMaxIdle",5);
 
-    public static final OBoolean DIRECTORY_LISTINGS=bool("directoryListings",true);
     public static final OBoolean USE_JASPER=bool("useJasper",false);
-    public static final OBoolean USE_SERVLET_RELOADING=bool("useServletReloading",false);
-    public static final OClass PREFERRED_CLASS_LOADER=clazz("preferredClassLoader", Object.class);
-    public static final OBoolean USE_INVOKER=bool("useInvoker",false);
-    public static final OString INVOKER_PREFIX=string("invokerPrefix","/servlet/");
-    public static final OBoolean SIMULATE_MOD_UNIQUE_ID=bool("simulateModUniqueId",false);
-    public static final OBoolean USE_SAVED_SESSIONS=bool("useSavedSessions",false);
     public static final OString MIME_TYPES=string("mimeTypes");
     public static final OInt MAX_PARAM_COUNT=integer("maxParamCount",-1);
     public static final OBoolean USAGE=bool("usage",false);
