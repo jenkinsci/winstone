@@ -32,13 +32,21 @@ application you wish to distribute or sell, please contact me.
 
 ## Using Winstone
 To run a single war file:
+
     java -jar winstone.jar --warfile=<location of warfile> (+ other options)
+
 To run a directory full of war files:
+
     java -jar winstone.jar --webappsDir=<location of webapps directory> (+ other options)
+
 To run locally exploded web archive:
+
     java -jar winstone.jar --webroot=<location of webroot> (+ other options)
+
 To run different web applications for diffent virtual hosts:
+
     java -jar winstone.jar --hostsDir=<location of hosts directory> (+ other options)
+
 
 ## Command-line options
     Usage: java winstone.Launcher [--option=value] [--option=value] [etc]
