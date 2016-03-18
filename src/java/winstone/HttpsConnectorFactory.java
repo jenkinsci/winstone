@@ -15,7 +15,7 @@ import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
-import sun.security.x509.CertAndKeyGen;
+//import sun.security.x509.CertAndKeyGen;
 import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -98,16 +99,34 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 this.keystorePassword = "changeit";
                 System.out.println("Using one-time self-signed certificate");
 
-                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
-                ckg.generate(1024);
-                PrivateKey privKey = ckg.getPrivateKey();
-
                 X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
+                X509Certificate cert = null;
+                PrivateKey privkey = null;
+                Object ckg = null;
+
+                // TODO: Cleanup when JDK 7 support is removed.
+                try {
+                    ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
+                } catch (Exception e) {
+                    // Java 8
+                    try {
+                        ckg = Class.forName("sun.security.tools.keytool.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
+                    } catch (Exception e1) {
+                        throw new IOException(e1);
+                    }
+                }
+
+                try {
+                    ckg.getClass().getDeclaredMethod("generate", int.class).invoke(ckg, 1024);
+                    privkey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
+                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", X500Name.class, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
 
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
+                keystore.setKeyEntry("hudson", privkey, keystorePassword.toCharArray(), new Certificate[]{cert});
             }
         } catch (GeneralSecurityException e) {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
