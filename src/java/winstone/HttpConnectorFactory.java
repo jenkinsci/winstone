@@ -42,6 +42,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
             HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
             config.addCustomizer(new ForwardedRequestCustomizer());
             config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+            config.setSendServerVersion(Option.SEND_SERVER_VERSION.get(args));
 
             server.addConnector(connector);
             return true;

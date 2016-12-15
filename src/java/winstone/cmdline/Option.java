@@ -53,6 +53,7 @@ public class Option<T> {
      */
     public static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
 
+    public static final OBoolean SEND_SERVER_VERSION=bool("sendServerVersion",true);
 
     public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);

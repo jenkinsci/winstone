@@ -45,4 +45,10 @@ public class AbstractWinstoneTest extends Assert {
             // expected
         }
     }
+
+    protected String responseHeader (String url, String header) throws IOException, SAXException {
+        WebRequest wreq = new GetMethodWebRequest(url);
+        WebResponse wresp = wc.getResponse(wreq);
+        return wresp.getHeaderField(header);
+    }
 }
