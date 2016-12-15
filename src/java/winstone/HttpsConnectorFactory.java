@@ -36,6 +36,7 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -113,8 +114,9 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                     Object xn = x500Name.getConstructor(String.class, String.class, String.class, String.class).newInstance("Test site", "Unknown", "Unknown", "Unknown");
                     cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", x500Name, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
                 } catch (Exception x) {
-                    throw new IOException("Failed to create a self-signed certificate; make one yourself: " + x, x);
+                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.SelfSignedError"), x);
                 }
+                Logger.log(Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.SelfSigned");
 
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
@@ -191,8 +193,9 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             // p1, p2, exp1, exp2, crtCoef
             privExpo = (BigInteger) getBigInteger.invoke(seq[3]);
         } catch (Exception x) {
-            throw new IOException("Cannot load private key; try using a Java keystore instead: " + x, x);
+            throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.LoadPrivateKeyError"), x);
         }
+        Logger.log(Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.LoadPrivateKey");
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
