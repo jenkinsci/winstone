@@ -13,10 +13,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-//import sun.security.x509.CertAndKeyGen;
-import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -27,7 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -99,34 +95,30 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 this.keystorePassword = "changeit";
                 System.out.println("Using one-time self-signed certificate");
 
-                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = null;
-                PrivateKey privkey = null;
-                Object ckg = null;
+                X509Certificate cert;
+                PrivateKey privKey;
+                Object ckg;
 
-                // TODO: Cleanup when JDK 7 support is removed.
-                try {
-                    ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                } catch (Exception e) {
-                    // Java 8
+                try { // TODO switch to (shaded?) Bouncy Castle
+                    // TODO: Cleanup when JDK 7 support is removed.
                     try {
+                        ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
+                    } catch (ClassNotFoundException cnfe) {
+                        // Java 8
                         ckg = Class.forName("sun.security.tools.keytool.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                    } catch (Exception e1) {
-                        throw new IOException(e1);
                     }
-                }
-
-                try {
                     ckg.getClass().getDeclaredMethod("generate", int.class).invoke(ckg, 1024);
-                    privkey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
-                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", X500Name.class, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
-                } catch (Exception e) {
-                    throw new IOException(e);
+                    privKey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
+                    Class<?> x500Name = Class.forName("sun.security.x509.X500Name");
+                    Object xn = x500Name.getConstructor(String.class, String.class, String.class, String.class).newInstance("Test site", "Unknown", "Unknown", "Unknown");
+                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", x500Name, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
+                } catch (Exception x) {
+                    throw new IOException("Failed to create a self-signed certificate; make one yourself: " + x, x);
                 }
 
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
-                keystore.setKeyEntry("hudson", privkey, keystorePassword.toCharArray(), new Certificate[]{cert});
+                keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
             }
         } catch (GeneralSecurityException e) {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
@@ -187,15 +179,20 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             reader.close();
         }
 
-
-        DerInputStream dis = new DerInputStream(baos.toByteArray());
-        DerValue[] seq = dis.getSequence(0);
-
-        // int v = seq[0].getInteger();
-        BigInteger mod = seq[1].getBigInteger();
-        // pubExpo
-        BigInteger privExpo = seq[3].getBigInteger();
-        // p1, p2, exp1, exp2, crtCoef
+        BigInteger mod, privExpo;
+        try {
+            Class<?> disC = Class.forName("sun.security.util.DerInputStream");
+            Object dis = disC.getConstructor(byte[].class).newInstance((Object) baos.toByteArray());
+            Object[] seq = (Object[]) disC.getMethod("getSequence", int.class).invoke(dis, 0);
+            Method getBigInteger = seq[0].getClass().getMethod("getBigInteger");
+            // int v = seq[0].getInteger();
+            mod = (BigInteger) getBigInteger.invoke(seq[1]);
+            // pubExpo
+            // p1, p2, exp1, exp2, crtCoef
+            privExpo = (BigInteger) getBigInteger.invoke(seq[3]);
+        } catch (Exception x) {
+            throw new IOException("Cannot load private key; try using a Java keystore instead: " + x, x);
+        }
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
