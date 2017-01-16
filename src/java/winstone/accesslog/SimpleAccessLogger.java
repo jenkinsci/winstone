@@ -6,6 +6,7 @@
  */
 package winstone.accesslog;
 
+import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
@@ -86,6 +87,17 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         synchronized (DF) {
             date = DF.format(new Date());
         }
+
+        // mimic https://github.com/eclipse/jetty.project/blob/jetty-9.4.0.v20161208/jetty-server/src/main/java/org/eclipse/jetty/server/AbstractNCSARequestLog.java#L130
+        Authentication authentication = request.getAuthentication();
+        String remoteUser;
+        if (authentication instanceof Authentication.User) {
+            Authentication.User user = (Authentication.User) authentication;
+            remoteUser = user.getUserIdentity().getUserPrincipal().getName();
+        } else {
+            remoteUser = null;
+        }
+
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
                 {"###x-forwarded-for###", nvl(request.getHeader("X-Forwarded-For"))},
                 {"###x-forwarded-host###", nvl(request.getHeader("X-Forwarded-Host"))},
@@ -98,7 +110,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
                 {"###dnt###", nvl(request.getHeader("DNT"))},
                 {"###via###", nvl(request.getHeader("Via"))},
                 {"###ip###", request.getRemoteHost()},
-                {"###user###", nvl(request.getRemoteUser())},
+                {"###user###", nvl(remoteUser)},
                 {"###time###", "[" + date + "]"},
                 {"###uriLine###", uriLine},
                 {"###status###", "" + status},
