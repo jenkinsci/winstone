@@ -82,6 +82,8 @@ To run different web applications for diffent virtual hosts:
 
        --handlerCountMax        = set the max no of worker threads to allow. Default is 40
        --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 5
+       
+       --requestHeaderSize      = sets the size of the buffer for request headers. Default is 8K.
 
        --useJasper              = enable jasper JSP handling (true/false). Default is false
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
