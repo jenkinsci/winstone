@@ -180,6 +180,7 @@ public class HostConfiguration {
             }
         };
         wac.getSecurityHandler().setLoginService(loginService);
+        wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
         SessionManager sm = wac.getSessionHandler().getSessionManager();
         sm.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE)); // disable URL-rewrite based session tracking, which leaks session ID. See JENKINS-22358
