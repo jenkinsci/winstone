@@ -312,6 +312,6 @@
 
   <properties>
     <jetty.version>9.2.15.v20160210</jetty.version>
-    <java.level>7</java.level>
+    <java.level>8</java.level>
   </properties>
 </project>
