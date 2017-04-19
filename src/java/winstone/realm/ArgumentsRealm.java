@@ -32,7 +32,7 @@ import static org.eclipse.jetty.util.security.Credential.*;
  * @author Kohsuke Kawaguchi
  * @version $Id: ArgumentsRealm.java,v 1.4 2007/06/01 15:55:41 rickknowles Exp $
  */
-public class ArgumentsRealm extends HashLoginService {
+public class ArgumentsRealm extends AbstractRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
 
     /**
@@ -61,11 +61,7 @@ public class ArgumentsRealm extends HashLoginService {
                     roleArray = rl.toArray(new String[rl.size()]);
                     Arrays.sort(roleArray);
                 }
-                Principal userPrincipal = new AbstractLoginService.UserPrincipal( userName, getCredential( password ));
-                Subject subject = new Subject( );
-                subject.getPrincipals().add( userPrincipal );
-                getIdentityService().newUserIdentity( subject, userPrincipal, roleArray );
-                //putUser(userName, getCredential(password), roleArray);
+                putUser(userName, getCredential(password), roleArray);
                 count++;
             }
         }

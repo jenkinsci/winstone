@@ -34,7 +34,7 @@ import static org.eclipse.jetty.util.security.Credential.*;
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
-public class FileRealm extends HashLoginService {
+public class FileRealm extends AbstractRealm {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     
     final String DEFAULT_FILE_NAME = "users.xml";
@@ -93,11 +93,7 @@ public class FileRealm extends HashLoginService {
                         }
                         String[] roleArray = rl.toArray(new String[rl.size()]);
                         Arrays.sort(roleArray);
-                        Principal userPrincipal = new AbstractLoginService.UserPrincipal( userName, getCredential( password ));
-                        Subject subject = new Subject( );
-                        subject.getPrincipals().add( userPrincipal );
-                        getIdentityService().newUserIdentity( subject, userPrincipal, roleArray );
-                        //putUser(userName, getCredential(password), roleArray);
+                        putUser(userName, getCredential(password), roleArray);
                         count++;
                     }
                 }
