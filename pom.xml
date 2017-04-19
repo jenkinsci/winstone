@@ -301,17 +301,19 @@
       <version>${jetty.version}</version>
     </dependency>
     -->
-
+    <!--
+    spdy abandonned
     <dependency>
       <groupId>org.eclipse.jetty.spdy</groupId>
       <artifactId>spdy-http-server</artifactId>
       <version>${jetty.version}</version>
     </dependency>
+    -->
 
   </dependencies>
 
   <properties>
-    <jetty.version>9.2.21.v20170120</jetty.version>
-    <java.level>7</java.level>
+    <jetty.version>9.4.4.v20170414</jetty.version>
+    <java.level>8</java.level>
   </properties>
 </project>

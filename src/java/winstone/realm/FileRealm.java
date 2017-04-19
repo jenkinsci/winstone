@@ -6,6 +6,7 @@
  */
 package winstone.realm;
 
+import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -14,11 +15,13 @@ import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
+import javax.security.auth.Subject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,8 +93,11 @@ public class FileRealm extends HashLoginService {
                         }
                         String[] roleArray = rl.toArray(new String[rl.size()]);
                         Arrays.sort(roleArray);
-
-                        putUser(userName, getCredential(password), roleArray);
+                        Principal userPrincipal = new AbstractLoginService.UserPrincipal( userName, getCredential( password ));
+                        Subject subject = new Subject( );
+                        subject.getPrincipals().add( userPrincipal );
+                        getIdentityService().newUserIdentity( subject, userPrincipal, roleArray );
+                        //putUser(userName, getCredential(password), roleArray);
                         count++;
                     }
                 }
