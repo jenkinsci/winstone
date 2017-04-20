@@ -19,10 +19,6 @@
     </license>
   </licenses>
 
-  <prerequisites>
-    <maven>3.0.4</maven>
-  </prerequisites>
-
   <build>
     <sourceDirectory>src/java</sourceDirectory>
 
@@ -228,6 +224,17 @@
       <id>repo.jenkins-ci.org</id>
       <url>http://repo.jenkins-ci.org/public/</url>
     </repository>
+    <!-- can be removed when jetty 9.4.5 released -->
+    <repository>
+      <id>jetty.snapshots</id>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <url>https://oss.sonatype.org/content/repositories/jetty-snapshots</url>
+    </repository>
   </repositories>  
 
   <scm>
@@ -313,7 +320,7 @@
   </dependencies>
 
   <properties>
-    <jetty.version>9.4.4.v20170414</jetty.version>
+    <jetty.version>9.4.5-SNAPSHOT</jetty.version>
     <java.level>8</java.level>
   </properties>
 </project>

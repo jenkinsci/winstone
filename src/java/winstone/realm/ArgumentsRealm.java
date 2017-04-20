@@ -8,6 +8,7 @@ package winstone.realm;
 
 import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.util.security.Credential;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
@@ -32,7 +33,7 @@ import static org.eclipse.jetty.util.security.Credential.*;
  * @author Kohsuke Kawaguchi
  * @version $Id: ArgumentsRealm.java,v 1.4 2007/06/01 15:55:41 rickknowles Exp $
  */
-public class ArgumentsRealm extends AbstractRealm {
+public class ArgumentsRealm extends HashLoginService {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
 
     /**
@@ -40,6 +41,8 @@ public class ArgumentsRealm extends AbstractRealm {
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public ArgumentsRealm(Map args) {
+        UserStore userStore = new UserStore();
+        setUserStore( userStore );
         int count=0;
         for (Object o : args.keySet()) {
             String key = (String) o;
@@ -61,7 +64,7 @@ public class ArgumentsRealm extends AbstractRealm {
                     roleArray = rl.toArray(new String[rl.size()]);
                     Arrays.sort(roleArray);
                 }
-                putUser(userName, getCredential(password), roleArray);
+                userStore.addUser(userName, getCredential(password), roleArray);
                 count++;
             }
         }

@@ -8,6 +8,7 @@ package winstone.realm;
 
 import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import winstone.Logger;
@@ -34,7 +35,7 @@ import static org.eclipse.jetty.util.security.Credential.*;
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
-public class FileRealm extends AbstractRealm {
+public class FileRealm extends HashLoginService {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
     
     final String DEFAULT_FILE_NAME = "users.xml";
@@ -48,6 +49,8 @@ public class FileRealm extends AbstractRealm {
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public FileRealm(Map args) {
+        UserStore userStore = new UserStore();
+        setUserStore( userStore );
         // Get the filename and parse the xml doc
         File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
         if (realmFile==null)    realmFile = new File(DEFAULT_FILE_NAME);
@@ -93,7 +96,7 @@ public class FileRealm extends AbstractRealm {
                         }
                         String[] roleArray = rl.toArray(new String[rl.size()]);
                         Arrays.sort(roleArray);
-                        putUser(userName, getCredential(password), roleArray);
+                        userStore.addUser(userName, getCredential(password), roleArray);
                         count++;
                     }
                 }
