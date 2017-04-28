@@ -166,3 +166,8 @@ New features in v2.0:
 * The engine is now Jetty 8.x, instead of the original from-scratch implementation
 
 For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.net/#recent)
+
+## Development
+If you have some unit test failures you may add an interface/ip alias such
+
+``` sudo ifconfig lo0 alias 127.0.0.2 ```
