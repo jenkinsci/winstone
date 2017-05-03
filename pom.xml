@@ -320,7 +320,7 @@
   </dependencies>
 
   <properties>
-    <jetty.version>9.4.5-SNAPSHOT</jetty.version>
+    <jetty.version>9.4.5.v20170502</jetty.version>
     <java.level>8</java.level>
   </properties>
 </project>
