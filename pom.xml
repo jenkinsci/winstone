@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>4.0-SNAPSHOT</version>
+  <version>4.0</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -230,7 +230,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
-    <tag>HEAD</tag>
+    <tag>winstone-4.0</tag>
   </scm>
 
   <dependencyManagement>
