@@ -297,14 +297,6 @@
       <version>${jetty.version}</version>
     </dependency>
     -->
-    <!--
-    spdy abandonned
-    <dependency>
-      <groupId>org.eclipse.jetty.spdy</groupId>
-      <artifactId>spdy-http-server</artifactId>
-      <version>${jetty.version}</version>
-    </dependency>
-    -->
 
   </dependencies>
 
