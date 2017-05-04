@@ -77,7 +77,6 @@ To run different web applications for diffent virtual hosts:
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
        --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
          / --httpsCertificate     file and the corresponding certificate file
-       --spdy                   = Enable SPDY. See http://wiki.eclipse.org/Jetty/Feature/NPN
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
 
        --handlerCountMax        = set the max no of worker threads to allow. Default is 40
@@ -166,3 +165,8 @@ New features in v2.0:
 * The engine is now Jetty 8.x, instead of the original from-scratch implementation
 
 For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.net/#recent)
+
+## Development
+If you have some unit test failures you may add an interface/ip alias such
+
+``` sudo ifconfig lo0 alias 127.0.0.2 ```

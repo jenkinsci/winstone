@@ -142,23 +142,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
 
     private ServerConnector createConnector(Server server, Map args) {
         SslContextFactory sslcf = getSSLContext(args);
-        if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
-            try {
-                sslcf.setIncludeProtocols("TLSv1");
-                return (ServerConnector)Class.forName("org.eclipse.jetty.spdy.server.http.HTTPSPDYServerConnector")
-                        .getConstructor(Server.class, SslContextFactory.class)
-                        .newInstance(server,sslcf);
-            } catch (NoClassDefFoundError e) {
-                if (e.getMessage().contains("org/eclipse/jetty/npn")) {
-                    // a typically error is to forget to run NPN
-                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsListener.MissingNPN"), e);
-                }
-                throw e;
-            } catch (Exception e) {
-                throw new Error("Failed to enable SPDY connector",e);
-            }
-        } else
-            return new ServerConnector(server,sslcf);
+        return new ServerConnector(server,sslcf);
     }
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
@@ -241,7 +225,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             ssl.setKeyStore(keystore);
             ssl.setKeyStorePassword(keystorePassword);
             ssl.setKeyManagerPassword(privateKeyPassword);
-            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            ssl.setKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             ssl.setExcludeProtocols("SSLv3", "SSLv2", "SSLv2Hello");
 
