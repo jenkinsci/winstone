@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>2.10-SNAPSHOT</version>
+  <version>4.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -45,10 +45,10 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.6.1</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.${java.level}</source>
+          <target>1.${java.level}</target>
         </configuration>
       </plugin>
       <plugin>
@@ -79,6 +79,7 @@
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.20</version>
         <configuration>
           <includes>
             <include>**/*Test.java</include>
@@ -92,6 +93,7 @@
 
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -115,7 +117,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.4.1</version>
         <executions>
           <execution>
             <goals>
@@ -124,12 +126,45 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[1.7,)</version>
+                  <version>[1.${java.level},)</version>
                 </requireJavaVersion>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>1.${java.level}</maxJdkVersion>
+                  <ignoredScopes>
+                    <ignoredScope>test</ignoredScope>
+                  </ignoredScopes>
+                </enforceBytecodeVersion>
               </rules>
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>extra-enforcer-rules</artifactId>
+            <version>1.0-beta-6</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <version>1.15</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <id>check</id>
+          </execution>
+        </executions>
+        <configuration>
+          <signature>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>java1${java.level}</artifactId>
+          </signature>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -167,13 +202,25 @@
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.5.3</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <distributionManagement>
     <repository>
       <id>maven.jenkins-ci.org</id>
-      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
+      <url>https://repo.jenkins-ci.org/releases/</url>
     </repository>
+    <snapshotRepository>
+      <id>maven.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <repositories>
@@ -189,6 +236,23 @@
     <url>http://github.com/jenkinsci/winstone</url>
     <tag>HEAD</tag>
   </scm>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.mojo.signature</groupId>
+        <artifactId>java17</artifactId>
+        <version>1.0</version>
+        <type>signature</type>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.mojo.signature</groupId>
+        <artifactId>java18</artifactId>
+        <version>1.0</version>
+        <type>signature</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -221,35 +285,27 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>8.1.13.v20130916</version>
+      <version>${jetty.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>8.1.13.v20130916</version>
+      <version>${jetty.version}</version>
     </dependency>
 
+    <!--  See https://github.com/eclipse/jetty.project/issues/134
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-ajp</artifactId>
-      <version>8.1.13.v20130916</version>
+      <version>${jetty.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty.spdy</groupId>
-      <artifactId>spdy-jetty-http</artifactId>
-      <version>8.1.13.v20130916</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kohsuke</groupId>
-      <artifactId>ajp-client</artifactId>
-      <version>1.0</version>
-      <scope>test</scope>
-    </dependency>
+    -->
 
   </dependencies>
 
+  <properties>
+    <jetty.version>9.4.5.v20170502</jetty.version>
+    <java.level>8</java.level>
+  </properties>
 </project>
-

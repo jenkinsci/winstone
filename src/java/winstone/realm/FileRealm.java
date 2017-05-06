@@ -6,7 +6,9 @@
  */
 package winstone.realm;
 
+import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import winstone.Logger;
@@ -14,11 +16,13 @@ import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
+import javax.security.auth.Subject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +49,8 @@ public class FileRealm extends HashLoginService {
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public FileRealm(Map args) {
+        UserStore userStore = new UserStore();
+        setUserStore( userStore );
         // Get the filename and parse the xml doc
         File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
         if (realmFile==null)    realmFile = new File(DEFAULT_FILE_NAME);
@@ -90,8 +96,7 @@ public class FileRealm extends HashLoginService {
                         }
                         String[] roleArray = rl.toArray(new String[rl.size()]);
                         Arrays.sort(roleArray);
-
-                        putUser(userName, getCredential(password), roleArray);
+                        userStore.addUser(userName, getCredential(password), roleArray);
                         count++;
                     }
                 }

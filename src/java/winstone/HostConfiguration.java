@@ -11,10 +11,8 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.server.session.AbstractSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
@@ -176,17 +174,14 @@ public class HostConfiguration {
                 // if specified, override the value in web.xml
                 int sessionTimeout = Option.SESSION_TIMEOUT.get(args);
                 if (sessionTimeout>0)
-                    getSessionHandler().getSessionManager().setMaxInactiveInterval(sessionTimeout * 60);
+                    getSessionHandler().setMaxInactiveInterval(sessionTimeout * 60);
             }
         };
         wac.getSecurityHandler().setLoginService(loginService);
+        wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
-        SessionManager sm = wac.getSessionHandler().getSessionManager();
-        sm.setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE)); // disable URL-rewrite based session tracking, which leaks session ID. See JENKINS-22358
-        if (sm instanceof AbstractSessionManager) {
-            AbstractSessionManager asm = (AbstractSessionManager) sm;
-            asm.setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
-        }
+        wac.getSessionHandler().setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+        wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
     }
@@ -333,7 +328,6 @@ public class HostConfiguration {
                         if (!this.webapps.containsKey(prefix)) {
                             try {
                                 WebAppContext context = create(aChildren, prefix);
-                                context.start();
                                 webApps.addHandler(configureAccessLog(context,childName));
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
@@ -351,7 +345,6 @@ public class HostConfiguration {
                         try {
                             WebAppContext context = create(
                                     getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
-                            context.start();
                             webApps.addHandler(configureAccessLog(context,outputName));
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {

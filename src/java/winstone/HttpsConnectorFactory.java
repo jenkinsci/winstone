@@ -6,15 +6,13 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.CertAndKeyGen;
-import sun.security.x509.X500Name;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -25,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
@@ -37,6 +36,7 @@ import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -53,7 +53,6 @@ public class HttpsConnectorFactory implements ConnectorFactory {
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.HTTPS_PORT.get(args);
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
-        boolean doHostnameLookups = Option.HTTPS_DO_HOSTNAME_LOOKUPS.get(args);
         int keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
 
         if (listenPort<0) {
@@ -97,12 +96,27 @@ public class HttpsConnectorFactory implements ConnectorFactory {
                 this.keystorePassword = "changeit";
                 System.out.println("Using one-time self-signed certificate");
 
-                CertAndKeyGen ckg = new CertAndKeyGen("RSA", "SHA1WithRSA", null);
-                ckg.generate(1024);
-                PrivateKey privKey = ckg.getPrivateKey();
+                X509Certificate cert;
+                PrivateKey privKey;
+                Object ckg;
 
-                X500Name xn = new X500Name("Test site", "Unknown", "Unknown", "Unknown");
-                X509Certificate cert = ckg.getSelfCertificate(xn, 3650L * 24 * 60 * 60);
+                try { // TODO switch to (shaded?) Bouncy Castle
+                    // TODO: Cleanup when JDK 7 support is removed.
+                    try {
+                        ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
+                    } catch (ClassNotFoundException cnfe) {
+                        // Java 8
+                        ckg = Class.forName("sun.security.tools.keytool.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
+                    }
+                    ckg.getClass().getDeclaredMethod("generate", int.class).invoke(ckg, 1024);
+                    privKey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
+                    Class<?> x500Name = Class.forName("sun.security.x509.X500Name");
+                    Object xn = x500Name.getConstructor(String.class, String.class, String.class, String.class).newInstance("Test site", "Unknown", "Unknown", "Unknown");
+                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", x500Name, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
+                } catch (Exception x) {
+                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.SelfSignedError"), x);
+                }
+                Logger.log(Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.SelfSigned");
 
                 keystore = KeyStore.getInstance("JKS");
                 keystore.load(null);
@@ -112,37 +126,23 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
         }
 
-        SelectChannelConnector connector = createConnector(args);
+        ServerConnector connector = createConnector(server,args);
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
-        connector.setForwarded(true);
-        connector.setMaxIdleTime(keepAliveTimeout);
-        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
+        connector.setIdleTimeout(keepAliveTimeout);
+
+        HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        config.addCustomizer(new ForwardedRequestCustomizer());
+        config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+
         server.addConnector(connector);
 
         return true;
     }
 
-    private SelectChannelConnector createConnector(Map args) {
+    private ServerConnector createConnector(Server server, Map args) {
         SslContextFactory sslcf = getSSLContext(args);
-        if (Option.HTTPS_SPDY.get(args)) {// based on http://wiki.eclipse.org/Jetty/Feature/SPDY
-            try {
-                sslcf.setIncludeProtocols("TLSv1");
-                return (SelectChannelConnector)Class.forName("org.eclipse.jetty.spdy.http.HTTPSPDYServerConnector")
-                        .getConstructor(SslContextFactory.class)
-                        .newInstance(sslcf);
-            } catch (NoClassDefFoundError e) {
-                if (e.getMessage().contains("org/eclipse/jetty/npn")) {
-                    // a typically error is to forget to run NPN
-                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsListener.MissingNPN"), e);
-                }
-                throw e;
-            } catch (Exception e) {
-                throw new Error("Failed to enable SPDY connector",e);
-            }
-        } else
-            return new SslSelectChannelConnector(sslcf);
+        return new ServerConnector(server,sslcf);
     }
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
@@ -165,15 +165,21 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             reader.close();
         }
 
-
-        DerInputStream dis = new DerInputStream(baos.toByteArray());
-        DerValue[] seq = dis.getSequence(0);
-
-        // int v = seq[0].getInteger();
-        BigInteger mod = seq[1].getBigInteger();
-        // pubExpo
-        BigInteger privExpo = seq[3].getBigInteger();
-        // p1, p2, exp1, exp2, crtCoef
+        BigInteger mod, privExpo;
+        try {
+            Class<?> disC = Class.forName("sun.security.util.DerInputStream");
+            Object dis = disC.getConstructor(byte[].class).newInstance((Object) baos.toByteArray());
+            Object[] seq = (Object[]) disC.getMethod("getSequence", int.class).invoke(dis, 0);
+            Method getBigInteger = seq[0].getClass().getMethod("getBigInteger");
+            // int v = seq[0].getInteger();
+            mod = (BigInteger) getBigInteger.invoke(seq[1]);
+            // pubExpo
+            // p1, p2, exp1, exp2, crtCoef
+            privExpo = (BigInteger) getBigInteger.invoke(seq[3]);
+        } catch (Exception x) {
+            throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.LoadPrivateKeyError"), x);
+        }
+        Logger.log(Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.LoadPrivateKey");
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate (new RSAPrivateKeySpec(mod,privExpo));
@@ -219,7 +225,7 @@ public class HttpsConnectorFactory implements ConnectorFactory {
             ssl.setKeyStore(keystore);
             ssl.setKeyStorePassword(keystorePassword);
             ssl.setKeyManagerPassword(privateKeyPassword);
-            ssl.setSslKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
+            ssl.setKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             ssl.setExcludeProtocols("SSLv3", "SSLv2", "SSLv2Hello");
 
