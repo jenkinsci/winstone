@@ -6,9 +6,7 @@
  */
 package winstone;
 
-import org.eclipse.jetty.ajp.Ajp13SocketConnector;
 import org.eclipse.jetty.server.Server;
-import winstone.ConnectorFactory;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -30,11 +28,23 @@ public class Ajp13ConnectorFactory implements ConnectorFactory {
             return false;
         }
 
+        throw new UnsupportedOperationException(
+                RESOURCES.getString("Ajp13ConnectorFactory.NotSupported"));
+
+        // if we are going to resurrect AJP support, look for Ajp13ConnectorFactoryTest in the history
+        // that you can resurrect as a test.
+
+        /* Jetty9 has no AJP support
         Ajp13SocketConnector connector = new Ajp13SocketConnector();
         connector.setPort(listenPort);
         connector.setHost(listenAddress);
+        connector.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+        connector.setRequestBufferSize(Option.REQUEST_BUFFER_SIZE.get(args));
 
         server.addConnector(connector);
         return true;
+        */
     }
+
+    public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
 }

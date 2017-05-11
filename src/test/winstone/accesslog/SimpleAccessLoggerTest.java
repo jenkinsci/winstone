@@ -36,7 +36,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
 
         // check the log file
         String text = FileUtils.readFileToString(logFile);
-        assertEquals("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200\n",text);
+        assertEquals(String.format("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200%n"),text);
     }
 
 }

@@ -6,6 +6,7 @@
  */
 package winstone.accesslog;
 
+import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
@@ -38,6 +39,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private static final DateFormat DF = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
     private static final String COMMON = "###ip### - ###user### ###time### \"###uriLine###\" ###status### ###size###";
     private static final String COMBINED = COMMON + " \"###referer###\" \"###userAgent###\"";
+    private static final String RPROXYCOMBINED = "###x-forwarded-for### " + COMBINED;
     private static final String RESIN = COMMON + " \"###userAgent###\"";
     
     private OutputStream outStream;
@@ -56,6 +58,8 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             this.pattern = COMMON;
         } else if (patternType.equalsIgnoreCase("resin")) {
             this.pattern = RESIN; 
+        } else if (patternType.equalsIgnoreCase("rproxycombined")) {
+            this.pattern = RPROXYCOMBINED;
         } else {
             this.pattern = patternType;
         }
@@ -83,9 +87,30 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         synchronized (DF) {
             date = DF.format(new Date());
         }
+
+        // mimic https://github.com/eclipse/jetty.project/blob/jetty-9.4.0.v20161208/jetty-server/src/main/java/org/eclipse/jetty/server/AbstractNCSARequestLog.java#L130
+        Authentication authentication = request.getAuthentication();
+        String remoteUser;
+        if (authentication instanceof Authentication.User) {
+            Authentication.User user = (Authentication.User) authentication;
+            remoteUser = user.getUserIdentity().getUserPrincipal().getName();
+        } else {
+            remoteUser = null;
+        }
+
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
+                {"###x-forwarded-for###", nvl(request.getHeader("X-Forwarded-For"))},
+                {"###x-forwarded-host###", nvl(request.getHeader("X-Forwarded-Host"))},
+                {"###x-forwarded-proto###", nvl(request.getHeader("X-Forwarded-Proto"))},
+                {"###x-forwarded-protocol###", nvl(request.getHeader("X-Forwarded-Protocol"))},
+                {"###x-forwarded-server###", nvl(request.getHeader("X-Forwarded-Server"))},
+                {"###x-forwarded-ssl###", nvl(request.getHeader("X-Forwarded-Ssl"))},
+                {"###x-requested-with###", nvl(request.getHeader("X-Requested-With"))},
+                {"###x-do-not-track###", nvl(request.getHeader("X-Do-Not-Track"))},
+                {"###dnt###", nvl(request.getHeader("DNT"))},
+                {"###via###", nvl(request.getHeader("Via"))},
                 {"###ip###", request.getRemoteHost()},
-                {"###user###", nvl(request.getRemoteUser())},
+                {"###user###", nvl(remoteUser)},
                 {"###time###", "[" + date + "]"},
                 {"###uriLine###", uriLine},
                 {"###status###", "" + status},

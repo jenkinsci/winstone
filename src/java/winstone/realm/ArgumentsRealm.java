@@ -6,11 +6,16 @@
  */
 package winstone.realm;
 
+import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.util.security.Credential;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
+import javax.security.auth.Subject;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +41,8 @@ public class ArgumentsRealm extends HashLoginService {
      * supplied on the command line as a source of userNames/passwords/roles.
      */
     public ArgumentsRealm(Map args) {
+        UserStore userStore = new UserStore();
+        setUserStore( userStore );
         int count=0;
         for (Object o : args.keySet()) {
             String key = (String) o;
@@ -57,7 +64,7 @@ public class ArgumentsRealm extends HashLoginService {
                     roleArray = rl.toArray(new String[rl.size()]);
                     Arrays.sort(roleArray);
                 }
-                putUser(userName, getCredential(password), roleArray);
+                userStore.addUser(userName, getCredential(password), roleArray);
                 count++;
             }
         }

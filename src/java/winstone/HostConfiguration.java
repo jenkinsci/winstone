@@ -16,12 +16,14 @@ import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
+import javax.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
@@ -67,17 +69,16 @@ public class HostConfiguration {
         }
 
         // Is this the single or multiple configuration ? Check args
-        File appFile = Option.WARFILE.get(args);
-        if (appFile==null)
-            appFile = Option.WEBROOT.get(args);
+        File warfile = Option.WARFILE.get(args);
+        File webroot = Option.WEBROOT.get(args);
 
         Handler handler;
         // If single-webapp mode
-        if (webappsDir == null && appFile != null) {
+        if (webappsDir == null && ((warfile != null) || (webroot != null))) {
             String prefix = Option.PREFIX.get(args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
-            handler = configureAccessLog(create(appFile, prefix),"webapp");
+            handler = configureAccessLog(create(getWebRoot(webroot,warfile), prefix),"webapp");
         }
         // Otherwise multi-webapp mode
         else {
@@ -173,11 +174,14 @@ public class HostConfiguration {
                 // if specified, override the value in web.xml
                 int sessionTimeout = Option.SESSION_TIMEOUT.get(args);
                 if (sessionTimeout>0)
-                    getSessionHandler().getSessionManager().setMaxInactiveInterval(sessionTimeout * 60);
+                    getSessionHandler().setMaxInactiveInterval(sessionTimeout * 60);
             }
         };
         wac.getSecurityHandler().setLoginService(loginService);
+        wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
+        wac.getSessionHandler().setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+        wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
     }
@@ -324,7 +328,6 @@ public class HostConfiguration {
                         if (!this.webapps.containsKey(prefix)) {
                             try {
                                 WebAppContext context = create(aChildren, prefix);
-                                context.start();
                                 webApps.addHandler(configureAccessLog(context,childName));
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
@@ -342,7 +345,6 @@ public class HostConfiguration {
                         try {
                             WebAppContext context = create(
                                     getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
-                            context.start();
                             webApps.addHandler(configureAccessLog(context,outputName));
                             Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                         } catch (Throwable err) {
