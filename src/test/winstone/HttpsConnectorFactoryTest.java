@@ -36,11 +36,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
 
     private void request(X509TrustManager tm) throws Exception {
         HttpsURLConnection con = (HttpsURLConnection)new URL("https://localhost:59009/CountRequestsServlet").openConnection();
-        con.setHostnameVerifier(new HostnameVerifier() {
-            public boolean verify(String s, SSLSession sslSession) {
-                return true;
-            }
-        });
+        con.setHostnameVerifier( ( s, sslSession ) -> true );
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         con.setSSLSocketFactory(ssl.getSocketFactory());

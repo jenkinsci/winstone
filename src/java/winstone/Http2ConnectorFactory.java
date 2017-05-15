@@ -20,8 +20,14 @@
 
 package winstone;
 
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.http2.HTTP2Cipher;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NegotiatingServerConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
@@ -31,51 +37,66 @@ import winstone.cmdline.Option;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.eclipse.jetty.util.resource.Resource.newClassPathResource;
+
 /**
  *
  */
-public class Http2ConnectorFactory implements ConnectorFactory
+public class Http2ConnectorFactory
+    extends AbstractSecuredConnectorFactory
+    implements ConnectorFactory
 {
     @Override
     public boolean start( Map args, Server server )
         throws IOException
     {
-        int listenPort = Option.HTTP2_PORT.get( args);
-        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get(args);
+        int listenPort = Option.HTTP2_PORT.get( args );
+        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
 
-        if (listenPort<0) {
+        if ( listenPort < 0 )
+        {
             // not running HTTP2 listener
             return false;
         }
 
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setSecureScheme("https");
-        http_config.setSecurePort(8443);
-        http_config.setSendXPoweredBy(true);
-        http_config.setSendServerVersion(true);
 
-        /*
-        ServerConnector connector =
-            new ServerConnector( server, new HTTP2CServerConnectionFactory(http_config));
-        connector.setPort(listenPort);
-        connector.setHost(listenAddress);
-         */
+        try
+        {
 
-        HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory( http_config);
+            configureSsl( args, server );
+            SslContextFactory sslContextFactory = getSSLContext( args );
+            sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
-        SslContextFactory sslContextFactory = new SslContextFactory(true);
-        ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
-        alpn.setDefaultProtocol(http.getDefaultProtocol());
+            // HTTPS Configuration
+            HttpConfiguration https_config = new HttpConfiguration();
+            https_config.setSecureScheme("https");
+            https_config.setSecurePort(listenPort);
+            https_config.addCustomizer(new SecureRequestCustomizer());
 
-        // SSL Connection Factory
-        SslConnectionFactory ssl = new SslConnectionFactory( sslContextFactory, alpn.getProtocol());
-        ServerConnector http2Connector =
-            new ServerConnector(server,ssl,alpn,h2);
-        http2Connector.setPort(listenPort);
-        http2Connector.setHost( listenAddress );
+            // HTTP/2 Connection Factory
+            HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
+            NegotiatingServerConnectionFactory.checkProtocolNegotiationAvailable();
+            ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
+            alpn.setDefaultProtocol("h2");
 
-        server.addConnector(http2Connector);
+            // SSL Connection Factory
+            SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory,alpn.getProtocol());
 
+            // HTTP/2 Connector
+            ServerConnector http2Connector =
+                new ServerConnector(server,ssl,alpn,h2,new HttpConnectionFactory(https_config));
+            http2Connector.setPort(listenPort);
+            server.addConnector(http2Connector);
+            server.setDumpAfterStart( Boolean.getBoolean( "dumpAfterStart" ) );
+
+            //ALPN.debug=false;
+
+            return true;
+        }
+        catch ( IllegalStateException e )
+        {
+            Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailStart.ALPN", e );
+        }
         return false;
     }
 }
