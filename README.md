@@ -1,8 +1,10 @@
 # What is Winstone?
-Winstone is a command line interface around Jetty 9.2, which implements
-servlet 3.1, WebSocket/JSR-356, and SPDY support. It is used as the default
+Winstone is a command line interface around [Jetty](http://www.eclipse.org/jetty/) 9.4, which implements
+Servlet 3.1 and WebSocket/JSR-356. It is used as the default
 embedded servlet container in Jenkins (via [executable-war](https://github.com/jenkinsci/extras-executable-war) module)
 and can be used by any other web applications that want to be self-contained.
+
+## History
 
 Winstone was [originally a from-scratch servlet container by Rick Knowles](http://winstone.sourceforge.net/)
 with a good command line interface. Over time, the upstream development
@@ -170,3 +172,8 @@ For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.ne
 If you have some unit test failures you may add an interface/ip alias such
 
 ``` sudo ifconfig lo0 alias 127.0.0.2 ```
+
+## Changelog
+
+See [this page](CHANGELOG.md).
+
