@@ -353,6 +353,7 @@ public class Launcher implements Runnable {
         try {
             new Launcher(args);
         } catch (Throwable err) {
+            err.printStackTrace();
             Logger.log(Logger.ERROR, RESOURCES, "Launcher.ContainerStartupError", err);
             System.exit(1);
         }

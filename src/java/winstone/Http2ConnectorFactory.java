@@ -20,6 +20,7 @@
 
 package winstone;
 
+import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.http2.HTTP2Cipher;
@@ -89,7 +90,7 @@ public class Http2ConnectorFactory
             server.addConnector(http2Connector);
             server.setDumpAfterStart( Boolean.getBoolean( "dumpAfterStart" ) );
 
-            //ALPN.debug=false;
+            ALPN.debug = Boolean.getBoolean( "alpnDebug" );
 
             return true;
         }
