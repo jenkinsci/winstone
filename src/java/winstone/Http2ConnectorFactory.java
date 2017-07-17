@@ -41,7 +41,9 @@ import java.util.Map;
 import static org.eclipse.jetty.util.resource.Resource.newClassPathResource;
 
 /**
- *
+ * This class add the HTTP/2 Listener This is the class that gets launched
+ * by the command line, and owns the server socket, etc.
+ *  @since 4.1
  */
 public class Http2ConnectorFactory
     extends AbstractSecuredConnectorFactory
@@ -87,6 +89,7 @@ public class Http2ConnectorFactory
             ServerConnector http2Connector =
                 new ServerConnector(server,ssl,alpn,h2,new HttpConnectionFactory(https_config));
             http2Connector.setPort(listenPort);
+            http2Connector.setHost( listenAddress );
             server.addConnector(http2Connector);
             server.setDumpAfterStart( Boolean.getBoolean( "dumpAfterStart" ) );
 
@@ -96,7 +99,7 @@ public class Http2ConnectorFactory
         }
         catch ( IllegalStateException e )
         {
-            Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailStart.ALPN", e );
+            Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
         }
         return false;
     }
