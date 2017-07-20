@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>4.1-SNAPSHOT</version>
+  <version>4.1</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -198,7 +198,7 @@
             <configuration>
               <createSourcesJar>true</createSourcesJar>
               <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
               </transformers>
             </configuration>
           </execution>
@@ -237,7 +237,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
-    <tag>HEAD</tag>
+    <tag>winstone-4.1</tag>
   </scm>
 
   <dependencyManagement>
