@@ -73,6 +73,9 @@ public class Option<T> {
     public static final OInt AJP13_PORT=integer("ajp13"+_PORT,-1);
     public static final OString AJP13_LISTEN_ADDRESS=string("ajp13"+_LISTEN_ADDRESS);
 
+    public static final OString HTTP2_LISTEN_ADDRESS=string("http2"+_LISTEN_ADDRESS);
+    public static final OInt HTTP2_PORT=integer("http2"+_PORT,-1);
+
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
 
     /**

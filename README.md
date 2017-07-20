@@ -1,6 +1,6 @@
 # What is Winstone?
-Winstone is a command line interface around [Jetty](http://www.eclipse.org/jetty/) 9.4, which implements
-Servlet 3.1 and WebSocket/JSR-356. It is used as the default
+Winstone is a command line interface around Jetty 9.4, which implements
+servlet 3.1, WebSocket/JSR-356, and HTTP/2 support. It is used as the default
 embedded servlet container in Jenkins (via [executable-war](https://github.com/jenkinsci/extras-executable-war) module)
 and can be used by any other web applications that want to be self-contained.
 
@@ -79,6 +79,8 @@ To run different web applications for diffent virtual hosts:
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
        --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
          / --httpsCertificate     file and the corresponding certificate file
+       --http2Port               = set the http2 listening port. -1 to disable, Default is disabled
+       --http2ListenAddress      = set the http2 listening address. Default is all interfaces         
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
 
        --handlerCountMax        = set the max no of worker threads to allow. Default is 40
@@ -157,6 +159,10 @@ becomes the default host.
 * `java -jar winstone.jar --hostsDir=<dir containing multiple host directories>`
 
 ## Recent additions
+New features in v4.0:
+
+* Jetty is now upgraded to 9.4 to bring HTTP/2 support. Winstone now requires Java8.
+    
 New features in v3.0:
 
 * Jetty is now upgraded to 9.2 to bring the servlet 3.1 support. Winstone now requires Java7.
@@ -167,6 +173,18 @@ New features in v2.0:
 * The engine is now Jetty 8.x, instead of the original from-scratch implementation
 
 For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.net/#recent)
+
+##HTTP/2 Support
+
+Please note Java8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
+
+The version to use depends on your used jvm version.
+
+To include in the bootclasspath, simply add an option ``` -Xbootclasspath/p: ``` to your jvm start script, this must contains
+a path to the alpn boot jar.
+Sample
+
+``` -Xbootclasspath/p:/Users/olamy/repository/org/mortbay/jetty/alpn/alpn-boot/8.1.11.v20170118/alpn-boot-8.1.11.v20170118.jar ```
 
 ## Development
 If you have some unit test failures you may add an interface/ip alias such

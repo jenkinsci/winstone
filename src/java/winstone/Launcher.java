@@ -45,6 +45,7 @@ public class Launcher implements Runnable {
     
     static final String HTTP_LISTENER_CLASS = "winstone.HttpConnectorFactory";
     static final String HTTPS_LISTENER_CLASS = "winstone.HttpsConnectorFactory";
+    static final String HTTP2_LISTENER_CLASS = "winstone.Http2ConnectorFactory";
     static final String AJP_LISTENER_CLASS = "winstone.Ajp13ConnectorFactory";
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
@@ -147,6 +148,7 @@ public class Launcher implements Runnable {
             spawnListener(HTTP_LISTENER_CLASS);
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
+            spawnListener(HTTP2_LISTENER_CLASS);
 
             try {
                 server.start();
@@ -177,7 +179,7 @@ public class Launcher implements Runnable {
 
         ExecutorService es = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
-                new SynchronousQueue<Runnable>(),
+                new SynchronousQueue<>(),
                 new ThreadFactory() {
                     private int threadIndex;
                     public synchronized Thread newThread(Runnable r) {
@@ -351,6 +353,7 @@ public class Launcher implements Runnable {
         try {
             new Launcher(args);
         } catch (Throwable err) {
+            err.printStackTrace();
             Logger.log(Logger.ERROR, RESOURCES, "Launcher.ContainerStartupError", err);
             System.exit(1);
         }
