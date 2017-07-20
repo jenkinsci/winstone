@@ -1,6 +1,12 @@
 Changelog
 ===
 
+#4.1
+
+Release date: ?
+
+* add HTTP/2 Support (disabled per default)
+
 ## 4.0
 
 Release date: May 04, 2017
