@@ -174,7 +174,7 @@ New features in v2.0:
 
 For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.net/#recent)
 
-##HTTP/2 Support
+## HTTP/2 Support
 
 Please note Java8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
 
