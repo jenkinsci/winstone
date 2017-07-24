@@ -186,6 +186,8 @@ Sample
 
 ``` -Xbootclasspath/p:/Users/olamy/repository/org/mortbay/jetty/alpn/alpn-boot/8.1.11.v20170118/alpn-boot-8.1.11.v20170118.jar ```
 
+To find the version to use you can look at this [table](https://www.eclipse.org/jetty/documentation/current/alpn-chapter.html#d0e15580)
+
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
 
