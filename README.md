@@ -2,7 +2,7 @@
 Winstone is a command line interface around Jetty 9.4, which implements
 servlet 3.1, WebSocket/JSR-356, and HTTP/2 support. It is used as the default
 embedded servlet container in Jenkins (via [executable-war](https://github.com/jenkinsci/extras-executable-war) module)
-and can be used by any other web applications that want to be self-contained.
+and can be used by any other web applications that wants to be self-contained.
 
 ## History
 
@@ -10,7 +10,7 @@ Winstone was [originally a from-scratch servlet container by Rick Knowles](http:
 with a good command line interface. Over time, the upstream development
 has halted, and it became impractical to maintain a from-scratch servlet
 implementation on our own. To reduce this maintenance burden, the gut of
-Winstone has been removed and delegated Jetty, while CLI was preserved, and
+Winstone has been removed and delegated to Jetty, while CLI was preserved, and
 we called it Winstone 2.0.
 
 ## License
