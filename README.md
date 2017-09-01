@@ -22,7 +22,7 @@ described at the top of each file (usually as licensed by Sun Microsystems).
 
 As of v0.8.1, all other files are dual-licensed, under either
 the Lesser GNU Public License (LGPL) as described in LICENSE-LGPL.txt,
-or the Common Development and Distribution License (CDDL) as decribed in
+or the Common Development and Distribution License (CDDL) as described in
 LICENSE-CDDL.txt.
 
 The goal of dual-licensing is to make Winstone as attractive as possible to
