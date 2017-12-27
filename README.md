@@ -10,8 +10,8 @@ Winstone was [originally a from-scratch servlet container by Rick Knowles](http:
 with a good command line interface. Over time, the upstream development
 has halted, and it became impractical to maintain a from-scratch servlet
 implementation on our own. To reduce this maintenance burden, the gut of
-Winstone has been removed and delegated Jetty, while CLI was preserved, and
-we called it Winstone 2.0.
+Winstone has been removed and delegated to Jetty, while CLI was preserved,
+and we called it Winstone 2.0.
 
 ## License
 The license of Winstone inherits its original license by Rick.
