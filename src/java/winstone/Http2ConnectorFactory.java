@@ -78,7 +78,6 @@ public class Http2ConnectorFactory
 
             // HTTP/2 Connection Factory
             HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
-            NegotiatingServerConnectionFactory.checkProtocolNegotiationAvailable();
             ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
             alpn.setDefaultProtocol("h2");
 

@@ -1,6 +1,10 @@
 Changelog
 ===
 
+##4.2
+
+* Update Jetty from ``9.4.5.v20170502` to `9.4.8.v20171121`
+
 ##4.1
 
 Release date: July 20, 2017
