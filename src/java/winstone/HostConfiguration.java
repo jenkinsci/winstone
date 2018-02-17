@@ -173,8 +173,11 @@ public class HostConfiguration {
 
                 // if specified, override the value in web.xml
                 int sessionTimeout = Option.SESSION_TIMEOUT.get(args);
-                if (sessionTimeout>0)
+                if (sessionTimeout>0) {
                     getSessionHandler().setMaxInactiveInterval(sessionTimeout * 60);
+                }
+                int sessionEviction = Option.SESSION_EVICTION.get(args);
+                getSessionHandler().getSessionCache().setEvictionPolicy( sessionEviction );
             }
         };
         wac.getSecurityHandler().setLoginService(loginService);
