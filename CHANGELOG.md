@@ -3,7 +3,8 @@ Changelog
 
 ##4.2
 
-* Update Jetty from ``9.4.5.v20170502` to `9.4.8.v20171121`
+* Update Jetty from `9.4.5.v20170502` to `9.4.8.v20171121` [CHANGELOG](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.8.v20171121)
+* User session memory leak. [JENKINS-49596](https://issues.jenkins-ci.org/browse/JENKINS-49596)
 
 ##4.1
 
