@@ -2,12 +2,11 @@ package winstone;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import winstone.Launcher;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
 import java.net.URL;
 import java.util.HashMap;

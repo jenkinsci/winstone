@@ -37,7 +37,7 @@
 
 	<servlet>
 		<servlet-name>CountRequestsServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.CountRequestsServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.CountRequestsServlet</servlet-class>
 		<init-param>
 			<param-name>offset</param-name>
 			<param-value>1000</param-value>
@@ -47,7 +47,7 @@
 	
 	<servlet>
 		<servlet-name>UnavailableAtInitServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>
 		<init-param>
 			<param-name>errorTime</param-name>
 			<param-value>init</param-value>
@@ -56,7 +56,7 @@
 	
 	<servlet>
 		<servlet-name>UnavailableAtGetServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>
 		<init-param>
 			<param-name>errorTime</param-name>
 			<param-value>get</param-value>

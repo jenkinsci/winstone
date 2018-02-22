@@ -1,6 +1,8 @@
 package winstone;
 
 import junit.framework.TestCase;
+import winstone.BoundedExecutorService;
+import winstone.Launcher;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;

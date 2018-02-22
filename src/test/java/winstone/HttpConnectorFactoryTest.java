@@ -1,6 +1,7 @@
 package winstone;
 
 import org.junit.Test;
+import winstone.Launcher;
 
 import java.util.HashMap;
 import java.util.Map;
