@@ -6,16 +6,12 @@
  */
 package winstone.realm;
 
-import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
-import org.eclipse.jetty.util.security.Credential;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
-import javax.security.auth.Subject;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

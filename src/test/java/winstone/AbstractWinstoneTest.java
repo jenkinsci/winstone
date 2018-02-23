@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.xml.sax.SAXException;
-import winstone.Launcher;
 
 import java.io.IOException;
 import java.io.InputStream;

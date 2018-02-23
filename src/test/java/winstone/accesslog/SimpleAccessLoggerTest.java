@@ -4,7 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
-import winstone.accesslog.SimpleAccessLogger;
 
 import java.io.File;
 import java.util.HashMap;

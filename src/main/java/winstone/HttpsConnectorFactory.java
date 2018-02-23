@@ -14,9 +14,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
-import javax.net.ssl.KeyManagerFactory;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Map;
 
 /**
