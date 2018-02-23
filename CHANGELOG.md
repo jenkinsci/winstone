@@ -3,8 +3,24 @@ Changelog
 
 ##4.2
 
+Release date: Coming soon
+
 * Update Jetty from `9.4.5.v20170502` to `9.4.8.v20171121` [CHANGELOG](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.8.v20171121)
-* User session memory leak. [JENKINS-49596](https://issues.jenkins-ci.org/browse/JENKINS-49596)
+
+## 4.1.2
+
+Release date: Feb 23, 2017
+
+* [JENKINS-49596](https://issues.jenkins-ci.org/browse/JENKINS-49596) -
+Increase the default idle session eviction timeout to 30 minutes. 
+
+## 4.1.1
+
+Release date: Feb 22, 2017
+
+* [JENKINS-49596](https://issues.jenkins-ci.org/browse/JENKINS-49596) -
+Prevent User session memory leak by setting the default idle session eviction timeout to 3 minutes. 
+* Allow configuring the session eviction timeout via the `-sessionEviction` command-line option.
 
 ##4.1
 
