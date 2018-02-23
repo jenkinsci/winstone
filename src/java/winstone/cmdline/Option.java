@@ -97,7 +97,7 @@ public class Option<T> {
     public static final OInt MAX_PARAM_COUNT=integer("maxParamCount",-1);
     public static final OBoolean USAGE=bool("usage",false);
     public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
-    public static final OInt SESSION_EVICTION=integer("sessionEviction",180);
+    public static final OInt SESSION_EVICTION=integer("sessionEviction",1800);
     public static final OInt REQUEST_HEADER_SIZE=integer("requestHeaderSize",8192); // default for jetty 9
     public static final OInt REQUEST_FORM_CONTENT_SIZE=integer("requestFormContentSize",-1); // no limit (compat with old winstone)
     public static final OBoolean HELP=bool("help",false);
