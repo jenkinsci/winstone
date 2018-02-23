@@ -90,8 +90,9 @@ To run different web applications for diffent virtual hosts:
 
        --useJasper              = enable jasper JSP handling (true/false). Default is false
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
-       --sessionEviction        = Set the session evition timeout for idle sessions. Default value is 180s.
-                                  (-1 is never evict; 0 is evict-on-exit; and any other positive value is the time in seconds that a session can be idle before it can be evicted)
+       --sessionEviction        = Set the session evition timeout for idle sessions. Default value is 30min.
+                                  (-1 is never evict; 0 is evict-on-exit; and any other positive value is the time 
+                                  in seconds that a session can be idle before it can be evicted)
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
