@@ -2,6 +2,7 @@ package winstone;
 
 import com.meterware.httpunit.WebResponse;
 import org.junit.Test;
+import winstone.Launcher;
 
 import java.util.HashMap;
 import java.util.Map;

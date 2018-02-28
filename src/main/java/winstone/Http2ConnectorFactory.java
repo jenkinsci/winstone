@@ -22,12 +22,10 @@ package winstone;
 
 import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
-import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.http2.HTTP2Cipher;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NegotiatingServerConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -37,8 +35,6 @@ import winstone.cmdline.Option;
 
 import java.io.IOException;
 import java.util.Map;
-
-import static org.eclipse.jetty.util.resource.Resource.newClassPathResource;
 
 /**
  * This class add the HTTP/2 Listener This is the class that gets launched

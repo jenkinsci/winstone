@@ -6,7 +6,6 @@
  */
 package winstone.realm;
 
-import org.eclipse.jetty.security.AbstractLoginService;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.w3c.dom.Document;
@@ -16,13 +15,11 @@ import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
-import javax.security.auth.Subject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

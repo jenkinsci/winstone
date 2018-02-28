@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 
@@ -27,6 +28,7 @@ import winstone.cmdline.Option;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: LoadTest.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
  */
+@Ignore("Intended to be run manually")
 public class LoadTest {
     private String url;
     private boolean useKeepAlives;
