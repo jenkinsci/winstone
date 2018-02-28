@@ -28,7 +28,7 @@ import winstone.cmdline.Option;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: LoadTest.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
  */
-@Ignore
+@Ignore("Intended to be run manually")
 public class LoadTest {
     private String url;
     private boolean useKeepAlives;
