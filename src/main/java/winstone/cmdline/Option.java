@@ -78,6 +78,8 @@ public class Option<T> {
 
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
 
+    public static final OBoolean USE_JMX=bool("useJmx",false);
+
     /**
      * How many requests do we handle concurrently?
      *
