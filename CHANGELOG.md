@@ -1,11 +1,17 @@
 Changelog
 ===
 
-##4.2
+## 4.2
 
 Release date: Coming soon
 
-* Update Jetty from `9.4.5.v20170502` to `9.4.8.v20171121` [CHANGELOG](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.8.v20171121)
+* [PR #44](https://github.com/jenkinsci/winstone/pull/44) -
+Update Jetty from `9.4.5.v20170502` to `9.4.8.v20171121` 
+  * [9.4.8 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.8.v20171121)
+  * [9.4.7 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.7.v20170914)
+  * [9.4.6 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.6.v20170531)
+* [PR #46](https://github.com/jenkinsci/winstone/pull/46) -
+Internal: Update codebase to use the standard [Jenkins parent POM](https://github.com/jenkinsci/pom) 
 
 ## 4.1.2
 
