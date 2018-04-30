@@ -97,6 +97,7 @@ To run different web applications for diffent virtual hosts:
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
+       --useJmx                 = Enable Jetty JMX                                   
        --usage / --help         = show this message
 
     Security options:
@@ -162,6 +163,11 @@ becomes the default host.
 * `java -jar winstone.jar --hostsDir=<dir containing multiple host directories>`
 
 ## Recent additions
+
+New feature in v4.3
+
+* option to enable Jetty JMX so users can collect some metrics on Jetty (threadpool state, sessions statistics etc...)
+
 New features in v4.0:
 
 * Jetty is now upgraded to 9.4 to bring HTTP/2 support. Winstone now requires Java8.
