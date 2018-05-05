@@ -3,7 +3,7 @@ Changelog
 
 ## 4.3
 
-Release date: Coming soon
+Release date: May 05, 2018
 
 * [PR-47](https://github.com/jenkinsci/winstone/pull/47) - 
 Option to enable [Jetty JMX](https://www.eclipse.org/jetty/documentation/9.4.x/jmx-chapter.html) 
