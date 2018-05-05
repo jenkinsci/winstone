@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -149,6 +151,12 @@ public class Launcher implements Runnable {
             spawnListener(AJP_LISTENER_CLASS);
             spawnListener(HTTPS_LISTENER_CLASS);
             spawnListener(HTTP2_LISTENER_CLASS);
+
+            if(Option.USE_JMX.get( args )) {
+                // Setup JMX if needed
+                MBeanContainer mbeanContainer = new MBeanContainer( ManagementFactory.getPlatformMBeanServer());
+                server.addBean(mbeanContainer);
+            }
 
             try {
                 server.start();
