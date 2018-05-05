@@ -8,7 +8,7 @@
 
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>4.3</version>
+  <version>4.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -153,7 +153,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
-    <tag>winstone-4.3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencyManagement>
