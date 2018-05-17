@@ -3,10 +3,12 @@ package winstone;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -34,13 +36,13 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Kohsuke Kawaguchi
  */
-public class BoundedExecutorService extends AbstractExecutorService {
+public class BoundedExecutorService extends ThreadPoolExecutor {
     /**
      * The FIFO queue of tasks waiting to be handed to the wrapped {@link ExecutorService}.
      */
-    private final List<Runnable> tasks = new LinkedList<Runnable>();
+    private final List<Runnable> tasks = new LinkedList<>();
     
-    private final ExecutorService base;
+    private final ThreadPoolExecutor base;
     private final int max;
 
     /**
@@ -51,7 +53,9 @@ public class BoundedExecutorService extends AbstractExecutorService {
 
     private boolean isShutdown = false;
 
-    public BoundedExecutorService(ExecutorService base, int max) {
+    public BoundedExecutorService(ThreadPoolExecutor base, int max) {
+        super(base.getCorePoolSize(), base.getMaximumPoolSize(), base.getKeepAliveTime( TimeUnit.SECONDS ), //
+              TimeUnit.SECONDS,base.getQueue(),base.getThreadFactory());
         this.base = base;
         this.max = max;
     }
@@ -71,15 +75,14 @@ public class BoundedExecutorService extends AbstractExecutorService {
             return;
         }
         final Runnable task = tasks.remove(0);
-        base.execute(new Runnable() {
-            public void run() {
+        base.execute(() -> {
                 try {
                     task.run();
                 } finally {
                     done();
                 }
             }
-        });
+        );
         current++;
     }
 

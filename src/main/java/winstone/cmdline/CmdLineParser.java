@@ -72,12 +72,13 @@ public class CmdLineParser {
         // Load default props if available
         File configFile = new File(configFilename);
         if (configFile.exists() && configFile.isFile()) {
-            InputStream inConfig = new FileInputStream(configFile);
-            loadPropsFromStream(inConfig, args);
-            inConfig.close();
-            initLogger(args);
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingPropertyFile",
-                    configFilename);
+            try (InputStream inConfig = new FileInputStream(configFile))
+            {
+                loadPropsFromStream( inConfig, args );
+                inConfig.close();
+                initLogger( args );
+                Logger.log( Logger.DEBUG, RESOURCES, "Launcher.UsingPropertyFile", configFilename );
+            }
         } else {
             initLogger(args);
         }
