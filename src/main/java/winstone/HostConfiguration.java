@@ -274,15 +274,16 @@ public class HostConfiguration {
                 outFile.getParentFile().mkdirs();
 
                 // Copy out the extracted file
-                InputStream inContent = warArchive.getInputStream(element);
-                OutputStream outStream = new FileOutputStream(outFile);
-                int readBytes = inContent.read(buffer);
-                while (readBytes != -1) {
-                    outStream.write(buffer, 0, readBytes);
-                    readBytes = inContent.read(buffer);
+                try (InputStream inContent = warArchive.getInputStream(element);
+                        OutputStream outStream = new FileOutputStream(outFile))
+                {
+                    int readBytes = inContent.read( buffer );
+                    while ( readBytes != -1 )
+                    {
+                        outStream.write( buffer, 0, readBytes );
+                        readBytes = inContent.read( buffer );
+                    }
                 }
-                inContent.close();
-                outStream.close();
             }
 
             // extraction completed

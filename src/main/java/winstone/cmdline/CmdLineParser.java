@@ -33,11 +33,13 @@ public class CmdLineParser {
         String embeddedPropertiesFilename = RESOURCES.getString(
                 "Launcher.EmbeddedPropertiesFile");
         
-        InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
-                embeddedPropertiesFilename);
-        if (embeddedPropsStream != null) {
-            loadPropsFromStream(embeddedPropsStream, args);
-            embeddedPropsStream.close();
+        try (InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
+                embeddedPropertiesFilename))
+        {
+            if ( embeddedPropsStream != null )
+            {
+                loadPropsFromStream( embeddedPropsStream, args );
+            }
         }
         
         // Get command line args
