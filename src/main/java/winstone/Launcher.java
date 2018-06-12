@@ -205,7 +205,7 @@ public class Launcher implements Runnable {
     protected void spawnListener(String listenerClassName) throws IOException {
         try {
             ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
-            connectorFactory. start(args, server);
+            connectorFactory.start(args, server);
         } catch (Throwable err) {
             throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }
