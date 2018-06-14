@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BoundedExecutorServiceDriver extends TestCase {
     public static void main(String[] args) throws Exception {
-        ExecutorService es = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
+        ThreadPoolExecutor es = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
                 5L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
                 new SynchronousQueue<Runnable>(),
                 new ThreadFactory() {
@@ -32,8 +32,7 @@ public class BoundedExecutorServiceDriver extends TestCase {
         
         for (int i=0; i<20; i++) {
             final int n = i;
-            bes.submit(new Runnable() {
-                public void run() {
+            bes.submit(() -> {
                     try {
                         System.out.println("#"+n+" started");
                         Thread.sleep(1000);
@@ -42,7 +41,7 @@ public class BoundedExecutorServiceDriver extends TestCase {
                         e.printStackTrace();
                     }
                 }
-            });
+            );
             Thread.sleep(100);
         }
         

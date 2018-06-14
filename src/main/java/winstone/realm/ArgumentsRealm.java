@@ -52,7 +52,7 @@ public class ArgumentsRealm extends HashLoginService {
                     Logger.log(Logger.WARNING, REALM_RESOURCES, "ArgumentsRealm.UndeclaredRoles", userName);
                 } else {
                     StringTokenizer st = new StringTokenizer(roleList, ",");
-                    List<String> rl = new ArrayList<String>();
+                    List<String> rl = new ArrayList<>();
                     for (; st.hasMoreTokens(); ) {
                         String currentRole = st.nextToken();
                         rl.add(currentRole);

@@ -54,11 +54,9 @@ public class FileRealm extends HashLoginService {
         if (!realmFile.exists())
             throw new WinstoneException(REALM_RESOURCES.getString(
                     "FileRealm.FileNotFound", realmFile.getPath()));
-        try {
+        try (InputStream inFile = new FileInputStream(realmFile)){
             int count=0;
-            InputStream inFile = new FileInputStream(realmFile);
             Document doc = this.parseStreamToXML(inFile);
-            inFile.close();
             Node rootElm = doc.getDocumentElement();
             for (int n = 0; n < rootElm.getChildNodes().getLength(); n++) {
                 Node child = rootElm.getChildNodes().item(n);
@@ -86,7 +84,7 @@ public class FileRealm extends HashLoginService {
                     else {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
-                        List<String> rl = new ArrayList<String>();
+                        List<String> rl = new ArrayList<>();
                         for (; st.hasMoreTokens();) {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);

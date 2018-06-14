@@ -29,6 +29,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -59,7 +60,7 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private ExecutorService threadPool;
+    private ThreadPoolExecutor threadPool;
     private Map args;
 
     public final Server server;
@@ -181,11 +182,11 @@ public class Launcher implements Runnable {
     /**
      * Used to handle requests.
      */
-    private ExecutorService createThreadPool() {
+    private ThreadPoolExecutor createThreadPool() {
         int maxConcurrentRequests = Option.HANDLER_COUNT_MAX.get(args);
         int maxIdleRequestHandlersInPool = Option.HANDLER_COUNT_MAX_IDLE.get(args);
 
-        ExecutorService es = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
                 new SynchronousQueue<>(),
                 new ThreadFactory() {
@@ -200,7 +201,7 @@ public class Launcher implements Runnable {
                         return thread;
                     }
                 });
-        return new BoundedExecutorService(es, maxConcurrentRequests);
+        return new BoundedExecutorService(threadPoolExecutor, maxConcurrentRequests);
     }
 
     /**
@@ -212,7 +213,7 @@ public class Launcher implements Runnable {
     protected void spawnListener(String listenerClassName) throws IOException {
         try {
             ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
-            connectorFactory. start(args, server);
+            connectorFactory.start(args, server);
         } catch (Throwable err) {
             throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
         }
