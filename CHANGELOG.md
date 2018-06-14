@@ -7,8 +7,8 @@ Release date: Jun 14, 2018
 
 * [PR #49](https://github.com/jenkinsci/winstone/pull/49) -
 Update Jetty from `9.4.8.v20171121` to `9.4.11.v20180605`
-  * [9.4.11 hangelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.11.v20180605)
-  * [9.4.10 hangelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.10.v20180503)
+  * [9.4.11 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.11.v20180605)
+  * [9.4.10 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.10.v20180503)
   * [9.4.9 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.9.v20180320)
 
 ## 4.3
