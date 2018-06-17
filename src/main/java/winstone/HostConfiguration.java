@@ -275,11 +275,9 @@ public class HostConfiguration {
 
                 // Copy out the extracted file
                 try (InputStream inContent = warArchive.getInputStream(element);
-                        OutputStream outStream = new FileOutputStream(outFile))
-                {
+                        OutputStream outStream = new FileOutputStream(outFile)) {
                     int readBytes = inContent.read( buffer );
-                    while ( readBytes != -1 )
-                    {
+                    while ( readBytes != -1 ) {
                         outStream.write( buffer, 0, readBytes );
                         readBytes = inContent.read( buffer );
                     }

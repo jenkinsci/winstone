@@ -34,10 +34,8 @@ public class CmdLineParser {
                 "Launcher.EmbeddedPropertiesFile");
         
         try (InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
-                embeddedPropertiesFilename))
-        {
-            if ( embeddedPropsStream != null )
-            {
+                embeddedPropertiesFilename)) {
+            if ( embeddedPropsStream != null ) {
                 loadPropsFromStream( embeddedPropsStream, args );
             }
         }
@@ -74,8 +72,7 @@ public class CmdLineParser {
         // Load default props if available
         File configFile = new File(configFilename);
         if (configFile.exists() && configFile.isFile()) {
-            try (InputStream inConfig = new FileInputStream(configFile))
-            {
+            try (InputStream inConfig = new FileInputStream(configFile)) {
                 loadPropsFromStream( inConfig, args );
                 inConfig.close();
                 initLogger( args );
