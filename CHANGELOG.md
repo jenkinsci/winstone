@@ -1,6 +1,12 @@
 Changelog
 ===
 
+## 4.5
+
+Release date: Coming soon
+
+
+
 ## 4.4
 
 Release date: Jun 14, 2018
