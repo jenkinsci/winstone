@@ -63,7 +63,7 @@ To run different web applications for diffent virtual hosts:
        --config                 = load configuration properties from here. Default is ./winstone.properties
        --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
        --commonLibFolder        = folder for additional jar files. Default is ./lib
-       --extraLibFolder         = folder for additional jar file to add to Jetty classloader
+       --extraLibFolder         = folder for additional jar files to add to Jetty classloader
 
        --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
        --logThrowingThread      = show the thread that logged the message. Default is false
