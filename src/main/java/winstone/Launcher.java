@@ -78,8 +78,8 @@ public class Launcher implements Runnable {
             this.controlPort =Option.CONTROL_PORT.get(args);
 
             // Check for java home
-            List<URL> jars = new ArrayList<URL>();
-            List<File> commonLibCLPaths = new ArrayList<File>();
+            List<URL> jars = new ArrayList<>();
+            List<File> commonLibCLPaths = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
@@ -125,6 +125,18 @@ public class Launcher implements Runnable {
             } else {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
             }
+
+            File extraLibFolder = Option.EXTRA_LIB_FOLDER.get(args);
+            List<URL> extraJars = new ArrayList<>();
+            if(extraLibFolder != null && extraLibFolder.exists()){
+                File[] children = extraLibFolder.listFiles();
+                for (File aChildren : children)
+                    if (aChildren.getName().endsWith(".jar")
+                        || aChildren.getName().endsWith(".zip")) {
+                        extraJars.add(aChildren.toURL());
+                    }
+            }
+
             ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[jars.size()]),
                     getClass().getClassLoader());
 
@@ -132,6 +144,13 @@ public class Launcher implements Runnable {
                     commonLibCL.toString());
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                     commonLibCLPaths.toString());
+
+
+            if(!extraJars.isEmpty()){
+                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[extraJars.size()]),
+                                                             getClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader( extraClassLoader );
+            }
 
             this.threadPool = createThreadPool();
             this.server = new Server(new ExecutorThreadPool(threadPool));

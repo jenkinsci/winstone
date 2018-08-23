@@ -1,6 +1,12 @@
 Changelog
 ===
 
+## 4.5
+
+Release date: ?
+
+* [JENKINS-52358](https://issues.jenkins-ci.org/browse/JENKINS-52358) fix broken http2 support
+
 ## 4.4
 
 Release date: Jun 14, 2018
