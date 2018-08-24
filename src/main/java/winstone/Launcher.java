@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
@@ -152,8 +153,10 @@ public class Launcher implements Runnable {
                 Thread.currentThread().setContextClassLoader( extraClassLoader );
             }
 
-            this.threadPool = createThreadPool();
-            this.server = new Server(new ExecutorThreadPool(threadPool));
+            int qtpMaxThread = Option.QTP_MAXTHREADS.get(args);
+            QueuedThreadPool queuedThreadPool = qtpMaxThread>0?new QueuedThreadPool(qtpMaxThread):new QueuedThreadPool();
+            this.server = new Server(queuedThreadPool);
+
 
             int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
             if (maxParameterCount>0) {
@@ -196,31 +199,6 @@ public class Launcher implements Runnable {
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
-    }
-
-    /**
-     * Used to handle requests.
-     */
-    private ThreadPoolExecutor createThreadPool() {
-        int maxConcurrentRequests = Option.HANDLER_COUNT_MAX.get(args);
-        int maxIdleRequestHandlersInPool = Option.HANDLER_COUNT_MAX_IDLE.get(args);
-
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
-                new SynchronousQueue<>(),
-                new ThreadFactory() {
-                    private int threadIndex;
-                    public synchronized Thread newThread(Runnable r) {
-                        String threadName = Launcher.RESOURCES.getString(
-                                "RequestHandlerThread.ThreadName", "" + (++threadIndex));
-
-                        // allocate a thread to run on this object
-                        Thread thread = new Thread(r, threadName);
-                        thread.setDaemon(true);
-                        return thread;
-                    }
-                });
-        return new BoundedExecutorService(threadPoolExecutor, maxConcurrentRequests);
     }
 
     /**
@@ -337,8 +315,10 @@ public class Launcher implements Runnable {
             Logger.log(Logger.INFO, RESOURCES, "Launcher.FailedShutdown", e);
         }
 
-        // Release all listeners/pools/webapps
-        this.threadPool.shutdown();
+        if(this.threadPool!=null){
+            // Release all listeners/pools/webapps
+            this.threadPool.shutdown();
+        }
 
         if (this.controlThread != null) {
             this.controlThread.interrupt();

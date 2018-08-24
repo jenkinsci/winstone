@@ -80,20 +80,9 @@ public class Option<T> {
     public static final OInt CONTROL_PORT=integer("controlPort",-1);
 
     public static final OBoolean USE_JMX=bool("useJmx",false);
-
-    /**
-     * How many requests do we handle concurrently?
-     *
-     * If the system gets really loaded, too many concurrent threads will create vicious cycles
-     * and make everyone slow (or worst case choke every request by OOME), so better to err
-     * on the conservative side (and have inbound connections wait in the queue)
-     */
-    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",40);
-    /**
-     * Leave this number of request handler threads in the pool even when they are idle.
-     * Other threads are destroyed when they are idle to free up resources.
-     */
-    public static final OInt HANDLER_COUNT_MAX_IDLE=integer("handlerCountMaxIdle",5);
+    public static final OInt QTP_MAXTHREADS=integer("qtpMaxThreads",-1);
+    public static final OInt JETTY_ACCEPTORS=integer("jettyAcceptors",-1);
+    public static final OInt JETTY_SELECTORS=integer("jettySelectors",0);
 
     public static final OBoolean USE_JASPER=bool("useJasper",false);
     public static final OString MIME_TYPES=string("mimeTypes");

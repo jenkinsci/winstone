@@ -80,12 +80,9 @@ To run different web applications for diffent virtual hosts:
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
        --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
          / --httpsCertificate     file and the corresponding certificate file
-       --http2Port               = set the http2 listening port. -1 to disable, Default is disabled
-       --http2ListenAddress      = set the http2 listening address. Default is all interfaces         
+       --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
+       --http2ListenAddress     = set the http2 listening address. Default is all interfaces         
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
-
-       --handlerCountMax        = set the max no of worker threads to allow. Default is 40
-       --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 5
        
        --requestHeaderSize      = sets the size of the buffer for request headers. Default is 8K.
 
@@ -98,7 +95,10 @@ To run different web applications for diffent virtual hosts:
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
-       --useJmx                 = Enable Jetty JMX                                   
+       --useJmx                 = Enable Jetty JMX    
+       --qtpMaxThreads          = max threads number when using Jetty Queued Thread Pool                           
+       --jettyAcceptors         = Jetty Acceptors number
+       --jettySelectors         = Jetty Selectors number
        --usage / --help         = show this message
 
     Security options:

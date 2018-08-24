@@ -54,7 +54,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
 
     private ServerConnector createConnector(Server server, Map args) {
         SslContextFactory sslcf = getSSLContext(args);
-        return new ServerConnector(server,sslcf);
+        return new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args ),sslcf);
     }
 
 
