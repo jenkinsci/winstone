@@ -6,6 +6,7 @@ Changelog
 Release date: ?
 
 * [JENKINS-52358](https://issues.jenkins-ci.org/browse/JENKINS-52358) fix broken http2 support
+* [JENKINS-52121](https://issues.jenkins-ci.org/browse/JENKINS-52121) sessionEviction flag is missing in the embedded Winstone Documentation
 
 ## 4.4
 
