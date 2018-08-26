@@ -10,7 +10,6 @@ import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
@@ -30,12 +29,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -61,7 +54,6 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private ThreadPoolExecutor threadPool;
     private Map args;
 
     public final Server server;
@@ -236,8 +228,6 @@ public class Launcher implements Runnable {
 
             // Enter the main loop
             while (!interrupted) {
-//                this.threadPool.removeUnusedRequestHandlers();
-//                this.hostGroup.invalidateExpiredSessions();
 
                 // Check for control request
                 Socket accepted = null;
@@ -313,11 +303,6 @@ public class Launcher implements Runnable {
             server.stop();
         } catch (Exception e) {
             Logger.log(Logger.INFO, RESOURCES, "Launcher.FailedShutdown", e);
-        }
-
-        if(this.threadPool!=null){
-            // Release all listeners/pools/webapps
-            this.threadPool.shutdown();
         }
 
         if (this.controlThread != null) {
