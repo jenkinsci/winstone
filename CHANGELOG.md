@@ -3,16 +3,22 @@ Changelog
 
 ## 5.0
 
-Release date: ?
+Release date: Aug 29, 2018
 
-* [JENKINS-52358](https://issues.jenkins-ci.org/browse/JENKINS-52358) fix broken http2 support
-* [JENKINS-52121](https://issues.jenkins-ci.org/browse/JENKINS-52121) sessionEviction flag is missing 
-in the embedded Winstone Documentation
-* [JENKINS-53239](https://issues.jenkins-ci.org/browse/JENKINS-53239) Use default Jetty QueuedThreadPool
-  * [JENKINS-33412](https://issues.jenkins-ci.org/browse/JENKINS-33412) Jenkins locks when started in HTTPS mode on a host with 37+ processors.
-  * [JENKINS-52804](https://issues.jenkins-ci.org/browse/JENKINS-52804) Jenkins web GUI hangs when using a computer with more then 70 CPU's.
-  * [JENKINS-51136](https://issues.jenkins-ci.org/browse/JENKINS-51136) Jenkins UI hangs 2.117 - 2.119.
-* Parameters handlerCountMax and handlerCountMaxIdle are now deprecated and doesn't have any effects
+* [JENKINS-52358](https://issues.jenkins-ci.org/browse/JENKINS-52358) - Fix broken Http/2 support (regression in 4.4)
+* [JENKINS-52121](https://issues.jenkins-ci.org/browse/JENKINS-52121) - `sessionEviction` flag was missing in the embedded Winstone Documentation
+* [JENKINS-53239](https://issues.jenkins-ci.org/browse/JENKINS-53239) - Use default Jetty `QueuedThreadPool` instead of the custom `winstone.BoundedExecutorService`. 
+Related issues:
+  * [JENKINS-33412](https://issues.jenkins-ci.org/browse/JENKINS-33412) - Jenkins locks when started in HTTPS mode on a host with 37+ processors.
+  * [JENKINS-52804](https://issues.jenkins-ci.org/browse/JENKINS-52804) - 
+  Jenkins web GUI hangs when using a computer with more then 70 CPU's.
+  * [JENKINS-51136](https://issues.jenkins-ci.org/browse/JENKINS-51136) - 
+  Jenkins UI hangs 2.117 - 2.119.
+
+Breaking changes:
+
+* `winstone.BoundedExecutorService` class was removed
+* `handlerCountMax` and `handlerCountMaxIdle` parameters are now deprecated and do not have any effect
 
 ## 4.4
 
