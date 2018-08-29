@@ -96,9 +96,9 @@ To run different web applications for diffent virtual hosts:
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
        --useJmx                 = Enable Jetty JMX    
-       --qtpMaxThreads          = max threads number when using Jetty Queued Thread Pool                           
-       --jettyAcceptors         = Jetty Acceptors number
-       --jettySelectors         = Jetty Selectors number
+       --qtpMaxThreadsCount     = max threads number when using Jetty Queued Thread Pool                           
+       --jettyAcceptorsCount    = Jetty Acceptors number
+       --jettySelectorsCount    = Jetty Selectors number
        --usage / --help         = show this message
 
     Security options:
