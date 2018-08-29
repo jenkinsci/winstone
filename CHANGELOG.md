@@ -1,12 +1,18 @@
 Changelog
 ===
 
-## 4.5
+## 5.0
 
 Release date: ?
 
 * [JENKINS-52358](https://issues.jenkins-ci.org/browse/JENKINS-52358) fix broken http2 support
-* [JENKINS-52121](https://issues.jenkins-ci.org/browse/JENKINS-52121) sessionEviction flag is missing in the embedded Winstone Documentation
+* [JENKINS-52121](https://issues.jenkins-ci.org/browse/JENKINS-52121) sessionEviction flag is missing 
+in the embedded Winstone Documentation
+* [JENKINS-53239](https://issues.jenkins-ci.org/browse/JENKINS-53239) Use default Jetty QueuedThreadPool
+  * [JENKINS-33412](https://issues.jenkins-ci.org/browse/JENKINS-33412) Jenkins locks when started in HTTPS mode on a host with 37+ processors.
+  * [JENKINS-52804](https://issues.jenkins-ci.org/browse/JENKINS-52804) Jenkins web GUI hangs when using a computer with more then 70 CPU's.
+  * [JENKINS-51136](https://issues.jenkins-ci.org/browse/JENKINS-51136) Jenkins UI hangs 2.117 - 2.119.
+* Parameters handlerCountMax and handlerCountMaxIdle are now deprecated and doesn't have any effects
 
 ## 4.4
 

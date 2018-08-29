@@ -82,7 +82,8 @@ public class Http2ConnectorFactory
 
             // HTTP/2 Connector
             ServerConnector http2Connector =
-                new ServerConnector(server,ssl,alpn,h2,new HttpConnectionFactory(https_config));
+                new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args )
+                    ,ssl,alpn,h2,new HttpConnectionFactory(https_config));
             http2Connector.setPort(listenPort);
             http2Connector.setHost( listenAddress );
             server.addConnector(http2Connector);

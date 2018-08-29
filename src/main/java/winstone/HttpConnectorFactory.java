@@ -34,7 +34,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
         if (listenPort < 0) {
             return false;
         } else {
-            ServerConnector connector = createConnector(server);
+            ServerConnector connector = createConnector(server, args);
             connector.setPort(listenPort);
             connector.setHost(listenAddress);
             connector.setIdleTimeout(keepAliveTimeout);
@@ -52,7 +52,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
      * Gets a server socket - this is mostly for the purpose of allowing an
      * override in the SSL connector.
      */
-    protected ServerConnector createConnector(Server server) {
-        return new ServerConnector(server);
+    protected ServerConnector createConnector(Server server, Map args) {
+        return new ServerConnector(server, Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args ));
     }
 }

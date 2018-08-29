@@ -10,7 +10,7 @@ import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
 
@@ -29,12 +29,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -60,7 +54,6 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private ThreadPoolExecutor threadPool;
     private Map args;
 
     public final Server server;
@@ -76,6 +69,13 @@ public class Launcher implements Runnable {
 
             this.args = args;
             this.controlPort =Option.CONTROL_PORT.get(args);
+
+            if( Option.HANDLER_COUNT_MAX.get( args, -1 )!=-1){
+                Logger.log(Logger.WARNING, RESOURCES, Option.HANDLER_COUNT_MAX.name);
+            }
+            if( Option.HANDLER_COUNT_MAX_IDLE.get( args, -1 )!=-1){
+                Logger.log(Logger.WARNING, RESOURCES, Option.HANDLER_COUNT_MAX_IDLE.name);
+            }
 
             // Check for java home
             List<URL> jars = new ArrayList<>();
@@ -152,8 +152,10 @@ public class Launcher implements Runnable {
                 Thread.currentThread().setContextClassLoader( extraClassLoader );
             }
 
-            this.threadPool = createThreadPool();
-            this.server = new Server(new ExecutorThreadPool(threadPool));
+            int qtpMaxThread = Option.QTP_MAXTHREADS.get(args);
+            QueuedThreadPool queuedThreadPool = qtpMaxThread>0?new QueuedThreadPool(qtpMaxThread):new QueuedThreadPool();
+            this.server = new Server(queuedThreadPool);
+
 
             int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
             if (maxParameterCount>0) {
@@ -199,31 +201,6 @@ public class Launcher implements Runnable {
     }
 
     /**
-     * Used to handle requests.
-     */
-    private ThreadPoolExecutor createThreadPool() {
-        int maxConcurrentRequests = Option.HANDLER_COUNT_MAX.get(args);
-        int maxIdleRequestHandlersInPool = Option.HANDLER_COUNT_MAX_IDLE.get(args);
-
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(maxIdleRequestHandlersInPool, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS, // idle thread will only hang around for 60 secs
-                new SynchronousQueue<>(),
-                new ThreadFactory() {
-                    private int threadIndex;
-                    public synchronized Thread newThread(Runnable r) {
-                        String threadName = Launcher.RESOURCES.getString(
-                                "RequestHandlerThread.ThreadName", "" + (++threadIndex));
-
-                        // allocate a thread to run on this object
-                        Thread thread = new Thread(r, threadName);
-                        thread.setDaemon(true);
-                        return thread;
-                    }
-                });
-        return new BoundedExecutorService(threadPoolExecutor, maxConcurrentRequests);
-    }
-
-    /**
      * Instantiates listeners. Note that an exception thrown in the 
      * constructor is interpreted as the listener being disabled, so 
      * don't do anything too adventurous in the constructor, or if you do, 
@@ -258,8 +235,6 @@ public class Launcher implements Runnable {
 
             // Enter the main loop
             while (!interrupted) {
-//                this.threadPool.removeUnusedRequestHandlers();
-//                this.hostGroup.invalidateExpiredSessions();
 
                 // Check for control request
                 Socket accepted = null;
@@ -336,9 +311,6 @@ public class Launcher implements Runnable {
         } catch (Exception e) {
             Logger.log(Logger.INFO, RESOURCES, "Launcher.FailedShutdown", e);
         }
-
-        // Release all listeners/pools/webapps
-        this.threadPool.shutdown();
 
         if (this.controlThread != null) {
             this.controlThread.interrupt();
