@@ -1,6 +1,13 @@
 Changelog
 ===
 
+## 5.1
+
+Release date: Oct 06, 2018
+
+* Update Jetty from `9.4.11.v20180605` to `9.4.12.v20180830`
+  * [9.4.12 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.12.v20180830)
+
 ## 5.0
 
 Release date: Aug 29, 2018
