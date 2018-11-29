@@ -202,7 +202,10 @@ You have to include the used ALPN processor with an extra configuration option. 
 * [openjdk8](http://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-alpn-openjdk8-server/9.4.11.v20180605/)
 * [conscrypt](http://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-alpn-conscrypt-server/9.4.11.v20180605/)
 
+
 The jar must be included using the option: ``` --extraLibFolder=extra ``` (path to a directory containing the jars)
+
+With Java9+ you do not need anymore to include the ALPN jar in the bootclasspath but only the jar jetty-alpn-java-server in the ``` extraLibFolder ```
 
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
