@@ -1,6 +1,12 @@
 Changelog
 ===
 
+## 5.2
+
+Release date: ?
+
+* [JENKINS-56591](https://issues.jenkins-ci.org/browse/JENKINS-56591) cipher exclusion configurable
+
 ## 5.1
 
 Release date: Oct 06, 2018

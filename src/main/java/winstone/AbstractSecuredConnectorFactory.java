@@ -32,6 +32,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.logging.Level;
@@ -172,7 +173,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             // There are many legacy setups in which the KeyStore password and the
             // key password are identical and people will not even be aware that these
             // are two different things
-            // Therefore if no httpsPrivateKeyPassword is explicitely set we try to
+            // Therefore if no httpsPrivateKeyPassword is explicitly set we try to
             // use the KeyStore password also for the key password not to break
             // backward compatibility
             // Otherwise the following code will completely break the startup of
@@ -197,14 +198,20 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             }
 
             SslContextFactory ssl = new SslContextFactory();
-
             ssl.setKeyStore(keystore);
             ssl.setKeyStorePassword(keystorePassword);
             ssl.setKeyManagerPassword(privateKeyPassword);
             ssl.setKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             ssl.setExcludeProtocols("SSLv3", "SSLv2", "SSLv2Hello");
-
+            String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
+            if(excludeCiphers!=null&&excludeCiphers.length()>0) {
+                String[] cipherSuites = excludeCiphers.split(",");
+                ssl.setExcludeCipherSuites(cipherSuites);
+            }
+            Logger.log( Logger.INFO, SSL_RESOURCES, //
+                        "HttpsListener.ExcludeCiphers", //
+                        Arrays.asList(ssl.getExcludeCipherSuites()));
 
             /**
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
