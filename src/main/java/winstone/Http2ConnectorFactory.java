@@ -41,27 +41,20 @@ import java.util.Map;
  * by the command line, and owns the server socket, etc.
  *  @since 4.1
  */
-public class Http2ConnectorFactory
-    extends AbstractSecuredConnectorFactory
-    implements ConnectorFactory
-{
+public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
     @Override
-    public boolean start( Map args, Server server )
-        throws IOException
+    public boolean start( Map args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
         String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
 
-        if ( listenPort < 0 )
-        {
+        if ( listenPort < 0 ) {
             // not running HTTP2 listener
             return false;
         }
 
 
-        try
-        {
-
+        try {
             configureSsl( args, server );
             SslContextFactory sslContextFactory = getSSLContext( args );
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
@@ -92,9 +85,7 @@ public class Http2ConnectorFactory
             ALPN.debug = Boolean.getBoolean( "alpnDebug" );
 
             return true;
-        }
-        catch ( IllegalStateException e )
-        {
+        } catch ( IllegalStateException e ) {
             Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
         }
         return false;

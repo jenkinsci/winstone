@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -67,17 +68,22 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 this.keystorePassword = pwd;
 
                 keystore = KeyStore.getInstance("JKS");
-                keystore.load( new FileInputStream( keyStore), this.keystorePassword.toCharArray());
+                try(InputStream inputStream = new FileInputStream(keyStore)){
+                    keystore.load( inputStream, this.keystorePassword.toCharArray());
+                }
             } else if (opensslCert!=null) {
                 // load from openssl style key files
                 CertificateFactory cf = CertificateFactory.getInstance( "X509");
-                Certificate cert = cf.generateCertificate( new FileInputStream( opensslCert));
-                PrivateKey key = readPEMRSAPrivateKey( new FileReader( opensslKey));
+                try(InputStream inputStream = new FileInputStream( opensslCert); //
+                    FileReader fileReader = new FileReader(opensslKey)) {
+                    Certificate cert = cf.generateCertificate(inputStream);
+                    PrivateKey key = readPEMRSAPrivateKey(fileReader);
 
-                this.keystorePassword = "changeit";
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", key, keystorePassword.toCharArray(), new Certificate[]{cert});
+                    this.keystorePassword = "changeit";
+                    keystore = KeyStore.getInstance( "JKS" );
+                    keystore.load( null );
+                    keystore.setKeyEntry( "hudson", key, keystorePassword.toCharArray(), new Certificate[]{ cert } );
+                }
             } else {
                 // use self-signed certificate
                 this.keystorePassword = "changeit";

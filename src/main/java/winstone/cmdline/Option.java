@@ -20,7 +20,7 @@ public class Option<T> {
      * List up all the known options.
      */
     public static List<Option<?>> all(Class<?> clazz) {
-        List<Option<?>> r = new ArrayList<Option<?>>();
+        List<Option<?>> r = new ArrayList<>();
         for (Field f : clazz.getFields()) {
             if (Modifier.isStatic(f.getModifiers()) && Option.class.isAssignableFrom(f.getType())) {
                 try {

@@ -79,10 +79,11 @@ public class WinstoneControl {
         if (operation.equalsIgnoreCase(OPERATION_SHUTDOWN)) {
             Socket socket = new Socket(host, port);
             socket.setSoTimeout(TIMEOUT);
-            OutputStream out = socket.getOutputStream();
-            out.write(Launcher.SHUTDOWN_TYPE);
-            out.close();
-            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK",host, port);
+            try(OutputStream out = socket.getOutputStream()){
+                out.write( Launcher.SHUTDOWN_TYPE );
+                out.close();
+                Logger.log( Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
+            }
         }
 
         // check for reload
@@ -90,13 +91,12 @@ public class WinstoneControl {
             String webappName = operation.substring(OPERATION_RELOAD.length());
             Socket socket = new Socket(host, port);
             socket.setSoTimeout(TIMEOUT);
-            OutputStream out = socket.getOutputStream();
-            out.write(Launcher.RELOAD_TYPE);
-            ObjectOutputStream objOut = new ObjectOutputStream(out);
-            objOut.writeUTF(host);
-            objOut.writeUTF(webappName);
-            objOut.close();
-            out.close();
+            try(OutputStream out = socket.getOutputStream(); //
+                ObjectOutputStream objOut = new ObjectOutputStream( out )) {
+                out.write( Launcher.RELOAD_TYPE );
+                objOut.writeUTF( host );
+                objOut.writeUTF( webappName );
+            }
             Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",host, port);
         }
         else {

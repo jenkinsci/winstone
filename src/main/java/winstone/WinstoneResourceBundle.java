@@ -70,12 +70,12 @@ public class WinstoneResourceBundle {
      * Just does a string swap, replacing occurrences of from with to.
      */
     public static String globalReplace(String input, String fromMarker, String toValue) {
-        StringBuffer out = new StringBuffer(input);
+        StringBuilder out = new StringBuilder(input);
         globalReplace(out, fromMarker, toValue);
         return out.toString();
     }
     
-    private static void globalReplace(StringBuffer input, String fromMarker, String toValue) {
+    private static void globalReplace(StringBuilder input, String fromMarker, String toValue) {
         if (input == null) {
             return;
         } else if (fromMarker == null) {
@@ -96,7 +96,7 @@ public class WinstoneResourceBundle {
     
     public static String globalReplace(String input, String parameters[][]) {
         if (parameters != null) {
-            StringBuffer out = new StringBuffer(input);
+            StringBuilder out = new StringBuilder(input);
             for (String[] parameter : parameters) {
                 globalReplace(out, parameter[0], parameter[1]);
             }
