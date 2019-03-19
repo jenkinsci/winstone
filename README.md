@@ -51,8 +51,10 @@ To run different web applications for diffent virtual hosts:
 
 
 ## Command-line options
-    Usage: java winstone.Launcher [--option=value] [--option=value] [etc]
 
+    Winstone Servlet Engine v4.0, (c) 2003-2006 Rick Knowles
+    Usage: java winstone.jar [--option=value] [--option=value] [etc]
+    
     Required options: either --webroot OR --warfile OR --webappsDir OR --hostsDir
        --webroot                = set document root folder.
        --warfile                = set location of warfile to extract from.
@@ -63,12 +65,13 @@ To run different web applications for diffent virtual hosts:
        --config                 = load configuration properties from here. Default is ./winstone.properties
        --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
        --commonLibFolder        = folder for additional jar files. Default is ./lib
+    
        --extraLibFolder         = folder for additional jar files to add to Jetty classloader
-
+    
        --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
        --logThrowingThread      = show the thread that logged the message. Default is false
        --debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)
-
+    
        --httpPort               = set the http listening port. -1 to disable, Default is 8080
        --httpListenAddress      = set the http listening address. Default is all interfaces
        --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 5000)?
@@ -81,39 +84,45 @@ To run different web applications for diffent virtual hosts:
        --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
          / --httpsCertificate     file and the corresponding certificate file
        --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
-       --http2ListenAddress     = set the http2 listening address. Default is all interfaces         
+       --http2ListenAddress     = set the http2 listening address. Default is all interfaces
+       --excludeCipherSuites    = set the ciphers to exclude (comma separated, use blank quote " " to exclude none) (default is 
+                               // Exclude weak / insecure ciphers 
+                               "^.*_(MD5|SHA|SHA1)$", 
+                               // Exclude ciphers that don't support forward secrecy 
+                               "^TLS_RSA_.*$", 
+                               // The following exclusions are present to cleanup known bad cipher 
+                               // suites that may be accidentally included via include patterns. 
+                               // The default enabled cipher list in Java will not include these 
+                               // (but they are available in the supported list). 
+                               "^SSL_.*$", 
+                               "^.*_NULL_.*$", 
+                               "^.*_anon_.*$" 
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
-       
-       --requestHeaderSize      = sets the size of the buffer for request headers. Default is 8K.
-
+    
        --useJasper              = enable jasper JSP handling (true/false). Default is false
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
-       --sessionEviction        = Set the session eviction timeout for idle sessions. Default value is 30min.
-                                  (-1 is never evict; 0 is evict-on-exit; and any other positive value is the time 
-                                  in seconds that a session can be idle before it can be evicted)
+       --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 180. -1 never evict, 0 evict on exit
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
-       --useJmx                 = Enable Jetty JMX    
-       --qtpMaxThreadsCount     = max threads number when using Jetty Queued Thread Pool                           
+       --useJmx                 = Enable Jetty Jmx
+       --qtpMaxThreadsCount     = max threads number when using Jetty Queued Thread Pool
        --jettyAcceptorsCount    = Jetty Acceptors number
        --jettySelectorsCount    = Jetty Selectors number
        --usage / --help         = show this message
-
-    Security options:
+     Security options:
        --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
-
+    
        --argumentsRealm.passwd.<user> = Password for user <user>. Only valid for the ArgumentsRealm realm class
        --argumentsRealm.roles.<user>  = Roles for user <user> (comma separated). Only valid for the ArgumentsRealm realm class
-
+    
        --fileRealm.configFile         = File containing users/passwds/roles. Only valid for the FileRealm realm class
-
-    Access logging:
+    
+     Access logging:
        --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
        --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
        --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
-
 
 ## Configuration file
 You don't really need a config file, but sometimes it's handy to
