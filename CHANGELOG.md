@@ -6,6 +6,8 @@ Changelog
 Release date: ?
 
 * [JENKINS-56591](https://issues.jenkins-ci.org/browse/JENKINS-56591) cipher exclusion configurable
+* Update Jetty from `9.4.12.v20180830` to `9.4.15.v20190215`
+  * [9.4.15 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.15.v20190215)
 
 ## 5.1
 
