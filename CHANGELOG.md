@@ -3,7 +3,7 @@ Changelog
 
 ## 5.2
 
-Release date: ?
+Release date: March 22, 2019
 
 * [JENKINS-56591](https://issues.jenkins-ci.org/browse/JENKINS-56591) cipher exclusion configurable
 * Update Jetty from `9.4.12.v20180830` to `9.4.15.v20190215`
