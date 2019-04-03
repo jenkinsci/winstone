@@ -81,7 +81,6 @@ public class WinstoneControl {
             socket.setSoTimeout(TIMEOUT);
             try(OutputStream out = socket.getOutputStream()){
                 out.write( Launcher.SHUTDOWN_TYPE );
-                out.close();
                 Logger.log( Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
             }
         }
