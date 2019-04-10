@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.50</version>
+    <version>1.51</version>
     <relativePath />
   </parent>
 
@@ -256,6 +256,12 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jmx</artifactId>
       <version>${jetty.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.jenkins.lib</groupId>
+      <artifactId>support-log-formatter</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <!--  See https://github.com/eclipse/jetty.project/issues/134

@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
@@ -29,6 +30,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 
 /**
@@ -329,6 +332,11 @@ public class Launcher implements Runnable {
      * listener thread. For now, just shut it down with a control-C.
      */
     public static void main(String argv[]) throws IOException {
+        for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
+            if (h instanceof ConsoleHandler) {
+                ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
+            }
+        }
         Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
         Map args = getArgsFromCommandLine(argv);
