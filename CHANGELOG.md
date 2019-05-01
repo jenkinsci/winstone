@@ -3,10 +3,12 @@ Changelog
 
 ## 5.3
 
-Release date: April ?, 2019
+Release date: May ?, 2019
 
-* Update Jetty from `9.4.15.v20190215` to `9.4.17.v20190418`
+* Update Jetty from `9.4.15.v20190215` to `9.4.18.v20190429`
+  * [9.4.18 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.18.v20190429)
   * [9.4.17 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.17.v20190418)
+  * [9.4.16 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.16.v20190411)
 
 ## 5.2
 
