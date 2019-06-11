@@ -7,6 +7,14 @@
 
 package winstone;
 
+import org.bouncycastle.*;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jcajce.provider.keystore.PKCS12;
+import org.bouncycastle.jcajce.provider.symmetric.AES;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.util.io.pem.PemObjectParser;
+import org.bouncycastle.util.io.pem.PemReader;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -23,13 +31,12 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.KeyStore;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -122,44 +129,30 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     }
 
 
-    private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
-        // TODO: should have more robust format error handling
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (BufferedReader r = new BufferedReader( reader )) {
-                String line;
-                boolean in = false;
-                while ( ( line = r.readLine() ) != null ) {
-                    if ( line.startsWith( "-----" ) ) {
-                        in = !in;
-                        continue;
-                    }
-                    if ( in ) {
-                        baos.write( B64Code.decode( line ) );
-                    }
-                }
-            } finally {
-                reader.close();
-            }
+    private static PrivateKey readPEMRSAPrivateKey(Reader reader) {
 
-            BigInteger mod, privExpo;
-            try {
-                Class<?> disC = Class.forName( "sun.security.util.DerInputStream" );
-                Object dis = disC.getConstructor( byte[].class ).newInstance( (Object) baos.toByteArray() );
-                Object[] seq = (Object[]) disC.getMethod( "getSequence", int.class ).invoke( dis, 0 );
-                Method getBigInteger = seq[0].getClass().getMethod( "getBigInteger" );
-                // int v = seq[0].getInteger();
-                mod = (BigInteger) getBigInteger.invoke( seq[1] );
-                // pubExpo
-                // p1, p2, exp1, exp2, crtCoef
-                privExpo = (BigInteger) getBigInteger.invoke( seq[3] );
-            } catch ( Exception x ) {
-                throw new WinstoneException( SSL_RESOURCES.getString( "HttpsConnectorFactory.LoadPrivateKeyError" ), x );
-            }
-            Logger.log( Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.LoadPrivateKey" );
+        PEMParser pemParser = new PEMParser(reader);
+        PKCS8EncodedKeySpec privateKey = null;
 
-            KeyFactory kf = KeyFactory.getInstance( "RSA" );
-            return kf.generatePrivate( new RSAPrivateKeySpec( mod, privExpo ) );
+        try {
+            PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
+            privateKey = new PKCS8EncodedKeySpec(pemKeyPair.getPrivateKeyInfo().getEncoded());
         }
+        catch (IOException ioex) {
+            new IOException("Failed to read PrivateKey").initCause(ioex);
+        }
+
+        PrivateKey privateKeyOutput = null;
+        try {
+            privateKeyOutput = KeyFactory.getInstance("RSA").generatePrivate(privateKey);
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return  privateKeyOutput;
+
     }
 
     /**

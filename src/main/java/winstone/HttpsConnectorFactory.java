@@ -6,11 +6,7 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -31,32 +27,19 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
         int keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
 
-        if (listenPort<0) {
+        if (listenPort < 0) {
             // not running HTTPS listener
             return false;
         }
 
         configureSsl(args, server);
+        SslContextFactory sslcf = getSSLContext(args);
 
-        ServerConnector connector = createConnector(server,args);
-        connector.setPort(listenPort);
-        connector.setHost(listenAddress);
-        connector.setIdleTimeout(keepAliveTimeout);
-
-        HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
-        config.addCustomizer(new ForwardedRequestCustomizer());
-        config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-
-        server.addConnector(connector);
+        ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslcf);
+        server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
 
         return true;
+
     }
-
-    private ServerConnector createConnector(Server server, Map args) {
-        SslContextFactory sslcf = getSSLContext(args);
-        return new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args ),sslcf);
-    }
-
-
 
 }
