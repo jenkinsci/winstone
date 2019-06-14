@@ -19,8 +19,8 @@ public class ServerConnectorFactory {
     private Map args;
 
     public ServerConnectorFactory(Server server, Map args, SslContextFactory scf) {
-        server = server;
-        args = args;
+        this.server = server;
+        this.args = args;
 
         if(scf != null) {
             sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args), scf);
