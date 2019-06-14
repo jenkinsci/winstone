@@ -60,13 +60,13 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
             // HTTPS Configuration
-            HttpConfiguration https_config = new HttpConfiguration();
-            https_config.setSecureScheme("https");
-            https_config.setSecurePort(listenPort);
-            https_config.addCustomizer(new SecureRequestCustomizer());
+            HttpConfiguration httpsConfig = new HttpConfiguration();
+            httpsConfig.setSecureScheme("https");
+            httpsConfig.setSecurePort(listenPort);
+            httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
             // HTTP/2 Connection Factory
-            HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
+            HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(httpsConfig);
             ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
             alpn.setDefaultProtocol("h2");
 
@@ -76,7 +76,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             // HTTP/2 Connector
             ServerConnector http2Connector =
                 new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args )
-                    ,ssl,alpn,h2,new HttpConnectionFactory(https_config));
+                    ,ssl,alpn,h2,new HttpConnectionFactory(httpsConfig));
             http2Connector.setPort(listenPort);
             http2Connector.setHost( listenAddress );
             server.addConnector(http2Connector);
