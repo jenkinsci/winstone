@@ -7,37 +7,25 @@
 
 package winstone;
 
-import org.bouncycastle.*;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
-import org.bouncycastle.jcajce.provider.keystore.PKCS12;
-import org.bouncycastle.jcajce.provider.symmetric.AES;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.util.io.pem.PemObjectParser;
-import org.bouncycastle.util.io.pem.PemReader;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -139,16 +127,16 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             privateKey = new PKCS8EncodedKeySpec(pemKeyPair.getPrivateKeyInfo().getEncoded());
         }
         catch (IOException ioex) {
-            new IOException("Failed to read PrivateKey").initCause(ioex);
+            Logger.log(Level.WARNING, SSL_RESOURCES, ioex.getMessage());
         }
 
         PrivateKey privateKeyOutput = null;
         try {
             privateKeyOutput = KeyFactory.getInstance("RSA").generatePrivate(privateKey);
         } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
+            Logger.log(Level.WARNING, SSL_RESOURCES, e.getMessage());
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            Logger.log(Level.WARNING, SSL_RESOURCES, e.getMessage());
         }
 
         return  privateKeyOutput;
