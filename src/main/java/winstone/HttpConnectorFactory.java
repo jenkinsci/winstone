@@ -29,10 +29,11 @@ public class HttpConnectorFactory implements ConnectorFactory {
 
         if (listenPort < 0) {
             return false;
-        } else {
-
+        }
+        else {
             ServerConnectorFactory scf = new ServerConnectorFactory(server, args, null);
             server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
+
             return true;
         }
     }
