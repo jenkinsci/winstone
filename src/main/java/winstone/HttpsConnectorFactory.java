@@ -33,9 +33,9 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
         }
 
         configureSsl(args, server);
-        SslContextFactory sslcf = getSSLContext(args);
+        SslContextFactory sslConfig = getSSLContext(args);
 
-        ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslcf);
+        ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslConfig);
         server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
 
         return true;

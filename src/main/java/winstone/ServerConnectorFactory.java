@@ -33,7 +33,6 @@ public class ServerConnectorFactory {
 
     public ServerConnector getConnector(int listenPort, String listenAddress, int keepAliveTimeout) {
 
-
         sc.setPort(listenPort);
         sc.setHost(listenAddress);
         sc.setIdleTimeout(keepAliveTimeout);
@@ -42,7 +41,20 @@ public class ServerConnectorFactory {
         config.addCustomizer(new ForwardedRequestCustomizer());
         config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
 
+        if(Option.HTTP_HTTPS_REDIRECT.get(args)) {
+            setSecureForward(config);
+        }
+
         return sc;
 
     }
+
+    private void setSecureForward(HttpConfiguration httpConfig) {
+
+        httpConfig.addCustomizer(new SecureRequestCustomizer());
+        httpConfig.setSecureScheme("https");
+        httpConfig.setSecurePort(Option.HTTPS_PORT.get(args));
+
+    }
+
 }
