@@ -37,12 +37,12 @@ import java.util.logging.Level;
 /**
  * Implements the main launcher daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Launcher.java,v 1.29 2007/04/23 02:55:35 rickknowles Exp $
  */
 public class Launcher implements Runnable {
-    
+
     static final String HTTP_LISTENER_CLASS = "winstone.HttpConnectorFactory";
     static final String HTTPS_LISTENER_CLASS = "winstone.HttpsConnectorFactory";
     static final String HTTP2_LISTENER_CLASS = "winstone.Http2ConnectorFactory";
@@ -50,7 +50,7 @@ public class Launcher implements Runnable {
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
-    
+
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
 
     private Thread controlThread;
@@ -93,10 +93,8 @@ public class Launcher implements Runnable {
                 // first try - if it doesn't exist, try up one dir since we might have
                 // the JRE home by mistake
                 if (!toolsJar.exists()) {
-                    File javaHome2 = javaHome.getParentFile();
-                    File toolsJar2 = new File(javaHome2, "lib/tools.jar");
+                    File toolsJar2 = new File(javaHome.getParentFile(), "lib/tools.jar");
                     if (toolsJar2.exists()) {
-                        javaHome = javaHome2;
                         toolsJar = toolsJar2;
                     }
                 }
@@ -104,7 +102,7 @@ public class Launcher implements Runnable {
 
             // Add tools jar to classloader path
             if (toolsJar.exists()) {
-                jars.add(toolsJar.toURL());
+                jars.add(toolsJar.toURI().toURL());
                 commonLibCLPaths.add(toolsJar);
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                         toolsJar.getName());
@@ -117,14 +115,15 @@ public class Launcher implements Runnable {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
                 File children[] = libFolder.listFiles();
-                for (File aChildren : children)
-                    if (aChildren.getName().endsWith(".jar")
-                            || aChildren.getName().endsWith(".zip")) {
-                        jars.add(aChildren.toURL());
-                        commonLibCLPaths.add(aChildren);
-                        Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
-                                aChildren.getName());
-                    }
+                if (children != null)
+                    for (File aChildren : children)
+                        if (aChildren.getName().endsWith(".jar")
+                                || aChildren.getName().endsWith(".zip")) {
+                            jars.add(aChildren.toURI().toURL());
+                            commonLibCLPaths.add(aChildren);
+                            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
+                                    aChildren.getName());
+                        }
             } else {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
             }
@@ -133,11 +132,12 @@ public class Launcher implements Runnable {
             List<URL> extraJars = new ArrayList<>();
             if(extraLibFolder != null && extraLibFolder.exists()){
                 File[] children = extraLibFolder.listFiles();
-                for (File aChildren : children)
-                    if (aChildren.getName().endsWith(".jar")
-                        || aChildren.getName().endsWith(".zip")) {
-                        extraJars.add(aChildren.toURL());
-                    }
+                if (children != null)
+                    for (File aChildren : children)
+                        if (aChildren.getName().endsWith(".jar")
+                            || aChildren.getName().endsWith(".zip")) {
+                            extraJars.add(aChildren.toURI().toURL());
+                        }
             }
 
             ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[jars.size()]),
@@ -204,9 +204,9 @@ public class Launcher implements Runnable {
     }
 
     /**
-     * Instantiates listeners. Note that an exception thrown in the 
-     * constructor is interpreted as the listener being disabled, so 
-     * don't do anything too adventurous in the constructor, or if you do, 
+     * Instantiates listeners. Note that an exception thrown in the
+     * constructor is interpreted as the listener being disabled, so
+     * don't do anything too adventurous in the constructor, or if you do,
      * catch and log any errors locally before rethrowing.
      */
     protected void spawnListener(String listenerClassName) throws IOException {
@@ -278,7 +278,6 @@ public class Launcher implements Runnable {
 
     protected void handleControlRequest(Socket csAccepted) throws IOException {
         InputStream inSocket = null;
-        OutputStream outSocket = null;
         ObjectInputStream inControl = null;
         try {
             inSocket = csAccepted.getInputStream();
@@ -302,12 +301,9 @@ public class Launcher implements Runnable {
             if (inSocket != null) {
                 try {inSocket.close();} catch (IOException err) {}
             }
-            if (outSocket != null) {
-                try {outSocket.close();} catch (IOException err) {}
-            }
         }
     }
-    
+
     public void shutdown() {
         try {
             server.stop();
@@ -326,7 +322,7 @@ public class Launcher implements Runnable {
     public boolean isRunning() {
         return (this.controlThread != null) && this.controlThread.isAlive();
     }
-    
+
     /**
      * Main method. This basically just accepts a few args, then initialises the
      * listener thread. For now, just shut it down with a control-C.
@@ -340,7 +336,7 @@ public class Launcher implements Runnable {
         Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
         Map args = getArgsFromCommandLine(argv);
-        
+
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
             printUsage();
             return;
@@ -348,7 +344,7 @@ public class Launcher implements Runnable {
 
         // Check for embedded war
         deployEmbeddedWarfile(args);
-        
+
         // Check for embedded warfile
         if (!Option.WEBROOT.isIn(args) && !Option.WARFILE.isIn(args)
          && !Option.WEBAPPS_DIR.isIn(args)) {
@@ -366,14 +362,14 @@ public class Launcher implements Runnable {
             System.exit(1);
         }
     }
-    
+
     public static Map getArgsFromCommandLine(String argv[]) throws IOException {
         Map args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
-        
+
         // Small hack to allow re-use of the command line parsing inside the control tool
         String firstNonSwitchArgument = (String) args.get("nonSwitch");
         args.remove("nonSwitch");
-        
+
         // Check if the non-switch arg is a file or folder, and overwrite the config
         if (firstNonSwitchArgument != null) {
             File webapp = new File(firstNonSwitchArgument);
@@ -390,17 +386,21 @@ public class Launcher implements Runnable {
 
     protected static void deployEmbeddedWarfile(Map args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
-        InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
-                embeddedWarfileName);
-        if (embeddedWarfile != null) {
+        try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
+                embeddedWarfileName)) {
             File tempWarfile = File.createTempFile("embedded", ".war").getAbsoluteFile();
-            tempWarfile.getParentFile().mkdirs();
+            File parentTempWarFile = tempWarfile.getParentFile();
+            if (!parentTempWarFile.mkdirs()) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), null);
+            }
             tempWarfile.deleteOnExit();
 
             String embeddedWebroot = RESOURCES.getString("Launcher.EmbeddedWebroot");
             File tempWebroot = new File(tempWarfile.getParentFile(), embeddedWebroot);
-            tempWebroot.mkdirs();
-            
+            if (!tempWebroot.mkdirs()) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), null);
+            }
+
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
                     tempWarfile.getAbsolutePath());
             OutputStream out = new FileOutputStream(tempWarfile, true);
@@ -410,18 +410,17 @@ public class Launcher implements Runnable {
                 out.write(buffer, 0, read);
             }
             out.close();
-            embeddedWarfile.close();
-            
+
             Option.WARFILE.put(args, tempWarfile.getAbsolutePath());
             Option.WARFILE.put(args, tempWebroot.getAbsolutePath());
             Option.WEBAPPS_DIR.remove(args);
         }
     }
-    
+
     public static void initLogger(Map args) throws IOException {
         // Reset the log level
         int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
-        boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
+        // boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
         if (args.get("logfile") != null) {

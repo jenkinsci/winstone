@@ -15,14 +15,14 @@ import java.util.Map;
 /**
  * Implements the main listener daemon thread. This is the class that gets
  * launched by the command line, and owns the server socket, etc.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Ajp13ConnectorFactory.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
 public class Ajp13ConnectorFactory implements ConnectorFactory {
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.AJP13_PORT.get(args);
-        String listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
+        // String listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
 
         if (listenPort < 0) {
             return false;

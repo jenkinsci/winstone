@@ -21,25 +21,25 @@ import static winstone.Launcher.*;
  */
 public class CmdLineParser {
     private final List<Option<?>> options;
-    
+
     public CmdLineParser(List<Option<?>> options) {
         this.options = options;
     }
 
     public Map<String,String> parse(String[] argv, String nonSwitchArgName) throws IOException {
         Map<String,String> args = new HashMap<String,String>();
-        
-        // Load embedded properties file 
+
+        // Load embedded properties file
         String embeddedPropertiesFilename = RESOURCES.getString(
                 "Launcher.EmbeddedPropertiesFile");
-        
+
         try (InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
                 embeddedPropertiesFilename)) {
             if ( embeddedPropsStream != null ) {
                 loadPropsFromStream( embeddedPropsStream, args );
             }
         }
-        
+
         // Get command line args
         String configFilename = RESOURCES.getString("Launcher.DefaultPropertyFile");
         for (String option : argv) {
@@ -84,7 +84,7 @@ public class CmdLineParser {
         return args;
     }
 
-    private static void loadPropsFromStream(InputStream inConfig, Map args) throws IOException {
+    private static void loadPropsFromStream(InputStream inConfig, Map<String,String> args) throws IOException {
         Properties props = new Properties();
         props.load(inConfig);
         for (Object o : props.keySet()) {

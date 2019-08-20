@@ -19,7 +19,7 @@ import javax.servlet.ServletResponse;
 
 /**
  * Simple timing and request dumping test filter
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: TimingFilter.java,v 1.2 2006/02/28 07:32:50 rickknowles Exp $
  */
@@ -47,9 +47,9 @@ public class TimingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         if (this.dumpRequestParams)
-            for (Enumeration paramNames = request.getParameterNames(); paramNames
+            for (Enumeration<String> paramNames = request.getParameterNames(); paramNames
                     .hasMoreElements();) {
-                String name = (String) paramNames.nextElement();
+                String name = paramNames.nextElement();
                 this.context.log("Request parameter: " + name + "="
                         + request.getParameter(name));
             }

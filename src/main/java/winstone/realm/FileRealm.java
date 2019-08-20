@@ -34,12 +34,12 @@ import static org.eclipse.jetty.util.security.Credential.*;
  */
 public class FileRealm extends HashLoginService {
     private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
-    
-    final String DEFAULT_FILE_NAME = "users.xml";
-    final String ELEM_USER = "user";
-    final String ATT_USERNAME = "username";
-    final String ATT_PASSWORD = "password";
-    final String ATT_ROLELIST = "roles";
+
+    static final String DEFAULT_FILE_NAME = "users.xml";
+    static final String ELEM_USER = "user";
+    static final String ATT_USERNAME = "username";
+    static final String ATT_PASSWORD = "password";
+    static final String ATT_ROLELIST = "roles";
 
     /**
      * Constructor - this sets up an authentication realm, using the file
