@@ -22,7 +22,6 @@ import java.util.Map;
 public class Ajp13ConnectorFactory implements ConnectorFactory {
     public boolean start(Map args, Server server) throws IOException {
         int listenPort = Option.AJP13_PORT.get(args);
-        // String listenAddress = Option.AJP13_LISTEN_ADDRESS.get(args);
 
         if (listenPort < 0) {
             return false;
