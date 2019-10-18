@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -275,9 +277,10 @@ public class HostConfiguration {
                     if (outFile.exists() && (outFile.lastModified() > warfile.lastModified())) {
                         continue;
                     }
-                    File parentOutFile = outFile.getParentFile();
-                    if (!parentOutFile.mkdirs()) {
-                        Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + parentOutFile.getAbsolutePath(), null);
+                    try {
+                        Files.createDirectories(Paths.get(outFile.getParent()));
+                    } catch (IOException | SecurityException ex) {
+                        Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
                     }
 
                     // Copy out the extracted file
