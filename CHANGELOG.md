@@ -1,4 +1,4 @@
-Changelog
+Changelog (old)
 ===
 
 ## 5.4
@@ -113,6 +113,15 @@ Jetty 9.4.5: Prevent the <i>400 Bad Host header</i> error for <code>HttpChannelO
 ([Jetty issue #592](https://github.com/eclipse/jetty.project/issues/592)).
 * Update minimal Java requirement to Java 8
 
-## Previous releases
+## 3.0
 
-See the commit history.
+* Jetty is now upgraded to 9.2 to bring the servlet 3.1 support. Winstone now requires Java7.
+* AJP support was dropped due to the discontinuation of the AJP support in Jetty
+
+## 2.0
+
+* The engine is now Jetty 8.x, instead of the original from-scratch implementation
+
+## Pre-1.0
+
+See [the upstream changelog](http://winstone.sourceforge.net/#recent).
