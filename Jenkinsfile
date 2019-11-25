@@ -8,11 +8,7 @@ properties([[$class: 'BuildDiscarderProperty',
 /* These platforms correspond to labels in ci.jenkins.io, see:
  *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
  */
-List platforms = ['linux', 'windows']
-Map branches = [:]
-
-for (int i = 0; i < platforms.size(); ++i) {
-    String label = platforms[i]
+['maven', 'maven-windows'].each {label ->
     branches[label] = {
         node(label) {
             timestamps {
@@ -22,7 +18,7 @@ for (int i = 0; i < platforms.size(); ++i) {
 
                 stage('Build') {
                     timeout(30) {
-                        infra.runMaven(['clean', 'install', '-Dmaven.test.failure.ignore=true'])
+                        infra.runMaven(['clean', 'install', '-Dset.changelist', '-Dmaven.test.failure.ignore=true'], 8, null, null, false)
                     }
                 }
 
@@ -30,8 +26,9 @@ for (int i = 0; i < platforms.size(); ++i) {
                     /* Archive the test results */
                     junit '**/target/surefire-reports/TEST-*.xml'
 
-                    /* Archive the build artifacts */
-                    archiveArtifacts artifacts: 'target/**/*.jar'
+                    if (label == 'maven') {
+                        infra.prepareToPublishIncrementals()
+                    }
                 }
             }
         }
@@ -40,3 +37,5 @@ for (int i = 0; i < platforms.size(); ++i) {
 
 /* Execute our platforms in parallel */
 parallel(branches)
+
+infra.maybePublishIncrementals()
