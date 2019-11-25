@@ -8,21 +8,26 @@ properties([[$class: 'BuildDiscarderProperty',
 /* These platforms correspond to labels in ci.jenkins.io, see:
  *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
  */
-List platforms = ['linux', 'windows']
 Map branches = [:]
-
-for (int i = 0; i < platforms.size(); ++i) {
-    String label = platforms[i]
+['maven', 'maven-windows'].each {label ->
     branches[label] = {
         node(label) {
-            timestamps {
-                stage('Checkout') {
-                    checkout scm
-                }
+            stage('Checkout') {
+                checkout scm
+            }
 
+            def settingsXml = "${pwd tmp: true}/settings-azure.xml"
+            def ok = infra.retrieveMavenSettingsFile(settingsXml)
+            assert ok
+            withEnv(["MAVEN_SETTINGS=$settingsXml"]) {
                 stage('Build') {
                     timeout(30) {
-                        infra.runMaven(['clean', 'install', '-Dmaven.test.failure.ignore=true'])
+                        String command = 'mvn -B -ntp -Dset.changelist -Dmaven.test.failure.ignore install'
+                        if (isUnix()) {
+                            sh command
+                        } else {
+                            bat command
+                        }
                     }
                 }
 
@@ -30,8 +35,9 @@ for (int i = 0; i < platforms.size(); ++i) {
                     /* Archive the test results */
                     junit '**/target/surefire-reports/TEST-*.xml'
 
-                    /* Archive the build artifacts */
-                    archiveArtifacts artifacts: 'target/**/*.jar'
+                    if (label == 'maven') {
+                        infra.prepareToPublishIncrementals()
+                    }
                 }
             }
         }
@@ -40,3 +46,5 @@ for (int i = 0; i < platforms.size(); ++i) {
 
 /* Execute our platforms in parallel */
 parallel(branches)
+
+infra.maybePublishIncrementals()
