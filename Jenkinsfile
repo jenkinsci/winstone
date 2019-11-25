@@ -12,7 +12,6 @@ Map branches = [:]
 ['maven', 'maven-windows'].each {label ->
     branches[label] = {
         node(label) {
-            timestamps {
                 stage('Checkout') {
                     checkout scm
                 }
@@ -31,7 +30,6 @@ Map branches = [:]
                         infra.prepareToPublishIncrementals()
                     }
                 }
-            }
         }
     }
 }
