@@ -12,13 +12,17 @@ Map branches = [:]
 ['maven', 'maven-windows'].each {label ->
     branches[label] = {
         node(label) {
-                stage('Checkout') {
-                    checkout scm
-                }
+            stage('Checkout') {
+                checkout scm
+            }
 
+            def settingsXml = "${pwd tmp: true}/settings-azure.xml"
+            def ok = infra.retrieveMavenSettingsFile(settingsXml)
+            assert ok
+            withEnv(["MAVEN_SETTINGS=$settingsXml"]) {
                 stage('Build') {
                     timeout(30) {
-                        infra.runMaven(['clean', 'install', '-Dset.changelist', '-Dmaven.test.failure.ignore=true'], 8, null, null, false)
+                        sh 'mvn -B -ntp -Dset.changelist -Dmaven.test.failure.ignore install'
                     }
                 }
 
@@ -30,6 +34,7 @@ Map branches = [:]
                         infra.prepareToPublishIncrementals()
                     }
                 }
+            }
         }
     }
 }
