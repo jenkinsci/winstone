@@ -1,6 +1,14 @@
 Changelog (old)
 ===
 
+## 5.5
+
+Release date: Sometime in the future
+
+* Update Jetty from `9.4.22.v20191022` to `9.4.24.v20191120`
+  * [9.4.24 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.24.v20191120)
+  * [9.4.23 changelog](https://github.com/eclipse/jetty.project/releases/tag/jetty-9.4.23.v20191118)
+
 ## 5.4
 
 Release date: Nov 9, 2019
