@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -235,8 +236,11 @@ public class HostConfiguration {
                         (userName != null ? WinstoneResourceBundle.globalReplace(userName,
                                 new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
                         "winstone/" + warfile.getName());
-                if (!tempFile.delete()) {
-                    Logger.logDirectMessage(Logger.WARNING, null, "Failed To delete dummy file", null);
+
+                try {
+                    Files.delete(tempFile.toPath());
+                } catch (Exception ex) {
+                    Logger.logDirectMessage(Logger.WARNING, null, "Failed To delete dummy file", ex);
                 }
             }
             if (unzippedDir.exists()) {
@@ -254,8 +258,10 @@ public class HostConfiguration {
             if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()- warfile.lastModified())>1000) {
                 // contents of the target directory is inconsistent from the war.
                 deleteRecursive(unzippedDir);
-                if (!unzippedDir.mkdirs()) {
-                    Logger.logDirectMessage(Logger.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), null);
+                try {
+                    Files.createDirectories(unzippedDir.toPath());
+                } catch (Exception ex) {
+                    Logger.logDirectMessage(Logger.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
                 }
             } else {
                 // files are up to date
@@ -278,8 +284,8 @@ public class HostConfiguration {
                         continue;
                     }
                     try {
-                        Files.createDirectories(Paths.get(outFile.getParent()));
-                    } catch (IOException | SecurityException ex) {
+                        Files.createDirectories(outFile.toPath().getParent());
+                    } catch (IOException | InvalidPathException | SecurityException ex) {
                         Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
                     }
 
@@ -315,8 +321,10 @@ public class HostConfiguration {
                 deleteRecursive(child);
             }
         }
-        if (!dir.delete()) {
-            Logger.logDirectMessage(Logger.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), null);
+        try {
+            Files.delete(dir.toPath());
+        } catch (Exception ex) {
+            Logger.logDirectMessage(Logger.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
         }
     }
 
@@ -359,8 +367,10 @@ public class HostConfiguration {
 
                         if (!this.webapps.containsKey(prefix)) {
                             File outputDir = new File(webappsDir, outputName);
-                            if (!outputDir.mkdirs()) {
-                                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), null);
+                            try {
+                                Files.createDirectories(outputDir.toPath());
+                            } catch (Exception ex) {
+                                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), ex);
                             }
                             try {
                                 WebAppContext context = create(

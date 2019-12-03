@@ -27,6 +27,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -390,15 +391,19 @@ public class Launcher implements Runnable {
                 embeddedWarfileName)) {
             File tempWarfile = File.createTempFile("embedded", ".war").getAbsoluteFile();
             File parentTempWarFile = tempWarfile.getParentFile();
-            if (!parentTempWarFile.mkdirs()) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), null);
+            try {
+                Files.createDirectories(parentTempWarFile.toPath());
+            } catch (Exception ex) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), ex);
             }
             tempWarfile.deleteOnExit();
 
             String embeddedWebroot = RESOURCES.getString("Launcher.EmbeddedWebroot");
             File tempWebroot = new File(tempWarfile.getParentFile(), embeddedWebroot);
-            if (!tempWebroot.mkdirs()) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), null);
+            try {
+                Files.createDirectories(tempWebroot.toPath());
+            } catch (Exception ex) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), ex);
             }
 
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
