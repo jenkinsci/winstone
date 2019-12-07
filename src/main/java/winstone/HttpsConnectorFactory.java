@@ -6,11 +6,16 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.*;
+import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +31,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
         int listenPort = Option.HTTPS_PORT.get(args);
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
         int keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
+        boolean redirectToHttps = Option.HTTP_HTTPS_REDIRECT.get(args);
 
         if (listenPort < 0) {
             // not running HTTPS listener
@@ -37,6 +43,10 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
 
         ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslConfig);
         server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
+
+        if(redirectToHttps) {
+            server.setHandler(new SecuredRedirectHandler());
+        }
 
         return true;
 
