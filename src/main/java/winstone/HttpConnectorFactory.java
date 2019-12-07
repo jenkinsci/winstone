@@ -7,7 +7,6 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.security.Constraint;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
