@@ -6,7 +6,10 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -37,7 +40,7 @@ public class ServerConnectorFactory {
         sc.setHost(listenAddress);
         sc.setIdleTimeout(keepAliveTimeout);
 
-        HttpConfiguration config = sc.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        HttpConfiguration config = sc.getConnectionFactory(HttpConnectorFactory.class).getHttpConfiguration();
         config.addCustomizer(new ForwardedRequestCustomizer());
         config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
 

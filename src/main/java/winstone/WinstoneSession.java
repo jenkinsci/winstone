@@ -6,12 +6,12 @@ package winstone;
  * @author Kohsuke Kawaguchi
  */
 public class WinstoneSession {
+
+    private WinstoneSession(){}
+
     /**
      * Name of the cookie that stores HTTP session ID.
      */
-    // @SuppressFBWarnings(value = "MS_SHOULD_BE_FINAL", justification = "mutated by extras-executable-war")
-    public static String SESSION_COOKIE_NAME = "JSESSIONID";
-
-    private WinstoneSession() {}
+    public static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
 }
