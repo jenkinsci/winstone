@@ -7,6 +7,7 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.security.Constraint;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -33,7 +34,6 @@ public class HttpConnectorFactory implements ConnectorFactory {
         else {
             ServerConnectorFactory scf = new ServerConnectorFactory(server, args, null);
             server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
-
             return true;
         }
     }
