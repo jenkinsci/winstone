@@ -49,13 +49,4 @@ public class WinstoneException extends RuntimeException {
         return getCause();
     }
 
-    /**
-     * Set the nested error or exception
-     * 
-     * @param pError
-     *            The nested error or exception
-     */
-    private void setNestedError(Throwable pError) {
-        initCause(pError);
-    }
 }

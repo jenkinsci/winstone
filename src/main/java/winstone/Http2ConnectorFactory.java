@@ -45,14 +45,16 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
     @Override
     public boolean start( Map args, Server server ) throws IOException
     {
+
         int listenPort = Option.HTTP2_PORT.get( args );
         String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
+        int jettyAcceptors = Option.JETTY_ACCEPTORS.get( args );
+        int jettySelectors = Option.JETTY_SELECTORS.get( args );
 
         if ( listenPort < 0 ) {
             // not running HTTP2 listener
             return false;
         }
-
 
         try {
             configureSsl( args, server );
@@ -74,9 +76,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory,alpn.getProtocol());
 
             // HTTP/2 Connector
-            ServerConnector http2Connector =
-                new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args )
-                    ,ssl,alpn,h2,new HttpConnectionFactory(httpsConfig));
+            ServerConnector http2Connector = new ServerConnector(server, jettyAcceptors,jettySelectors ,ssl,alpn,h2, new HttpConnectionFactory(httpsConfig));
             http2Connector.setPort(listenPort);
             http2Connector.setHost( listenAddress );
             server.addConnector(http2Connector);
