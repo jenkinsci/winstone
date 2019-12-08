@@ -6,12 +6,8 @@ package winstone;
  * @author Kohsuke Kawaguchi
  */
 public class WinstoneSession {
-
-    private WinstoneSession(){}
-
     /**
      * Name of the cookie that stores HTTP session ID.
      */
-    public static final String SESSION_COOKIE_NAME = "JSESSIONID";
-
+    public static String SESSION_COOKIE_NAME = "JSESSIONID";
 }

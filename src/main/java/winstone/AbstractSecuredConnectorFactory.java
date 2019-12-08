@@ -131,13 +131,15 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             privateKey = new PKCS8EncodedKeySpec(pemKeyPair.getPrivateKeyInfo().getEncoded());
         }
         catch (IOException ioex) {
-            throw new WinstoneException(ioex.getMessage(),ioex);
+            Logger.log(Level.WARNING, SSL_RESOURCES, ioex.getMessage());
         }
 
         PrivateKey privateKeyOutput = null;
         try {
             privateKeyOutput = KeyFactory.getInstance("RSA").generatePrivate(privateKey);
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+        } catch (InvalidKeySpecException e) {
+            Logger.log(Level.WARNING, SSL_RESOURCES, e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
             throw new WinstoneException(e.getMessage(),e);
         }
 
