@@ -27,15 +27,16 @@ import java.util.Map;
  * @version $Id: WinstoneControl.java,v 1.6 2006/03/13 15:37:29 rickknowles Exp $
  */
 public class WinstoneControl {
-    private final static WinstoneResourceBundle TOOLS_RESOURCES = new WinstoneResourceBundle("winstone.tools.LocalStrings");
-    
-    final static String OPERATION_SHUTDOWN = "shutdown";
-    final static String OPERATION_RELOAD = "reload:";
+    private static final WinstoneResourceBundle TOOLS_RESOURCES = new WinstoneResourceBundle("winstone.tools.LocalStrings");
+
+    static final String OPERATION_SHUTDOWN = "shutdown";
+    static final String OPERATION_RELOAD = "reload:";
     static int TIMEOUT = 10000;
 
-    public static OInt CONTROL_PORT = Option.integer("controlPort");
+    public static final OInt CONTROL_PORT = Option.integer("controlPort");
     public static OInt PORT = Option.integer("port");
     public static OInt DEBUG = new OInt("debug", 5) {
+        @Override
         public int get(Map args) {
             switch(super.get(args)) {
                 // before switching to java.util.Logging, winstone used a (1:9) range for log levels
