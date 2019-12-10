@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -36,7 +39,7 @@ import java.util.jar.JarFile;
 /**
  * Manages the references to individual webapps within the container. This object handles
  * the mapping of url-prefixes to webapps, and init and shutdown of any webapps it manages.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostConfiguration.java,v 1.8 2007/08/02 06:16:00 rickknowles Exp $
  */
@@ -61,8 +64,8 @@ public class HostConfiguration {
 
         try {
             // Build the realm
-            Class realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
-            Constructor realmConstr = realmClass.getConstructor(Map.class);
+            Class<? extends LoginService> realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
+            Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
             loginService = (LoginService) realmConstr.newInstance(args);
         } catch (Throwable err) {
             throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
@@ -133,10 +136,10 @@ public class HostConfiguration {
      */
     private Handler configureAccessLog(Handler handler, String webAppName) {
         try {
-            Class loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
+            Class<? extends RequestLog> loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
             if (loggerClass!=null) {
                 // Build the realm
-                Constructor loggerConstr = loggerClass.getConstructor(String.class, Map.class);
+                Constructor<? extends RequestLog> loggerConstr = loggerClass.getConstructor(String.class, Map.class);
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setHandler(handler);
                 rlh.setRequestLog((RequestLog) loggerConstr.newInstance(webAppName, args));
@@ -192,7 +195,7 @@ public class HostConfiguration {
     public String getHostname() {
         return this.hostname;
     }
-    
+
     public void reloadWebApp(String prefix) {
         WebAppContext webApp = this.webapps.get(prefix);
         if (webApp != null) {
@@ -230,10 +233,15 @@ public class HostConfiguration {
                 File tempFile = File.createTempFile("dummy", "dummy");
                 String userName = System.getProperty("user.name");
                 unzippedDir = new File(tempFile.getParent(),
-                        (userName != null ? WinstoneResourceBundle.globalReplace(userName, 
+                        (userName != null ? WinstoneResourceBundle.globalReplace(userName,
                                 new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
                         "winstone/" + warfile.getName());
-                tempFile.delete();
+
+                try {
+                    Files.delete(tempFile.toPath());
+                } catch (Exception ex) {
+                    Logger.logDirectMessage(Logger.WARNING, null, "Failed To delete dummy file", ex);
+                }
             }
             if (unzippedDir.exists()) {
                 if (!unzippedDir.isDirectory()) {
@@ -250,43 +258,54 @@ public class HostConfiguration {
             if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()- warfile.lastModified())>1000) {
                 // contents of the target directory is inconsistent from the war.
                 deleteRecursive(unzippedDir);
-                unzippedDir.mkdirs();
+                try {
+                    Files.createDirectories(unzippedDir.toPath());
+                } catch (Exception ex) {
+                    Logger.logDirectMessage(Logger.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
+                }
             } else {
                 // files are up to date
                 return unzippedDir;
             }
-            
+
             // Iterate through the files
             byte buffer[] = new byte[8192];
-            JarFile warArchive = new JarFile(warfile);
-            for (Enumeration e = warArchive.entries(); e.hasMoreElements();) {
-                JarEntry element = (JarEntry) e.nextElement();
-                if (element.isDirectory()) {
-                    continue;
-                }
-                String elemName = element.getName();
+            try (JarFile warArchive = new JarFile(warfile)) {
+                for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements();) {
+                    JarEntry element = e.nextElement();
+                    if (element.isDirectory()) {
+                        continue;
+                    }
+                    String elemName = element.getName();
 
-                // If archive date is newer than unzipped file, overwrite
-                File outFile = new File(unzippedDir, elemName);
-                if (outFile.exists() && (outFile.lastModified() > warfile.lastModified())) {
-                    continue;
-                }
-                outFile.getParentFile().mkdirs();
+                    // If archive date is newer than unzipped file, overwrite
+                    File outFile = new File(unzippedDir, elemName);
+                    if (outFile.exists() && (outFile.lastModified() > warfile.lastModified())) {
+                        continue;
+                    }
+                    try {
+                        Files.createDirectories(outFile.toPath().getParent());
+                    } catch (IOException | InvalidPathException | SecurityException ex) {
+                        Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
+                    }
 
-                // Copy out the extracted file
-                try (InputStream inContent = warArchive.getInputStream(element);
-                        OutputStream outStream = new FileOutputStream(outFile)) {
-                    int readBytes = inContent.read( buffer );
-                    while ( readBytes != -1 ) {
-                        outStream.write( buffer, 0, readBytes );
-                        readBytes = inContent.read( buffer );
+                    // Copy out the extracted file
+                    try (InputStream inContent = warArchive.getInputStream(element);
+                            OutputStream outStream = new FileOutputStream(outFile)) {
+                        int readBytes = inContent.read( buffer );
+                        while ( readBytes != -1 ) {
+                            outStream.write( buffer, 0, readBytes );
+                            readBytes = inContent.read( buffer );
+                        }
                     }
                 }
             }
 
             // extraction completed
             new FileOutputStream(timestampFile).close();
-            timestampFile.setLastModified(warfile.lastModified());
+            if(!timestampFile.setLastModified(warfile.lastModified())) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to set timestamp " + timestampFile.getAbsolutePath(), null);
+            }
 
             // Return webroot
             return unzippedDir;
@@ -302,7 +321,11 @@ public class HostConfiguration {
                 deleteRecursive(child);
             }
         }
-        dir.delete();
+        try {
+            Files.delete(dir.toPath());
+        } catch (Exception ex) {
+            Logger.logDirectMessage(Logger.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
+        }
     }
 
     protected ContextHandlerCollection initMultiWebappDir(File webappsDir) {
@@ -317,40 +340,46 @@ public class HostConfiguration {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
         } else {
             File children[] = webappsDir.listFiles();
-            for (File aChildren : children) {
-                String childName = aChildren.getName();
+            if (children != null) {
+                for (File aChildren : children) {
+                    String childName = aChildren.getName();
 
-                // Check any directories for warfiles that match, and skip: only deploy the war file
-                if (aChildren.isDirectory()) {
-                    File matchingWarFile = new File(webappsDir, aChildren.getName() + ".war");
-                    if (matchingWarFile.exists() && matchingWarFile.isFile()) {
-                        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
-                    } else {
-                        String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
+                    // Check any directories for warfiles that match, and skip: only deploy the war file
+                    if (aChildren.isDirectory()) {
+                        File matchingWarFile = new File(webappsDir, aChildren.getName() + ".war");
+                        if (matchingWarFile.exists() && matchingWarFile.isFile()) {
+                            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
+                        } else {
+                            String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
+                            if (!this.webapps.containsKey(prefix)) {
+                                try {
+                                    WebAppContext context = create(aChildren, prefix);
+                                    webApps.addHandler(configureAccessLog(context,childName));
+                                    Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
+                                } catch (Throwable err) {
+                                    Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
+                                }
+                            }
+                        }
+                    } else if (childName.endsWith(".war")) {
+                        String outputName = childName.substring(0, childName.lastIndexOf(".war"));
+                        String prefix = outputName.equalsIgnoreCase("ROOT") ? "" : "/" + outputName;
+
                         if (!this.webapps.containsKey(prefix)) {
+                            File outputDir = new File(webappsDir, outputName);
                             try {
-                                WebAppContext context = create(aChildren, prefix);
-                                webApps.addHandler(configureAccessLog(context,childName));
+                                Files.createDirectories(outputDir.toPath());
+                            } catch (Exception ex) {
+                                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), ex);
+                            }
+                            try {
+                                WebAppContext context = create(
+                                        getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
+                                webApps.addHandler(configureAccessLog(context,outputName));
                                 Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
                                 Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
                             }
-                        }
-                    }
-                } else if (childName.endsWith(".war")) {
-                    String outputName = childName.substring(0, childName.lastIndexOf(".war"));
-                    String prefix = outputName.equalsIgnoreCase("ROOT") ? "" : "/" + outputName;
-
-                    if (!this.webapps.containsKey(prefix)) {
-                        File outputDir = new File(webappsDir, outputName);
-                        outputDir.mkdirs();
-                        try {
-                            WebAppContext context = create(
-                                    getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
-                            webApps.addHandler(configureAccessLog(context,outputName));
-                            Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
-                        } catch (Throwable err) {
-                            Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
                         }
                     }
                 }

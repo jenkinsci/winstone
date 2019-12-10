@@ -38,8 +38,7 @@ public class AbstractWinstoneTest extends Assert {
     }
 
     protected void assertConnectionRefused(String host, int port) throws IOException {
-        try {
-            new Socket(host, port);
+        try (Socket s = new Socket(host,port)) {
             fail("shouldn't be listening on 127.0.0.1");
         } catch (ConnectException e) {
             // expected

@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,29 +18,28 @@ import java.util.logging.Level;
  * A utility class for logging event and status messages. It maintains a
  * collection of streams for different types of messages, but any messages with
  * unknown or unspecified stream go to the default stream.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: Logger.java,v 1.8 2006/11/09 06:01:43 rickknowles Exp $
  */
 public class Logger {
-    
-    public final static String DEFAULT_STREAM = "Winstone";
-    public static Level MIN = Level.OFF;
-    public static Level ERROR = Level.SEVERE;
-    public static Level WARNING = Level.WARNING;
-    public static Level INFO = Level.INFO;
-    public static Level SPEED = Level.FINE;
-    public static Level DEBUG = Level.FINER;
-    public static Level FULL_DEBUG = Level.FINEST;
-    public static Level MAX = Level.ALL;
 
-    protected static Boolean semaphore = true;
-    protected static boolean initialised = false;
-    protected static Writer defaultStream;
-    protected static Map namedStreams;
+    public final static String DEFAULT_STREAM = "Winstone";
+    public final static Level MIN = Level.OFF;
+    public final static Level ERROR = Level.SEVERE;
+    public final static Level WARNING = Level.WARNING;
+    public final static Level INFO = Level.INFO;
+    public final static Level SPEED = Level.FINE;
+    public final static Level DEBUG = Level.FINER;
+    public final static Level FULL_DEBUG = Level.FINEST;
+    public final static Level MAX = Level.ALL;
+
+    protected final static Object semaphore = new Object();
+    static boolean initialised = false;
+    static Writer defaultStream;
+    static Map<String,Writer> namedStreams;
 //    protected static Collection nullStreams;
-    protected final static DateFormat sdfLog = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    protected static boolean showThrowingThread;
+    static boolean showThrowingThread;
 
     /**
      * Initialises default streams
@@ -54,17 +51,17 @@ public class Logger {
     public static void init(int level) {
         init(Level.parse(String.valueOf(level)));
     }
-    
+
     /**
      * Initialises default streams
      */
-    public static void init(Level level, OutputStream defaultStream, 
+    public static void init(Level level, OutputStream defaultStream,
             boolean showThrowingThreadArg) {
         synchronized (semaphore) {
             if (!initialised) { // recheck in case we were blocking on another init
                 initialised = false;
                 LOGGER.setLevel(level);
-                namedStreams = new HashMap();
+                namedStreams = new HashMap<>();
 //                nullStreams = new ArrayList();
                 initialised = true;
                 setStream(DEFAULT_STREAM, defaultStream);
@@ -114,7 +111,7 @@ public class Logger {
             try {stream.flush();} catch (IOException err) {}
         }
     }
-    
+
     private static Writer getStreamByName(String streamName) {
         if ((streamName != null) && streamName.equals(DEFAULT_STREAM)) {
             // As long as the stream has not been nulled, assign the default if not found
@@ -128,7 +125,7 @@ public class Logger {
         } else {
             return defaultStream;
         }
-        
+
     }
 
     public static void setCurrentDebugLevel(int level) {
@@ -147,13 +144,13 @@ public class Logger {
         if (!initialised) {
             init(INFO);
         }
-        
+
         String msg = "";
         if (showThrowingThread) {
             msg = "["+Thread.currentThread().getName()+"] - ";
         }
         msg += message;
-        
+
         LOGGER.log(level,msg,error);
     }
 
@@ -220,7 +217,7 @@ public class Logger {
         }
     }
 
-    public static void logDirectMessage(Level level, String streamName, String message, 
+    public static void logDirectMessage(Level level, String streamName, String message,
             Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;

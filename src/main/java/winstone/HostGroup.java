@@ -16,19 +16,19 @@ import java.util.Map;
 
 /**
  * Manages the references to individual hosts within the container. This object handles
- * the mapping of ip addresses and hostnames to groups of webapps, and init and 
+ * the mapping of ip addresses and hostnames to groups of webapps, and init and
  * shutdown of any hosts it manages.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HostGroup.java,v 1.4 2006/03/24 17:24:21 rickknowles Exp $
  */
 public class HostGroup {
-    
+
     private final static String DEFAULT_HOSTNAME = "default";
     private final Server server;
 
     //    private Map args;
-    private Map hostConfigs;
+    private Map<String, HostConfiguration> hostConfigs;
     private String defaultHostName;
 
     public HostGroup(
@@ -36,8 +36,8 @@ public class HostGroup {
             File commonLibCLPaths[], Map args) throws IOException {
         this.server = server;
 //        this.args = args;
-        this.hostConfigs = new Hashtable();
-        
+        this.hostConfigs = new Hashtable<>();
+
         // Is this the single or multiple configuration ? Check args
         File webappsDir = Option.WEBAPPS_DIR.get(args);
 
@@ -58,7 +58,7 @@ public class HostGroup {
         }
         return (HostConfiguration) this.hostConfigs.get(this.defaultHostName);
     }
-    
+
     protected void initHost(File webappsDir, String hostname,
                             ClassLoader commonLibCL,
                             File commonLibCLPaths[], Map args) throws IOException {
