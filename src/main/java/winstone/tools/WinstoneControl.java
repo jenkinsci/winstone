@@ -22,11 +22,12 @@ import java.util.Map;
 /**
  * Included so that we can control winstone from the command line a little more
  * easily.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: WinstoneControl.java,v 1.6 2006/03/13 15:37:29 rickknowles Exp $
  */
 public class WinstoneControl {
+
     private static final WinstoneResourceBundle TOOLS_RESOURCES = new WinstoneResourceBundle("winstone.tools.LocalStrings");
 
     static final String OPERATION_SHUTDOWN = "shutdown";
@@ -36,7 +37,8 @@ public class WinstoneControl {
     public static final OInt CONTROL_PORT = Option.integer("controlPort");
     public static OInt PORT = Option.integer("port");
     public static OInt DEBUG = new OInt("debug", 5) {
-        @Override
+
+
         public int get(Map args) {
             switch(super.get(args)) {
                 // before switching to java.util.Logging, winstone used a (1:9) range for log levels
@@ -51,7 +53,7 @@ public class WinstoneControl {
                 case 5:
                 default: return Logger.INFO.intValue();
     }}};
-    public static OString HOST = Option.string("host", "localhost");
+    public final static OString HOST = Option.string("host", "localhost");
 
 
     /**

@@ -172,27 +172,6 @@ becomes the default host.
 
 * `java -jar winstone.jar --hostsDir=<dir containing multiple host directories>`
 
-## Recent additions
-
-New feature in v4.3
-
-* option to enable Jetty JMX so users can collect some metrics on Jetty (threadpool state, sessions statistics etc...)
-
-New features in v4.0:
-
-* Jetty is now upgraded to 9.4 to bring HTTP/2 support. Winstone now requires Java8.
-    
-New features in v3.0:
-
-* Jetty is now upgraded to 9.2 to bring the servlet 3.1 support. Winstone now requires Java7.
-* AJP support was dropped due to the discontinuation of the AJP support in Jetty
-
-New features in v2.0:
-
-* The engine is now Jetty 8.x, instead of the original from-scratch implementation
-
-For pre-1.0 history, see [the upstream changelog](http://winstone.sourceforge.net/#recent)
-
 ## HTTP/2 Support
 
 Please note Java8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
@@ -223,5 +202,5 @@ If you have some unit test failures you may add an interface/ip alias such
 
 ## Changelog
 
-See [this page](CHANGELOG.md).
-
+See [GitHub releases](https://github.com/jenkinsci/winstone/releases),
+or for older versions [this page](CHANGELOG.md).

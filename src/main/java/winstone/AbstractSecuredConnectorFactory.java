@@ -73,7 +73,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 }
             } else if (opensslCert!=null) {
                 // load from openssl style key files
-                CertificateFactory cf = CertificateFactory.getInstance( "X509");
+                CertificateFactory cf = CertificateFactory.getInstance("X509");
                 try(InputStream inputStream = new FileInputStream( opensslCert); //
                     FileReader fileReader = new FileReader(opensslKey)) {
                     Certificate cert = cf.generateCertificate(inputStream);

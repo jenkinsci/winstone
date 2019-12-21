@@ -29,7 +29,7 @@ import com.meterware.httpunit.WebResponse;
 /**
  * Test case for the Http Connector to Winstone. Simulates a simple connect and
  * retrieve case, then a keep-alive connection case.
- * 
+ *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpConnectorTest.java,v 1.8 2007/04/23 15:06:22 rickknowles Exp $
  */
@@ -51,7 +51,7 @@ public class HttpConnectorTest extends TestCase {
     public void testSimpleConnection() throws IOException, SAXException,
             InterruptedException {
         // Initialise container
-        Map args = new HashMap();
+        Map<String,String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10003");
@@ -80,7 +80,7 @@ public class HttpConnectorTest extends TestCase {
     public void testKeepAliveConnection() throws IOException,
             InterruptedException, SAXException {
         // Initialise container
-        Map args = new HashMap();
+        Map<String,String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10004");
@@ -109,14 +109,14 @@ public class HttpConnectorTest extends TestCase {
         winstone.shutdown();
         Thread.sleep(500);
     }
-    
+
     /**
      * Test the keep alive case
      */
     public void testWriteAfterServlet() throws IOException,
             InterruptedException, SAXException {
         // Initialise container
-        Map args = new HashMap();
+        Map<String,String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10005");

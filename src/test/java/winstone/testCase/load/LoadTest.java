@@ -22,9 +22,9 @@ import winstone.cmdline.Option;
  * This class is an attempt to benchmark performance under load for winstone. It
  * works by hitting a supplied URL with parallel threads (with keep-alives or
  * without) at an escalating rate, and counting the no of failures.
- * 
+ *
  * It uses HttpUnit's WebConversation class for the connection.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: LoadTest.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
  */
@@ -70,7 +70,7 @@ public class LoadTest {
 
             // Spawn the threads
             int noOfSeconds = (int) this.stepPeriod / 1000;
-            List threads = new ArrayList();
+            List<LoadTestThread> threads = new ArrayList<>();
             for (int m = 0; m < n; m++)
                 threads.add(new LoadTestThread(this.url, this, this.resources,
                         wc, noOfSeconds - 1));
@@ -88,7 +88,7 @@ public class LoadTest {
                     averageSuccessTime + "");
 
             // Close threads
-            for (Object thread : threads) ((LoadTestThread) thread).destroy();
+            for (LoadTestThread thread : threads) thread.destroy();
 
             this.successTimeTotal = 0;
             this.successCount = 0;
@@ -109,7 +109,7 @@ public class LoadTest {
                 LOCAL_RESOURCE_FILE);
 
         // Loop for args
-        Map options = new HashMap();
+        Map<String,String> options = new HashMap<>();
         // String operation = "";
         for (String option : args) {
             if (option.startsWith("--")) {
