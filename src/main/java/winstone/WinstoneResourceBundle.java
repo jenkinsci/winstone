@@ -57,7 +57,7 @@ public class WinstoneResourceBundle {
     public String getString(String key, Object[] parameters) {
         String myCopy = this.resources.getString(key);
         if (parameters != null) {
-            String tokens[][] = new String[parameters.length][2];
+            String[][] tokens = new String[parameters.length][2];
             for (int n = 0; n < parameters.length; n++) {
                 tokens[n] = new String[] {"[#" + n + "]", toString(parameters[n])};
             }
@@ -76,9 +76,7 @@ public class WinstoneResourceBundle {
     }
     
     private static void globalReplace(StringBuilder input, String fromMarker, String toValue) {
-        if (input == null) {
-            return;
-        } else if (fromMarker == null) {
+        if (input == null || fromMarker == null) {
             return;
         }
 
@@ -94,7 +92,7 @@ public class WinstoneResourceBundle {
         }
     }
     
-    public static String globalReplace(String input, String parameters[][]) {
+    public static String globalReplace(String input, String[][] parameters) {
         if (parameters != null) {
             StringBuilder out = new StringBuilder(input);
             for (String[] parameter : parameters) {

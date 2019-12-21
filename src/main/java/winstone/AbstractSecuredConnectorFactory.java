@@ -48,14 +48,17 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     protected void configureSsl( Map args, Server server ) throws IOException
     {
         try {
+
             File opensslCert = Option.HTTPS_CERTIFICATE.get( args);
             File opensslKey =  Option.HTTPS_PRIVATE_KEY.get(args);
             File keyStore =    Option.HTTPS_KEY_STORE.get(args);
             String pwd =       Option.HTTPS_KEY_STORE_PASSWORD.get(args);
 
-            if ((opensslCert!=null ^ opensslKey!=null))
+            if(opensslCert!=null ^ opensslKey!=null){
                 throw new WinstoneException(
-                    MessageFormat.format( "--{0} and --{1} need to be used together", Option.HTTPS_CERTIFICATE, Option.HTTPS_PRIVATE_KEY));
+                        MessageFormat.format( "--{0} and --{1} need to be used together", Option.HTTPS_CERTIFICATE, Option.HTTPS_PRIVATE_KEY));
+            }
+
             if (keyStore!=null && opensslKey!=null)
                 throw new WinstoneException(MessageFormat.format("--{0} and --{1} are mutually exclusive", Option.HTTPS_KEY_STORE, Option.HTTPS_PRIVATE_KEY));
 

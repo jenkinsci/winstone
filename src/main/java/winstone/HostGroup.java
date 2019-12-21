@@ -24,26 +24,22 @@ import java.util.Map;
  */
 public class HostGroup {
 
-    private final static String DEFAULT_HOSTNAME = "default";
+    private static final String DEFAULT_HOSTNAME = "default";
     private final Server server;
 
-    //    private Map args;
     private Map<String, HostConfiguration> hostConfigs;
     private String defaultHostName;
 
-    public HostGroup(
-            Server server, ClassLoader commonLibCL,
-            File commonLibCLPaths[], Map args) throws IOException {
+    public HostGroup(Server server, ClassLoader commonLibCL, File[] commonLibCLPaths, Map args) throws IOException {
+
         this.server = server;
-//        this.args = args;
         this.hostConfigs = new Hashtable<>();
 
         // Is this the single or multiple configuration ? Check args
         File webappsDir = Option.WEBAPPS_DIR.get(args);
 
         // If host mode
-        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
-                commonLibCLPaths, args);
+        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL, commonLibCLPaths, args);
         this.defaultHostName = DEFAULT_HOSTNAME;
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                 this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
@@ -51,17 +47,16 @@ public class HostGroup {
 
     public HostConfiguration getHostByName(String hostname) {
         if ((hostname != null) && (this.hostConfigs.size() > 1)) {
-            HostConfiguration host = (HostConfiguration) this.hostConfigs.get(hostname);
+            HostConfiguration host = hostConfigs.get(hostname);
             if (host != null) {
                 return host;
             }
         }
-        return (HostConfiguration) this.hostConfigs.get(this.defaultHostName);
+        return hostConfigs.get(this.defaultHostName);
     }
 
-    protected void initHost(File webappsDir, String hostname,
-                            ClassLoader commonLibCL,
-                            File commonLibCLPaths[], Map args) throws IOException {
+    protected void initHost(File webappsDir, String hostname, ClassLoader commonLibCL,
+                            File[] commonLibCLPaths, Map args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
                 commonLibCLPaths, args, webappsDir);
