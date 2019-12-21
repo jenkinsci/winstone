@@ -34,6 +34,8 @@ public class Logger {
     public final static Level FULL_DEBUG = Level.FINEST;
     public final static Level MAX = Level.ALL;
 
+
+
     protected final static Object semaphore = new Object();
     static boolean initialised = false;
     static Writer defaultStream;

@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -269,7 +268,7 @@ public class HostConfiguration {
             }
 
             // Iterate through the files
-            byte buffer[] = new byte[8192];
+            byte[] buffer = new byte[8192];
             try (JarFile warArchive = new JarFile(warfile)) {
                 for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements();) {
                     JarEntry element = e.nextElement();

@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import winstone.Logger;
+import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
@@ -142,7 +143,9 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         if (this.outStream != null) {
             try {
                 this.outStream.close();
-            } catch (IOException err) {}
+            } catch (IOException err) {
+                throw new WinstoneException(err.getMessage(), err);
+            }
             this.outStream = null;
         }
         this.fileName = null;

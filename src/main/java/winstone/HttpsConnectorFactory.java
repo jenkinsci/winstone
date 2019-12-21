@@ -54,5 +54,4 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
         return true;
 
     }
-
 }

@@ -7,8 +7,6 @@ a
 1src/main/java/winstone/Http2ConnectorFactory.java,3\f\3f0b4764b50c1e01951f3a29ee894d2b21d39039
 a
 1src/main/java/winstone/HttpsConnectorFactory.java,2\0\20b46d59c7bc7d1abe38da39540e5e846d3d209d
-b
-2src/main/java/winstone/ServerConnectorFactory.java,5\9\595ed539214cd62c4087442c663b87d691f4741c
 7
 pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
 k
@@ -69,3 +67,8 @@ G
 src/testwebapp/test.xxx,5\9\59d51c7ae8e8143c59af92489997a5961891fd98
 Y
 )src/main/java/winstone/entities/User.java,2\d\2de66d33cb4c4ee69ffb8476d001f0c9b3c57939
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+b
+2src/main/java/winstone/ServerConnectorBuilder.java,4\7\47400a1aee54acf01e8a7ea7a10077ccce079d33
