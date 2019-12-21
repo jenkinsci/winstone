@@ -1,0 +1,5 @@
+
+Isquid:S1481"2Remove this unused "listenAddress" local variable.(œ…¶Å
+Xsquid:S1854"ARemove this useless assignment to local variable "listenAddress".(œ…¶Å
+osquid:ModifiersOrderCheck1"EReorder the modifiers to comply with the Java Language Specification.(±ç…ôøÿÿÿÿ
+gsquid:CommentedOutCodeLine&"<This block of commented-out lines of code should be removed.(©Î‹ùÿÿÿÿ

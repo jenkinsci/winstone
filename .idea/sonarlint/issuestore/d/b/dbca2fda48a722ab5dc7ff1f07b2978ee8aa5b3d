@@ -1,0 +1,16 @@
+
+[squid:S1197="8Move the array designator from the variable to the type.(‘şªâùÿÿÿÿ8Õºîâµ-
+O
+squid:S106o"9Replace this use of System.out or System.err by a logger.(¤Êô¢
+bsquid:S2095Q"DUse try-with-resources or close this "Socket" in a "finally" clause.(ò©·Ù8Õºîâµ-
+gsquid:S3008&"PRename this field "DEBUG" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‡™ûË
+"squid:ClassVariableVisibilityCheck&"QMake DEBUG a static final constant or non-public and provide accessors if needed.(‡™ûË
+Fsquid:S1444%"*Make this "public static PORT" field final(êÊÊ·üÿÿÿÿ
+Bsquid:S1444&"+Make this "public static DEBUG" field final(‡™ûË
+ƒ"squid:ClassVariableVisibilityCheck%"PMake PORT a static final constant or non-public and provide accessors if needed.(êÊÊ·üÿÿÿÿ
+…"squid:ClassVariableVisibilityCheck6"PMake HOST a static final constant or non-public and provide accessors if needed.(ôİ®»8Õºîâµ-
+bsquid:S2095\"DUse try-with-resources or close this "Socket" in a "finally" clause.(ò©·Ù8Õºîâµ-
+Hsquid:S14446"*Make this "public static HOST" field final(ôİ®»8Õºîâµ-
+msquid:S30086"ORename this field "HOST" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ôİ®»8Õºîâµ-
+ksquid:S3008%"ORename this field "PORT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êÊÊ·üÿÿÿÿ
+nsquid:S3008""RRename this field "TIMEOUT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²ıòúÿÿÿÿ

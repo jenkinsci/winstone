@@ -1,0 +1,49 @@
+
+Rsquid:S1141ô"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Usquid:S1197Î"8Move the array designator from the variable to the type.(Â¡¾¤øÿÿÿÿ
+fsquid:S2095–"NUse try-with-resources or close this "FileOutputStream" in a "finally" clause.(”È¬
+Fsquid:S2093F"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ
+Zsquid:CallToDeprecatedMethod{"-Remove this use of "toURL"; it is deprecated.(·×œÆÿÿÿÿÿ
+Osquid:S1197w"8Move the array designator from the variable to the type.(È—„
+U
+squid:S106°"9Replace this use of System.out or System.err by a logger.(Ã©Ğ’úÿÿÿÿ
+P
+squid:S106®"9Replace this use of System.out or System.err by a logger.(µùéİ
+Vsquid:CallToDeprecatedMethod‹"-Remove this use of "toURL"; it is deprecated.(•¨íµ
+jsquid:S3776à"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(“–ış
+€"squid:ClassVariableVisibilityCheckÊ"QMake USAGE a static final constant or non-public and provide accessors if needed.(œÏšõ
+=squid:S1181ë"%Catch Exception instead of Throwable.(Ö¶
+csquid:CommentedOutCodeLine²"<This block of commented-out lines of code should be removed.(û–±
+osquid:ModifiersOrderCheck9"EReorder the modifiers to comply with the Java Language Specification.(±ç…ôøÿÿÿÿ
+Usquid:CallToDeprecatedMethodk"-Remove this use of "toURL"; it is deprecated.(Ş£ËÊ
+Usquid:S1197ò"8Move the array designator from the variable to the type.(Ï—Åõùÿÿÿÿ
+Bsquid:S00108²")Either remove or fill this block of code.(–´û¾
+Bsquid:S00108…")Either remove or fill this block of code.(ıó—ÿ
+isquid:S2095"LUse try-with-resources or close this "URLClassLoader" in a "finally" clause.(’ÁÏÿüÿÿÿÿ
+rsquid:CallToDeprecatedMethodO">Remove this use of "HANDLER_COUNT_MAX_IDLE"; it is deprecated.(ñÏúêÿÿÿÿÿ8©´ªàµ-
+hsquid:S3008Ê"PRename this field "USAGE" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œÏšõ
+Csquid:S1444Ê"+Make this "public static USAGE" field final(œÏšõ
+hsquid:CallToDeprecatedMethodL"9Remove this use of "HANDLER_COUNT_MAX"; it is deprecated.(íŸÙ‘8©´ªàµ-
+Osquid:S1481¨"7Remove this unused "showThrowingLineNo" local variable.(Ğ§»Ú
+bsquid:S2095æ"JUse try-with-resources or close this "ServerSocket" in a "finally" clause.(Ì»¸ç
+nsquid:S3776D"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(˜ô´çşÿÿÿÿ
+=squid:S1181‘"%Catch Exception instead of Throwable.(Ö¶
+Msquid:S1141…"5Extract this nested try block into a separate method.(ıó—ÿ
+rsquid:S001166"ZRename this field "CONTROL_TIMEOUT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ï¼ñö
+P
+squid:S106Ä"9Replace this use of System.out or System.err by a logger.(•¶ö
+msquid:CallToDeprecatedMethodM"9Remove this use of "HANDLER_COUNT_MAX"; it is deprecated.(‡ÚÃ¶ûÿÿÿÿ8©´ªàµ-
+asquid:S2583±"DChange this condition so that it does not always evaluate to "false"(ïëÊ†şÿÿÿÿ
+=squid:S1181€"%Catch Exception instead of Throwable.(Ö¶
+Psquid:S1197˜"8Move the array designator from the variable to the type.(•Şã¾
+Gsquid:S00108¯")Either remove or fill this block of code.(Úîùıúÿÿÿÿ
+Bsquid:S00108ı")Either remove or fill this block of code.(ÖŞ¨Ğ
+Gsquid:S2093›"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ
+^squid:S2142ş"FEither re-interrupt this method or rethrow the "InterruptedException".(Ö™”»
+Gsquid:S00108¬")Either remove or fill this block of code.(Ïüƒ¶ÿÿÿÿÿ
+bsquid:S1192ó"JDefine a constant instead of duplicating this literal "nonSwitch" 3 times.(Æ¥ö
+^squid:S1854¨"FRemove this useless assignment to local variable "showThrowingLineNo".(Ğ§»Ú
+=squid:S1181Ø"%Catch Exception instead of Throwable.(Ö¶
+;squid:S1148ì"#Use a logger to log this exception.(îÍç™
+hsquid:CallToDeprecatedMethodÖ"3Remove this use of "newInstance"; it is deprecated.(òĞĞµùÿÿÿÿ8ğ¾şí-
+rsquid:CallToDeprecatedMethodP">Remove this use of "HANDLER_COUNT_MAX_IDLE"; it is deprecated.(ÎËœØüÿÿÿÿ8©´ªàµ-

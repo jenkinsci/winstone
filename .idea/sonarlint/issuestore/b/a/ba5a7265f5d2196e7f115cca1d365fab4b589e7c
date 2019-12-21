@@ -1,0 +1,51 @@
+
+|"squid:ClassVariableVisibilityCheck%"OMake MAX a static final constant or non-public and provide accessors if needed.(©ÀÇ
+jsquid:S3008"NRename this field "MIN" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¡ĞÂ¤ÿÿÿÿÿ
+Bsquid:S1860]"&Synchronize on a new "Object" instead.(§¬ŒÓÿÿÿÿÿ
+3squid:S3626Ç"Remove this redundant jump.(ûÁİ…
+Gsquid:S1444#"+Make this "public static DEBUG" field final(îæ­˜ùÿÿÿÿ
+3squid:S3626µ"Remove this redundant jump.(ûÁİ…
+Bsquid:S1860y"&Synchronize on a new "Object" instead.(§¬ŒÓÿÿÿÿÿ
+€"squid:ClassVariableVisibilityCheck "SMake WARNING a static final constant or non-public and provide accessors if needed.( ñà
+?squid:S2885,"#Make "sdfLog" an instance variable.(ÕÚ®üÿÿÿÿ
+3squid:S3626Ğ"Remove this redundant jump.(ûÁİ…
+3squid:S3626¾"Remove this redundant jump.(ûÁİ…
+„"squid:ClassVariableVisibilityCheck"QMake ERROR a static final constant or non-public and provide accessors if needed.(§ÛŠûÿÿÿÿ
+hsquid:S3008 "RRename this field "WARNING" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ñà
+3squid:S3626¬"Remove this redundant jump.(ûÁİ…
+osquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(êÀéúûÿÿÿÿ
+lsquid:S3008""PRename this field "SPEED" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•¹ïİüÿÿÿÿ
+lsquid:S3008"PRename this field "ERROR" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(§ÛŠûÿÿÿÿ
+Fsquid:S00108r")Either remove or fill this block of code.(ˆÓæ¶ùÿÿÿÿ
+Usquid:S1197Î"8Move the array designator from the variable to the type.(å”ÊÅÿÿÿÿÿ
+osquid:ModifiersOrderCheck,"EReorder the modifiers to comply with the Java Language Specification.(ÕÚ®üÿÿÿÿ
+Isquid:S1172ß"1Remove this unused method parameter "streamName".(“´œò
+„"squid:ClassVariableVisibilityCheck$"VMake FULL_DEBUG a static final constant or non-public and provide accessors if needed.(ÙÚ÷
+ksquid:S3008!"ORename this field "INFO" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÿ°’úÿÿÿÿ
+3squid:S3626â"Remove this redundant jump.(ûÁİ…
+asquid:CommentedOutCodeLine+"<This block of commented-out lines of code should be removed.(†…±j
+„"squid:ClassVariableVisibilityCheck""QMake SPEED a static final constant or non-public and provide accessors if needed.(•¹ïİüÿÿÿÿ
+Bsquid:S1860?"&Synchronize on a new "Object" instead.(§¬ŒÓÿÿÿÿÿ
+‚"squid:ClassVariableVisibilityCheck"OMake MIN a static final constant or non-public and provide accessors if needed.(¡ĞÂ¤ÿÿÿÿÿ
+Fsquid:S1444!"*Make this "public static INFO" field final(ÿ°’úÿÿÿÿ
+Isquid:S1172×"1Remove this unused method parameter "streamName".(…§
+ƒ"squid:ClassVariableVisibilityCheck!"PMake INFO a static final constant or non-public and provide accessors if needed.(ÿ°’úÿÿÿÿ
+?squid:S1444%")Make this "public static MAX" field final(©ÀÇ
+lsquid:S3008#"PRename this field "DEBUG" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îæ­˜ùÿÿÿÿ
+Csquid:S1444 "-Make this "public static WARNING" field final( ñà
+Psquid:S1197×"8Move the array designator from the variable to the type.(…§
+Gsquid:S1444""+Make this "public static SPEED" field final(•¹ïİüÿÿÿÿ
+2squid:S1700è"Rename field "LOGGER"(×›Îÿÿÿÿÿ
+„"squid:ClassVariableVisibilityCheck#"QMake DEBUG a static final constant or non-public and provide accessors if needed.(îæ­˜ùÿÿÿÿ
+lsquid:S3008$"URename this field "FULL_DEBUG" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÙÚ÷
+Vsquid:S1118":Add a private constructor to hide the implicit public one.(ŸæÌıÿÿÿÿ
+O
+squid:S1063"9Replace this use of System.out or System.err by a logger.(úîé„
+3squid:S3626£"Remove this redundant jump.(ûÁİ…
+Gsquid:S1444"+Make this "public static ERROR" field final(§ÛŠûÿÿÿÿ
+Esquid:S1444")Make this "public static MIN" field final(¡ĞÂ¤ÿÿÿÿÿ
+dsquid:S3008%"NRename this field "MAX" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(©ÀÇ
+3squid:S3626Ù"Remove this redundant jump.(ûÁİ…
+bsquid:CommentedOutCodeLineD"<This block of commented-out lines of code should be removed.(¯Â§š
+>squid:S1860‰"&Synchronize on a new "Object" instead.(öÖ¨¾
+Gsquid:S1444$"0Make this "public static FULL_DEBUG" field final(ÙÚ÷

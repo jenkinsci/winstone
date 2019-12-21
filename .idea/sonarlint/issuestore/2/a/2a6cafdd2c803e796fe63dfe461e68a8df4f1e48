@@ -1,0 +1,4 @@
+
+~squid:S4087M"bRemove this "close" call; closing the resource is handled automatically by the try-with-resources.(ö½®Èüÿÿÿÿ
+usquid:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(¸Ÿ«ûÿÿÿÿ
+nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(´º×éûÿÿÿÿ

@@ -1,0 +1,14 @@
+
+_squid:S1192k"HDefine a constant instead of duplicating this literal "Unknown" 3 times.(Å»¼Ó
+rsquid:S2068Y"V'Password' detected in this expression, review this potentially hard-coded credential.(«Îó øÿÿÿÿ
+nsquid:CallToDeprecatedMethodĞ"9Remove this use of "setNeedClientAuth"; it is deprecated.(¡÷³ûÿÿÿÿ8ò¼âäî-
+rsquid:S2068R"V'Password' detected in this expression, review this potentially hard-coded credential.(«Îó øÿÿÿÿ
+Qsquid:S1141b"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Dsquid:S1181Ò"%Catch Exception instead of Throwable.(Ö¶8ò¼âäî-
+Lsquid:S1141`"5Extract this nested try block into a separate method.(‚…Şí
+Ksquid:S11720"-Remove this unused method parameter "server".(ıûêë8×›’¯î-
+Isquid:S1135`"2Complete the task associated to this TODO comment.(‚…Şí
+Isquid:S1135a"2Complete the task associated to this TODO comment.(ÇÓŞ
+nsquid:CallToDeprecatedMethod·"9Remove this use of "SslContextFactory"; it is deprecated.(“›¨ÿÿÿÿÿ8ò¼âäî-
+O
+squid:S106Z"9Replace this use of System.out or System.err by a logger.(ÀŸû

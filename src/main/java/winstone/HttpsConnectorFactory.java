@@ -6,16 +6,12 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.*;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,8 +37,15 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
         configureSsl(args, server);
         SslContextFactory sslConfig = getSSLContext(args);
 
-        ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslConfig);
-        server.addConnector(scf.getConnector(listenPort, listenAddress, keepAliveTimeout));
+        ServerConnectorBuilder scb = new ServerConnectorBuilder().
+                                            withServer(server).
+                                            withArgs(args).
+                                            withSslConfig(sslConfig).
+                                            withKeepAliveTimeout(keepAliveTimeout).
+                                            withListenerPort(listenPort).
+                                            withListenerAddress(listenAddress);
+
+        server.addConnector(scb.build());
 
         if(redirectToHttps) {
             server.setHandler(new SecuredRedirectHandler());

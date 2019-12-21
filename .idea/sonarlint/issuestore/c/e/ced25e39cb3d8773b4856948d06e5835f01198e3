@@ -1,0 +1,29 @@
+
+^squid:S00112w"FDefine and throw a dedicated exception instead of using a generic one.(ß¤çõ
+=squid:S1181à"%Catch Exception instead of Throwable.(Ö¶
+Usquid:S1197„"8Move the array designator from the variable to the type.(¿Œ¨§ûÿÿÿÿ
+bsquid:S2095…"EUse try-with-resources or close this "JarFile" in a "finally" clause.(ÿ»á˜ÿÿÿÿÿ
+<squid:S1181C"%Catch Exception instead of Throwable.(Ö¶
+=squid:S1181Ï"%Catch Exception instead of Throwable.(Ö¶
+osquid:S3776×"RRefactor this method to reduce its Cognitive Complexity from 33 to the 15 allowed.(öÅµâùÿÿÿÿ
+asquid:S4042±"IUse "java.nio.Files#delete" here for better messages on error conditions.(íÔˆ¢
+Z
+squid:S899¡"DDo something with the "boolean" value returned by "setLastModified".(Ú”î
+Tsquid:S11976"8Move the array designator from the variable to the type.(ÏŞĞ²úÿÿÿÿ
+jsquid:S3776´"RRefactor this method to reduce its Cognitive Complexity from 45 to the 15 allowed.(úÈ È
+gsquid:MaximumInheritanceDepth›"=This class has 10 parents which is greater than 5 authorized.(²úå¡
+Hsquid:S1264]",Replace this "for" loop with a "while" loop.(Ü±Úóşÿÿÿÿ
+W
+squid:S899ì";Do something with the "boolean" value returned by "delete".(¼·áüÿÿÿÿ
+u
+squid:S135†"YReduce the total number of break and continue statements in this loop to use at most one.(›è®Äıÿÿÿÿ
+R
+squid:S899±";Do something with the "boolean" value returned by "delete".(íÔˆ¢
+Nsquid:S11971"8Move the array designator from the variable to the type.(®÷ŞL
+Jsquid:S10681"4Remove this unused "commonLibCLPaths" private field.(®÷ŞL
+Usquid:S1197¿"8Move the array designator from the variable to the type.(·Ùã‡ıÿÿÿÿ
+Csquid:S1075ê"&Remove this hard-coded path-delimiter.(ÎÙªøÿÿÿÿ
+fsquid:S4042ì"IUse "java.nio.Files#delete" here for better messages on error conditions.(¼·áüÿÿÿÿ
+Isquid:S1199X"-Extract this nested code block into a method.(¶Õàæÿÿÿÿÿ
+psquid:S2293:"YReplace the type specification in this constructor call with the diamond operator ("<>").(óèâç
+=squid:S1181“"%Catch Exception instead of Throwable.(Ö¶
