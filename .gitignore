@@ -5,5 +5,5 @@ target
 .classpath
 .project
 .settings
-.idea/sonarlint
+.idea/sonarlint/*
 dependency-reduced-pom.xml
