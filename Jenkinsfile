@@ -22,12 +22,7 @@ Map branches = [:]
             withEnv(["MAVEN_SETTINGS=$settingsXml"]) {
                 stage('Build') {
                     timeout(30) {
-                        String command = 'mvn -B -ntp -Dset.changelist -Dmaven.test.failure.ignore install'
-                        if (isUnix()) {
-                            sh command
-                        } else {
-                            bat command
-                        }
+                        infra.runMaven(["-Dset.changelist", "-Dmaven.test.failure.ignore", "install"])
                     }
                 }
 
