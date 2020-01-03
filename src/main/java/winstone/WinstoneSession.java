@@ -9,5 +9,9 @@ public class WinstoneSession {
     /**
      * Name of the cookie that stores HTTP session ID.
      */
-    public final static String SESSION_COOKIE_NAME = "JSESSIONID";
+    // @SuppressFBWarnings(value = "MS_SHOULD_BE_FINAL", justification = "mutated by extras-executable-war")
+    public static String SESSION_COOKIE_NAME = "JSESSIONID";
+
+    private WinstoneSession() {}
+
 }
