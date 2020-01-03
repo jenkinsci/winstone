@@ -389,6 +389,9 @@ public class Launcher implements Runnable {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
                 embeddedWarfileName)) {
+            if (embeddedWarfile == null) {
+                return;
+            }
             File tempWarfile = File.createTempFile("embedded", ".war").getAbsoluteFile();
             File parentTempWarFile = tempWarfile.getParentFile();
             try {
