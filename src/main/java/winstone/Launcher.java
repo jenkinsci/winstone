@@ -329,10 +329,12 @@ public class Launcher implements Runnable {
      * listener thread. For now, just shut it down with a control-C.
      */
     public static void main(String argv[]) throws IOException {
-        for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
-            if (h instanceof ConsoleHandler) {
-                ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
-            }
+        if (System.getProperty("java.util.logging.config.file") == null) {
+          for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
+              if (h instanceof ConsoleHandler) {
+                  ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
+              }
+          }
         }
         Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
