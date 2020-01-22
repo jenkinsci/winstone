@@ -158,6 +158,7 @@ public class Launcher implements Runnable {
 
             int qtpMaxThread = Option.QTP_MAXTHREADS.get(args);
             QueuedThreadPool queuedThreadPool = qtpMaxThread>0?new QueuedThreadPool(qtpMaxThread):new QueuedThreadPool();
+            queuedThreadPool.setName("Jetty (winstone)");
             this.server = new Server(queuedThreadPool);
 
 
