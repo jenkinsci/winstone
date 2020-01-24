@@ -1,3 +1,0 @@
-
-usquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(´º×éûÿÿÿÿ8¡°éÇò-
-…squid:S4087M"bRemove this "close" call; closing the resource is handled automatically by the try-with-resources.(ö½®Èüÿÿÿÿ8¦›¹®ú-

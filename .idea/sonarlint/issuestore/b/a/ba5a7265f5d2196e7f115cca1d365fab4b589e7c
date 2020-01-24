@@ -1,19 +1,0 @@
-
-V
-squid:S1061"9Replace this use of System.out or System.err by a logger.(úîé„8ÊÌËÇò-
-Gsquid:S1905x")Remove this unnecessary cast to "Writer".(¢ã¶§8ÊÌËÇò-
-Msquid:S00108p")Either remove or fill this block of code.(ˆÓæ¶ùÿÿÿÿ8ÊÌËÇò-
-isquid:CommentedOutCodeLineB"<This block of commented-out lines of code should be removed.(¯Â§š8ÊÌËÇò-
-:squid:S3626ª"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-:squid:S3626Î"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-:squid:S3626³"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-:squid:S3626Å"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-Psquid:S1172İ"1Remove this unused method parameter "streamName".(“´œò8ÊÌËÇò-
-2squid:S1700æ"Rename field "LOGGER"(×›Îÿÿÿÿÿ
-Psquid:S1172Õ"1Remove this unused method parameter "streamName".(…§8ÊÌËÇò-
-:squid:S3626¡"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-:squid:S3626¼"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-:squid:S3626×"Remove this redundant jump.(ûÁİ…8ÊÌËÇò-
-Wsquid:S1197Õ"8Move the array designator from the variable to the type.(…§8ÊÌËÇò-
-3squid:S3626à"Remove this redundant jump.(ûÁİ…
-\squid:S1197Ì"8Move the array designator from the variable to the type.(å”ÊÅÿÿÿÿÿ8ÊÌËÇò-
