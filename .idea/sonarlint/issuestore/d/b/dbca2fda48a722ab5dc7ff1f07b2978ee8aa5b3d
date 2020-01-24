@@ -1,15 +1,0 @@
-
-Msquid:S1444&"*Make this "public static PORT" field final(êÊÊ·üÿÿÿÿ8ƒ˜¿Çò-
-Xsquid:S1161*":Add the "@Override" annotation above this method signature(òŒÖµ8ƒ˜¿Çò-
-Isquid:S1444'"+Make this "public static DEBUG" field final(‡™ûË8ƒ˜¿Çò-
-usquid:S3008#"RRename this field "TIMEOUT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²ıòúÿÿÿÿ8ƒ˜¿Çò-
-nsquid:S3008'"PRename this field "DEBUG" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‡™ûË8ƒ˜¿Çò-
-O
-squid:S106q"9Replace this use of System.out or System.err by a logger.(¤Êô¢
-bsquid:S2095^"DUse try-with-resources or close this "Socket" in a "finally" clause.(ò©·Ù8Õºîâµ-
-rsquid:S3008&"ORename this field "PORT" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êÊÊ·üÿÿÿÿ8ƒ˜¿Çò-
-Š"squid:ClassVariableVisibilityCheck&"PMake PORT a static final constant or non-public and provide accessors if needed.(êÊÊ·üÿÿÿÿ8ƒ˜¿Çò-
-bsquid:S2095S"DUse try-with-resources or close this "Socket" in a "finally" clause.(ò©·Ù8Õºîâµ-
-†"squid:ClassVariableVisibilityCheck'"QMake DEBUG a static final constant or non-public and provide accessors if needed.(‡™ûË8ƒ˜¿Çò-
-[squid:S1197?"8Move the array designator from the variable to the type.(‘şªâùÿÿÿÿ8Õºîâµ-
-psquid:ModifiersOrderCheck8"EReorder the modifiers to comply with the Java Language Specification.(üÉ¾58ƒ˜¿Çò-

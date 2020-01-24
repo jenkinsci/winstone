@@ -1,14 +1,12 @@
 
-nsquid:CallToDeprecatedMethodº"9Remove this use of "SslContextFactory"; it is deprecated.(“›¨ÿÿÿÿÿ8õß°Éò-
+Ssquid:S1141c"5Extract this nested try block into a separate method.(‚…Şí8õß°Éò-
+ysquid:S2068U"V'Password' detected in this expression, review this potentially hard-coded credential.(«Îó øÿÿÿÿ8õß°Éò-
+Psquid:S1135d"2Complete the task associated to this TODO comment.(ÇÓŞ8õß°Éò-
+fsquid:S1192n"HDefine a constant instead of duplicating this literal "Unknown" 3 times.(Å»¼Ó8õß°Éò-
 Xsquid:S1141e"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ8õß°Éò-
-Isquid:S1135c"2Complete the task associated to this TODO comment.(‚…Şí
+nsquid:CallToDeprecatedMethodÕ"9Remove this use of "setNeedClientAuth"; it is deprecated.(¡÷³ûÿÿÿÿ8õß°Éò-
 V
 squid:S106]"9Replace this use of System.out or System.err by a logger.(ÀŸû8õß°Éò-
-ysquid:S2068U"V'Password' detected in this expression, review this potentially hard-coded credential.(«Îó øÿÿÿÿ8õß°Éò-
-Dsquid:S1181Õ"%Catch Exception instead of Throwable.(Ö¶8õß°Éò-
-Ksquid:S11720"-Remove this unused method parameter "server".(ıûêë8×›’¯î-
 ysquid:S2068\"V'Password' detected in this expression, review this potentially hard-coded credential.(«Îó øÿÿÿÿ8õß°Éò-
-fsquid:S1192n"HDefine a constant instead of duplicating this literal "Unknown" 3 times.(Å»¼Ó8õß°Éò-
-Ssquid:S1141c"5Extract this nested try block into a separate method.(‚…Şí8õß°Éò-
-Psquid:S1135d"2Complete the task associated to this TODO comment.(ÇÓŞ8õß°Éò-
-nsquid:CallToDeprecatedMethodÓ"9Remove this use of "setNeedClientAuth"; it is deprecated.(¡÷³ûÿÿÿÿ8õß°Éò-
+Isquid:S1135c"2Complete the task associated to this TODO comment.(‚…Şí
+Ksquid:S11720"-Remove this unused method parameter "server".(ıûêë8×›’¯î-

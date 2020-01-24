@@ -1,5 +1,6 @@
 package winstone;
 
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -50,13 +51,8 @@ public class ServerConnectorBuilder {
     }
 
     public ServerConnector build() {
-        ServerConnector sc;
-        if(scf == null){
-            sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args));
-        }
-        else {
-            sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args), scf);
-        }
+        ServerConnector sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args));
+        sc.addConnectionFactory((ConnectionFactory) scf);
         sc.setPort(listenerPort);
         sc.setHost(listenerAddress);
         sc.setIdleTimeout(keepAliveTimeout);

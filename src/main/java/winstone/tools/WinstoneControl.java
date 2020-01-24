@@ -32,13 +32,13 @@ public class WinstoneControl {
 
     static final String OPERATION_SHUTDOWN = "shutdown";
     static final String OPERATION_RELOAD = "reload:";
-    static int TIMEOUT = 10000;
+    static final int TIMEOUT = 10000;
 
     public static final OInt CONTROL_PORT = Option.integer("controlPort");
-    public static OInt PORT = Option.integer("port");
-    public static OInt DEBUG = new OInt("debug", 5) {
+    public static final OInt PORT = Option.integer("port");
+    public static final OInt DEBUG = new OInt("debug", 5) {
 
-
+        @Override
         public int get(Map args) {
             switch(super.get(args)) {
                 // before switching to java.util.Logging, winstone used a (1:9) range for log levels
@@ -53,14 +53,14 @@ public class WinstoneControl {
                 case 5:
                 default: return Logger.INFO.intValue();
     }}};
-    public final static OString HOST = Option.string("host", "localhost");
+    public static final OString HOST = Option.string("host", "localhost");
 
 
     /**
      * Parses command line parameters, and calls the appropriate method for
      * executing the winstone operation required.
      */
-    public static void main(String argv[]) throws Exception {
+    public static void main(String[] argv) throws Exception {
 
         // Load args from the config file
         Map options = new CmdLineParser(Option.all(WinstoneControl.class)).parse(argv,"operation");
@@ -80,24 +80,28 @@ public class WinstoneControl {
 
         // Check for shutdown
         if (operation.equalsIgnoreCase(OPERATION_SHUTDOWN)) {
-            Socket socket = new Socket(host, port);
-            socket.setSoTimeout(TIMEOUT);
-            try(OutputStream out = socket.getOutputStream()){
-                out.write( Launcher.SHUTDOWN_TYPE );
-                Logger.log( Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
+            try (Socket socket = new Socket(host, port)) {
+                socket.setSoTimeout(TIMEOUT);
+                try(OutputStream out = socket.getOutputStream()){
+                    out.write( Launcher.SHUTDOWN_TYPE );
+                    Logger.log( Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
+                }
             }
         }
 
         // check for reload
         else if (operation.toLowerCase().startsWith(OPERATION_RELOAD.toLowerCase())) {
             String webappName = operation.substring(OPERATION_RELOAD.length());
-            Socket socket = new Socket(host, port);
-            socket.setSoTimeout(TIMEOUT);
-            try(OutputStream out = socket.getOutputStream(); //
-                ObjectOutputStream objOut = new ObjectOutputStream( out )) {
-                out.write( Launcher.RELOAD_TYPE );
-                objOut.writeUTF( host );
-                objOut.writeUTF( webappName );
+
+            try (Socket socket = new Socket(host, port)) {
+                socket.setSoTimeout(TIMEOUT);
+                try (OutputStream out = socket.getOutputStream()) {
+                    try (ObjectOutputStream objOut = new ObjectOutputStream(out)) {
+                        out.write(Launcher.RELOAD_TYPE);
+                        objOut.writeUTF(host);
+                        objOut.writeUTF(webappName);
+                    }
+                }
             }
             Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",host, port);
         }
@@ -110,6 +114,6 @@ public class WinstoneControl {
      * Displays the usage message
      */
     private static void printUsage() {
-        System.out.println(TOOLS_RESOURCES.getString("WinstoneControl.Usage"));
+        Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.Usage");
     }
 }

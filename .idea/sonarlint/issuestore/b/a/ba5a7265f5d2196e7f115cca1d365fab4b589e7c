@@ -1,31 +1,19 @@
 
-hsquid:CommentedOutCodeLine+"<This block of commented-out lines of code should be removed.(†…±j8ÊÌËÇò-
-qsquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(ƒçŸ›8ÊÌËÇò-
-qsquid:ModifiersOrderCheck""EReorder the modifiers to comply with the Java Language Specification.(ö‘ÆÔ8ÊÌËÇò-
-Msquid:S00108q")Either remove or fill this block of code.(ˆÓæ¶ùÿÿÿÿ8ÊÌËÇò-
-:squid:S3626«"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-3squid:S3626á"Remove this redundant jump.(ûÁÝ…
-vsquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(ô©¿üÿÿÿÿ8ÊÌËÇò-
-qsquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(ü ‰ö8ÊÌËÇò-
-qsquid:ModifiersOrderCheck#"EReorder the modifiers to comply with the Java Language Specification.(°‹±ü8ÊÌËÇò-
-:squid:S3626Æ"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-:squid:S3626½"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-vsquid:ModifiersOrderCheck "EReorder the modifiers to comply with the Java Language Specification.(ßšìþÿÿÿÿ8ÊÌËÇò-
-isquid:CommentedOutCodeLineC"<This block of commented-out lines of code should be removed.(¯Â§š8ÊÌËÇò-
-Psquid:S1172Þ"1Remove this unused method parameter "streamName".(“´œò8ÊÌËÇò-
-Psquid:S1172Ö"1Remove this unused method parameter "streamName".(…§8ÊÌËÇò-
-]squid:S1118":Add a private constructor to hide the implicit public one.(ŸæÌýÿÿÿÿ8ÊÌËÇò-
-vsquid:ModifiersOrderCheck!"EReorder the modifiers to comply with the Java Language Specification.(ÿùßÿÿÿÿÿ8ÊÌËÇò-
-\squid:S1197Í"8Move the array designator from the variable to the type.(å”ÊÅÿÿÿÿÿ8ÊÌËÇò-
-vsquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(‘­—Ðúÿÿÿÿ8ÊÌËÇò-
 V
-squid:S1062"9Replace this use of System.out or System.err by a logger.(úîé„8ÊÌËÇò-
-Wsquid:S1197Ö"8Move the array designator from the variable to the type.(…§8ÊÌËÇò-
-:squid:S3626¢"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-2squid:S1700ç"Rename field "LOGGER"(×›Îÿÿÿÿÿ
-:squid:S3626Ï"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-Gsquid:S1905y")Remove this unnecessary cast to "Writer".(¢ã¶§8ÊÌËÇò-
-vsquid:ModifiersOrderCheck'"EReorder the modifiers to comply with the Java Language Specification.(ŠÔäßøÿÿÿÿ8ÊÌËÇò-
-vsquid:ModifiersOrderCheck"EReorder the modifiers to comply with the Java Language Specification.(êÀéúûÿÿÿÿ8ÊÌËÇò-
-:squid:S3626´"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
-:squid:S3626Ø"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+squid:S1061"9Replace this use of System.out or System.err by a logger.(úîé„8ÊÌËÇò-
+Gsquid:S1905x")Remove this unnecessary cast to "Writer".(¢ã¶§8ÊÌËÇò-
+Msquid:S00108p")Either remove or fill this block of code.(ˆÓæ¶ùÿÿÿÿ8ÊÌËÇò-
+isquid:CommentedOutCodeLineB"<This block of commented-out lines of code should be removed.(¯Â§š8ÊÌËÇò-
+:squid:S3626ª"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+:squid:S3626Î"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+:squid:S3626³"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+:squid:S3626Å"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+Psquid:S1172Ý"1Remove this unused method parameter "streamName".(“´œò8ÊÌËÇò-
+2squid:S1700æ"Rename field "LOGGER"(×›Îÿÿÿÿÿ
+Psquid:S1172Õ"1Remove this unused method parameter "streamName".(…§8ÊÌËÇò-
+:squid:S3626¡"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+:squid:S3626¼"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+:squid:S3626×"Remove this redundant jump.(ûÁÝ…8ÊÌËÇò-
+Wsquid:S1197Õ"8Move the array designator from the variable to the type.(…§8ÊÌËÇò-
+3squid:S3626à"Remove this redundant jump.(ûÁÝ…
+\squid:S1197Ì"8Move the array designator from the variable to the type.(å”ÊÅÿÿÿÿÿ8ÊÌËÇò-
