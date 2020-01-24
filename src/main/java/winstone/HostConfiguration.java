@@ -321,7 +321,7 @@ public class HostConfiguration {
             }
         }
         try {
-            Files.delete(dir.toPath());
+            Files.deleteIfExists(dir.toPath());
         } catch (Exception ex) {
             Logger.logDirectMessage(Logger.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
         }
