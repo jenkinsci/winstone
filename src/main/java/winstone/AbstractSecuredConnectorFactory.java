@@ -197,7 +197,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                            keystore.getCertificate(alias) + "");
             }
 
-            SslContextFactory ssl = new SslContextFactory.Server();
+            SslContextFactory.Server ssl = new SslContextFactory.Server();
             ssl.setKeyStore(keystore);
             ssl.setKeyStorePassword(keystorePassword);
             ssl.setKeyManagerPassword(privateKeyPassword);
