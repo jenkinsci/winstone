@@ -27,7 +27,7 @@ public class CmdLineParser {
     }
 
     public Map<String,String> parse(String[] argv, String nonSwitchArgName) throws IOException {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
 
         // Load embedded properties file
         String embeddedPropertiesFilename = RESOURCES.getString(

@@ -153,6 +153,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * This is basically just so we can have a custom location for key stores.
      */
     protected SslContextFactory getSSLContext( Map args) {
+
         try {
             String privateKeyPassword;
 
@@ -183,7 +184,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                            keystore.getCertificate(alias) + "");
             }
 
-            SslContextFactory.Server ssl = new SslContextFactory.Server();
+
+            SslContextFactory ssl = new SslContextFactory.Server();
             ssl.setKeyStore(keystore);
             ssl.setKeyStorePassword(keystorePassword);
             ssl.setKeyManagerPassword(privateKeyPassword);
@@ -210,7 +212,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
              */
             ssl.setNeedClientAuth(Option.HTTPS_VERIFY_CLIENT.get(args));
             return ssl;
-        } catch (Throwable err) {
+        } catch (Exception err) {
             throw new WinstoneException(SSL_RESOURCES
                                             .getString("HttpsListener.ErrorGettingContext"), err);
         }

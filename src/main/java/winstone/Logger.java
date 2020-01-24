@@ -24,24 +24,23 @@ import java.util.logging.Level;
  */
 public class Logger {
 
-    public final static String DEFAULT_STREAM = "Winstone";
-    public final static Level MIN = Level.OFF;
-    public final static Level ERROR = Level.SEVERE;
-    public final static Level WARNING = Level.WARNING;
-    public final static Level INFO = Level.INFO;
-    public final static Level SPEED = Level.FINE;
-    public final static Level DEBUG = Level.FINER;
-    public final static Level FULL_DEBUG = Level.FINEST;
-    public final static Level MAX = Level.ALL;
+    private Logger() {}
 
+    public static final String DEFAULT_STREAM = "Winstone";
+    public static final Level MIN = Level.OFF;
+    public static final Level ERROR = Level.SEVERE;
+    public static final Level WARNING = Level.WARNING;
+    public static final Level INFO = Level.INFO;
+    public static final Level SPEED = Level.FINE;
+    public static final Level DEBUG = Level.FINER;
+    public static final Level FULL_DEBUG = Level.FINEST;
+    public static final Level MAX = Level.ALL;
 
-
-    protected final static Object semaphore = new Object();
-    static boolean initialised = false;
-    static Writer defaultStream;
-    static Map<String,Writer> namedStreams;
-//    protected static Collection nullStreams;
-    static boolean showThrowingThread;
+    protected static final Object semaphore = new Object();
+    protected static boolean initialised = false;
+    protected static Writer defaultStream;
+    protected static Map<String,Writer> namedStreams;
+    protected static boolean showThrowingThread;
 
     /**
      * Initialises default streams

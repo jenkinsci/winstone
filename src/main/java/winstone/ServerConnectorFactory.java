@@ -1,52 +1,66 @@
-/*
- * Copyright 2003-2006 Rick Knowles <winstone-devel at lists sourceforge net>
- * Distributed under the terms of either:
- * - the common development and distribution license (CDDL), v1.0; or
- * - the GNU Lesser General Public License, v2.1 or later
- */
 package winstone;
 
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
 import java.util.Map;
 
-public class ServerConnectorFactory {
+public class ServerConnectorBuilder {
 
-    private ServerConnector sc;
     private Server server;
     private Map args;
+    private SslContextFactory scf;
+    private int listenerPort;
+    private String listenerAddress;
+    private int keepAliveTimeout;
 
-    public ServerConnectorFactory(Server server, Map args, SslContextFactory scf) {
+    public ServerConnectorBuilder withServer(Server server){
         this.server = server;
-        this.args = args;
-
-        if(scf != null) {
-            sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args), scf);
-        }
-        else {
-            sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args));
-        }
-
+        return this;
     }
 
-    public ServerConnector getConnector(int listenPort, String listenAddress, int keepAliveTimeout) {
+    public ServerConnectorBuilder withArgs(Map args){
+        this.args = args;
+        return this;
+    }
 
-        sc.setPort(listenPort);
-        sc.setHost(listenAddress);
+    public ServerConnectorBuilder withSslConfig(SslContextFactory scf){
+        this.scf = scf;
+        return this;
+    }
+
+    public ServerConnectorBuilder withListenerPort(int listenerPort){
+        this.listenerPort = listenerPort;
+        return this;
+    }
+
+    public ServerConnectorBuilder withListenerAddress(String listenerAddress){
+        this.listenerAddress = listenerAddress;
+        return this;
+    }
+
+    public ServerConnectorBuilder withKeepAliveTimeout(int keepAliveTimeout){
+        this.keepAliveTimeout = keepAliveTimeout;
+        return this;
+    }
+
+    public ServerConnector build() {
+        ServerConnector sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args));
+        sc.addConnectionFactory((ConnectionFactory) scf);
+        sc.setPort(listenerPort);
+        sc.setHost(listenerAddress);
         sc.setIdleTimeout(keepAliveTimeout);
 
         HttpConfiguration config = sc.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
         config.addCustomizer(new ForwardedRequestCustomizer());
         config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-
         return sc;
-
     }
 
 }
