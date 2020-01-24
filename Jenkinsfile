@@ -9,7 +9,7 @@ properties([[$class: 'BuildDiscarderProperty',
  *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
  */
 Map branches = [:]
-['maven', 'maven-windows'].each {label ->
+['maven'/* TODO broken , 'maven-windows'*/].each {label ->
     branches[label] = {
         node(label) {
             stage('Checkout') {
