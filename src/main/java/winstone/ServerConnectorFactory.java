@@ -1,11 +1,7 @@
 package winstone;
 
-import org.eclipse.jetty.server.ConnectionFactory;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -52,7 +48,8 @@ public class ServerConnectorBuilder {
 
     public ServerConnector build() {
         ServerConnector sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args));
-        sc.addConnectionFactory((ConnectionFactory) scf);
+        sc.addConnectionFactory(new SslConnectionFactory(scf, HttpVersion.HTTP_1_1.asString()));
+
         sc.setPort(listenerPort);
         sc.setHost(listenerAddress);
         sc.setIdleTimeout(keepAliveTimeout);
