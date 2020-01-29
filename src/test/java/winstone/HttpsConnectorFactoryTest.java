@@ -11,6 +11,7 @@ import javax.net.ssl.X509TrustManager;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import org.jvnet.hudson.test.Issue;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -64,4 +65,20 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
 
         request(new TrustEveryoneManager());
     }
+
+    @Issue("JENKINS-60857")
+    @Test
+    public void wildcard() throws Exception {
+        Map<String,String> args = new HashMap<String,String>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "-1");
+        args.put("httpsPort", "59009");
+        args.put("httpsListenAddress", "localhost");
+        args.put("httpsKeyStore", "src/ssl/wildcard.jks");
+        args.put("httpsKeyStorePassword", "changeit");
+        winstone = new Launcher(args);
+        request(new TrustEveryoneManager());
+    }
+
 }
