@@ -25,9 +25,10 @@ import java.util.Map;
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: HttpsConnectorFactory.java,v 1.10 2007/06/13 15:27:35 rickknowles Exp $
  */
-public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
+public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory {
 
     public boolean start(Map args, Server server) throws IOException {
+
         int listenPort = Option.HTTPS_PORT.get(args);
         String listenAddress = Option.HTTPS_LISTEN_ADDRESS.get(args);
         int keepAliveTimeout = Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args);
@@ -38,7 +39,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             return false;
         }
 
-        configureSsl(args, server);
+        super.configureSsl(args, server);
         SslContextFactory sslConfig = getSSLContext(args);
 
         ServerConnectorFactory scf = new ServerConnectorFactory(server, args, sslConfig);
