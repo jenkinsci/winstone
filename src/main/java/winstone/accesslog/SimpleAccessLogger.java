@@ -144,7 +144,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             try {
                 this.outStream.close();
             } catch (IOException err) {
-                throw new WinstoneException(err.getMessage(), err);
+                Logger.logDirectMessage(Logger.ERROR, null, "SimpleAccessLogger.Exception" + err.getMessage(), err);
             }
             this.outStream = null;
         }
