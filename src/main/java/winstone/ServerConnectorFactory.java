@@ -1,6 +1,5 @@
 package winstone;
 
-import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -50,8 +49,9 @@ public class ServerConnectorBuilder {
         return this;
     }
 
+
     public ServerConnector build() {
-        ServerConnector sc = null;
+        ServerConnector sc;
         if(scf != null) {
             sc = new ServerConnector(server, Option.JETTY_ACCEPTORS.get(args), Option.JETTY_SELECTORS.get(args),scf);
         }

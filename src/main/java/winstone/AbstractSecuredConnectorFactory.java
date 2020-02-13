@@ -59,8 +59,9 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         MessageFormat.format( "--{0} and --{1} need to be used together", Option.HTTPS_CERTIFICATE, Option.HTTPS_PRIVATE_KEY));
             }
 
-            if (keyStore!=null && opensslKey!=null)
+            if (keyStore!=null && opensslKey!=null) {
                 throw new WinstoneException(MessageFormat.format("--{0} and --{1} are mutually exclusive", Option.HTTPS_KEY_STORE, Option.HTTPS_PRIVATE_KEY));
+            }
 
             if (keyStore!=null) {
                 // load from Java style JKS
@@ -77,7 +78,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             } else if (opensslCert!=null) {
                 // load from openssl style key files
                 CertificateFactory cf = CertificateFactory.getInstance("X509");
-                try(InputStream inputStream = new FileInputStream( opensslCert); //
+                try(InputStream inputStream = new FileInputStream(opensslCert);
                     FileReader fileReader = new FileReader(opensslKey)) {
                     Certificate cert = cf.generateCertificate(inputStream);
                     PrivateKey key = readPEMRSAPrivateKey(fileReader);
@@ -122,7 +123,6 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             throw (IOException)new IOException("Failed to handle keys").initCause(e);
         }
     }
-
 
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) {
 
