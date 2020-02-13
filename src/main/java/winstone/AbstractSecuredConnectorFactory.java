@@ -45,6 +45,12 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     protected KeyStore keystore;
     protected String keystorePassword;
 
+    /***
+     *
+     * @param args
+     * @param server
+     * @throws IOException
+     */
     protected void configureSsl( Map args, Server server ) throws IOException
     {
         try {

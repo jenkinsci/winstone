@@ -62,9 +62,11 @@ public class Launcher implements Runnable {
 
     public final Server server;
 
-    /**
+    /***
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
+     * @param args
+     * @throws IOException
      */
     public Launcher(Map args) throws IOException {
         boolean success=false;
