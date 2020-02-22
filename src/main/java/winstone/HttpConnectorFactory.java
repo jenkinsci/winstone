@@ -6,11 +6,7 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import winstone.cmdline.Option;
 
 import java.io.IOException;
@@ -28,31 +24,21 @@ public class HttpConnectorFactory implements ConnectorFactory {
     public boolean start(Map args, Server server) throws IOException {
         // Load resources
         int listenPort = Option.HTTP_PORT.get(args);
-        String listenAddress = Option.HTTP_LISTEN_ADDRESS.get(args);
-        int keepAliveTimeout = Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args);
 
         if (listenPort < 0) {
             return false;
         } else {
-            ServerConnector connector = createConnector(server, args);
-            connector.setPort(listenPort);
-            connector.setHost(listenAddress);
-            connector.setIdleTimeout(keepAliveTimeout);
 
-            HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
-            config.addCustomizer(new ForwardedRequestCustomizer());
-            config.setRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
+            ServerConnectorBuilder scb = new ServerConnectorBuilder();
+            scb.withAcceptors(Option.JETTY_ACCEPTORS.get(args));
+            scb.withSelectors(Option.JETTY_SELECTORS.get(args));
+            scb.withListenerPort(listenPort);
+            scb.withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args));
+            scb.withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
 
-            server.addConnector(connector);
+            server.addConnector(scb.build());
             return true;
         }
     }
 
-    /**
-     * Gets a server socket - this is mostly for the purpose of allowing an
-     * override in the SSL connector.
-     */
-    protected ServerConnector createConnector(Server server, Map args) {
-        return new ServerConnector(server, Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args ));
-    }
 }
