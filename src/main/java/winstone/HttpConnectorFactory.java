@@ -27,18 +27,17 @@ public class HttpConnectorFactory implements ConnectorFactory {
 
         if (listenPort < 0) {
             return false;
-        } else {
-
-            ServerConnectorBuilder scb = new ServerConnectorBuilder();
-            scb.withAcceptors(Option.JETTY_ACCEPTORS.get(args));
-            scb.withSelectors(Option.JETTY_SELECTORS.get(args));
-            scb.withListenerPort(listenPort);
-            scb.withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args));
-            scb.withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-
+        }
+        else {
+            ServerConnectorBuilder scb = new ServerConnectorBuilder()
+                .withAcceptors(Option.JETTY_ACCEPTORS.get(args))
+                .withSelectors(Option.JETTY_SELECTORS.get(args))
+                .withListenerPort(listenPort)
+                .withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args))
+                .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
             server.addConnector(scb.build());
             return true;
+
         }
     }
-
 }

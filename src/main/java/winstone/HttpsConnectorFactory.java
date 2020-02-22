@@ -32,17 +32,15 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
 
         configureSsl(args, server);
 
-        ServerConnectorBuilder scb = new ServerConnectorBuilder();
-        scb.withAcceptors(Option.JETTY_ACCEPTORS.get(args));
-        scb.withSelectors(Option.JETTY_SELECTORS.get(args));
-        scb.withListenerPort(listenPort);
-        scb.withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args));
-        scb.withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
-        scb.withSslContext(getSSLContext(args));
-
+        ServerConnectorBuilder scb = new ServerConnectorBuilder()
+            .withAcceptors(Option.JETTY_ACCEPTORS.get(args))
+            .withSelectors(Option.JETTY_SELECTORS.get(args))
+            .withListenerPort(listenPort)
+            .withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args))
+            .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
+            .withSslContext(getSSLContext(args));
         server.addConnector(scb.build());
-
         return true;
-    }
 
+    }
 }
