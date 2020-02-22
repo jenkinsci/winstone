@@ -18,8 +18,6 @@ public class ServerConnectorBuilder {
     private Server server;
     private SslContextFactory sslContextFactory;
 
-    private ServerConnector sc;
-
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
         return this;
@@ -61,6 +59,8 @@ public class ServerConnectorBuilder {
     }
 
     public ServerConnector build() {
+
+        ServerConnector sc;
 
         if(sslContextFactory != null) {
             sc = new ServerConnector(server, acceptors, selectors, sslContextFactory);
