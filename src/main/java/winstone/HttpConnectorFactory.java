@@ -30,6 +30,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
         }
         else {
             ServerConnectorBuilder scb = new ServerConnectorBuilder()
+                .withServer(server)
                 .withAcceptors(Option.JETTY_ACCEPTORS.get(args))
                 .withSelectors(Option.JETTY_SELECTORS.get(args))
                 .withListenerPort(listenPort)
