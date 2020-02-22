@@ -34,7 +34,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
                 .withAcceptors(Option.JETTY_ACCEPTORS.get(args))
                 .withSelectors(Option.JETTY_SELECTORS.get(args))
                 .withListenerPort(listenPort)
-                .withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args))
+                .withListenerAddress(Option.HTTP_LISTEN_ADDRESS.get(args))
                 .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args));
             server.addConnector(scb.build());
             return true;
