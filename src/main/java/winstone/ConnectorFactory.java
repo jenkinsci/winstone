@@ -24,5 +24,4 @@ public interface ConnectorFactory {
      * @param server
      */
     boolean start(Map args, Server server) throws IOException;
-
 }
