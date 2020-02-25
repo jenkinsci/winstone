@@ -7,7 +7,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-public class ServerConnectorBuilder {
+class ServerConnectorBuilder {
 
     private int listenerPort;
     private int keepAliveTimeout;
