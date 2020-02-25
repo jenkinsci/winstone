@@ -62,7 +62,7 @@ class ServerConnectorBuilder {
 
         ServerConnector sc;
 
-        if(sslContextFactory != null) {
+        if (sslContextFactory != null) {
             sc = new ServerConnector(server, acceptors, selectors, sslContextFactory);
         }
         else {
