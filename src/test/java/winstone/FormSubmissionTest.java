@@ -9,13 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import static org.junit.Assert.assertTrue;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
 public class FormSubmissionTest extends AbstractWinstoneTest {
 
-    @Ignore("TODO indeed fails after 200_000 regardless of requestFormContentSize option")
     @Issue("JENKINS-60409")
     @Test
     public void largeForm() throws Exception {
@@ -24,6 +22,9 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
         args.put("prefix", "/");
         args.put("httpPort", "59009");
         args.put("httpListenAddress", "127.0.0.2");
+        /* To see it fail:
+        args.put("requestFormContentSize", "999");
+        */
         winstone = new Launcher(args);
 
         for (int size = 1; size <= 9_999_999; size *= 3) {
