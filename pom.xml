@@ -38,7 +38,6 @@
   </licenses>
 
   <build>
-
     <plugins>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -66,7 +65,6 @@
           </execution>
         </executions>
       </plugin>
-
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -128,6 +126,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <!-- if changed that please re enable sources plugin -->
               <createSourcesJar>true</createSourcesJar>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
@@ -136,6 +135,15 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <!-- because shade plugin already produce a sources jar and fail deploy during release -->
+          <skipSource>true</skipSource>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
