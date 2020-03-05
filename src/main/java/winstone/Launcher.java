@@ -161,13 +161,6 @@ public class Launcher implements Runnable {
             this.server = new Server(queuedThreadPool);
 
 
-            int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
-            if (maxParameterCount>0) {
-                server.setAttribute("org.eclipse.jetty.server.Request.maxFormKeys",maxParameterCount);
-            }
-            server.setAttribute("org.eclipse.jetty.server.Request.maxFormContentSize",
-                    Option.REQUEST_FORM_CONTENT_SIZE.get(args));
-
             // Open the web apps
             this.hostGroup = new HostGroup(server, commonLibCL,
                     commonLibCLPaths.toArray(new File[0]), args);

@@ -44,7 +44,12 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
+	<servlet>
+		<servlet-name>AcceptFormServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.AcceptFormServlet</servlet-class>
+	</servlet>
+
 	<servlet>
 		<servlet-name>UnavailableAtInitServlet</servlet-name>
 		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>
@@ -81,6 +86,11 @@
 		<url-pattern>/CountRequestsServlet</url-pattern>
 	</servlet-mapping>
 	
+	<servlet-mapping>
+		<servlet-name>AcceptFormServlet</servlet-name>
+		<url-pattern>/AcceptFormServlet</url-pattern>
+	</servlet-mapping>
+
 	<!-- test that an explicit mapping overrides the default JSP one -->
 	<servlet-mapping>
 		<servlet-name>loadOnStartupJSP</servlet-name>
