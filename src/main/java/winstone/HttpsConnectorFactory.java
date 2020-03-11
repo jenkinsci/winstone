@@ -30,7 +30,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             return false;
         }
 
-        configureSsl(args, server);
+        configureSsl(args);
 
         ServerConnectorBuilder scb = new ServerConnectorBuilder()
             .withServer(server)

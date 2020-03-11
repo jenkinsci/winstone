@@ -42,6 +42,7 @@ import java.util.Map;
  *  @since 4.1
  */
 public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
+
     @Override
     public boolean start( Map args, Server server ) throws IOException
     {
@@ -55,7 +56,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
 
 
         try {
-            configureSsl( args, server );
+            configureSsl(args);
             SslContextFactory sslContextFactory = getSSLContext( args );
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
