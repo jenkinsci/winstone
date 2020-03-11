@@ -9,7 +9,6 @@ package winstone;
 
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
-import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -119,10 +118,12 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
 
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (PemReader priavteKeyFile = new PemReader(reader)) {
-                PemObject privateKey = priavteKeyFile.readPemObject();
+            try (PemReader privateKeyFile = new PemReader(reader)) {
+                PemObject privateKey = privateKeyFile.readPemObject();
                 if(privateKey.getType().equalsIgnoreCase("PRIVATE KEY")){
-                    baos.write(priavteKeyFile.read());
+                    baos.write(privateKeyFile.read());
+                } else {
+                    Logger.log(Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.NoPrivateKeyFound");
                 }
             }
         finally {
