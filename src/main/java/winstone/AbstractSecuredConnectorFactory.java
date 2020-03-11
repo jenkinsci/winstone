@@ -122,7 +122,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             try (PemReader priavteKeyFile = new PemReader(reader)) {
                 PemObject privateKey = priavteKeyFile.readPemObject();
                 if(privateKey.getType().equalsIgnoreCase("PRIVATE KEY")){
-                    baos.write(privateKey.getContent());
+                    baos.write(priavteKeyFile.read());
                 }
             }
         finally {
