@@ -8,6 +8,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509TrustManager;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +80,37 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpsKeyStorePassword", "changeit");
         winstone = new Launcher(args);
         request(new TrustEveryoneManager());
+    }
+
+    @Test
+    public void httpRedirect() throws Exception {
+        Map<String,String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "59008");
+        args.put("httpsPort", "59009");
+        args.put("httpsRedirectHttp", "true");
+        winstone = new Launcher(args);
+        requestRedirect(new TrustEveryoneManager());
+
+        // also verify that directly accessing the resource works.
+        request(new TrustEveryoneManager());
+    }
+
+    private void requestRedirect(X509TrustManager tm) throws Exception {
+        HttpURLConnection con = (HttpURLConnection)new URL("http://localhost:59008/CountRequestsServlet").openConnection();
+        assertEquals(302, con.getResponseCode());
+        assertTrue("Should have a Location header of the resource", con.getHeaderFields().containsKey("Location"));
+        String newUrl = con.getHeaderField("Location");
+        assertNotNull(newUrl);
+        assertTrue(newUrl.contains("https"));
+        assertTrue(newUrl.contains("59009"));
+        HttpsURLConnection secureCon = (HttpsURLConnection)new URL(newUrl).openConnection();
+        secureCon.setHostnameVerifier( ( s, sslSession ) -> true );
+        SSLContext ssl = SSLContext.getInstance("SSL");
+        ssl.init(null, new X509TrustManager[] {tm}, null);
+        secureCon.setSSLSocketFactory(ssl.getSocketFactory());
+        IOUtils.toString(secureCon.getInputStream());
     }
 
 }
