@@ -49,7 +49,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
                 }
             }
         }
-        configureSsl(args, server);
+        configureSsl(args);
 
         ServerConnectorBuilder scb = new ServerConnectorBuilder()
             .withServer(server)

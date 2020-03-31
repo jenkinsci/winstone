@@ -46,7 +46,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     protected KeyStore keystore;
     protected String keystorePassword;
 
-    protected void configureSsl( Map args, Server server ) throws IOException
+    protected void configureSsl(Map args) throws IOException
     {
         try {
             File opensslCert = Option.HTTPS_CERTIFICATE.get( args);

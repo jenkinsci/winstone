@@ -55,7 +55,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
 
 
         try {
-            configureSsl( args, server );
+            configureSsl(args);
             SslContextFactory sslContextFactory = getSSLContext( args );
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
