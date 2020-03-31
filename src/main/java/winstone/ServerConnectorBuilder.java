@@ -10,6 +10,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 class ServerConnectorBuilder {
 
     private int listenerPort;
+    private int secureListenerPort;
     private int keepAliveTimeout;
     private int acceptors;
     private int selectors;
@@ -20,6 +21,11 @@ class ServerConnectorBuilder {
 
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
+        return this;
+    }
+
+    public ServerConnectorBuilder withSecureListenerPort(int secureListenerPort) {
+        this.secureListenerPort = secureListenerPort;
         return this;
     }
 
@@ -73,6 +79,9 @@ class ServerConnectorBuilder {
         sc.setIdleTimeout(keepAliveTimeout);
 
         HttpConfiguration hc = sc.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        if(secureListenerPort > 0) {
+            hc.setSecurePort(secureListenerPort);
+        }
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
 
