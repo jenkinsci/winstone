@@ -47,12 +47,12 @@ public class Option<T> {
     public static final OBoolean DEBUG=bool("debug",false);
 
     // these are combined with protocol to form options
-    public static final OInt _PORT = integer("Port");
-    public static final OString _LISTEN_ADDRESS = string("ListenAddress");
+    private static final OInt _PORT = integer("Port");
+    private static final OString _LISTEN_ADDRESS = string("ListenAddress");
     /**
      * Number of milliseconds for the HTTP keep-alive to hang around until the next request is sent.
      */
-    public static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
+    private static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
 
 
     public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
