@@ -175,7 +175,7 @@ becomes the default host.
 
 ## HTTP/2 Support
 
-Please note Java8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
+*Old versions of* Java 8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
 
 The version to use depends on your used jvm version.
 
@@ -194,7 +194,7 @@ You have to include the used ALPN processor with an extra configuration option. 
 
 The jar must be included using the option: ``` --extraLibFolder=extra ``` (path to a directory containing the jars)
 
-With Java9+ you do not need anymore to include the ALPN jar in the bootclasspath but only the jar jetty-alpn-java-server in the ``` extraLibFolder ```
+With JDK 8u252+ or Java 9+ you do not need anymore to include the ALPN jar in the bootclasspath but only the jar jetty-alpn-java-server in the ``` extraLibFolder ```
 
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
