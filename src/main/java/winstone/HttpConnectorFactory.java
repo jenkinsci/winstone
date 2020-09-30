@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import winstone.cmdline.Option;
 
@@ -21,12 +22,12 @@ import java.util.Map;
  * @version $Id: HttpConnectorFactory.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
 public class HttpConnectorFactory implements ConnectorFactory {
-    public boolean start(Map args, Server server) throws IOException {
+    public Connector start( Map args, Server server) throws IOException {
         // Load resources
         int listenPort = Option.HTTP_PORT.get(args);
 
         if (listenPort < 0) {
-            return false;
+            return null;
         }
         else {
             ServerConnectorBuilder scb = new ServerConnectorBuilder()
@@ -38,8 +39,9 @@ public class HttpConnectorFactory implements ConnectorFactory {
                 .withListenerAddress(Option.HTTP_LISTEN_ADDRESS.get(args))
                 .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
                 .withKeepAliveTimeout(Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args));
-            server.addConnector(scb.build());
-            return true;
+            Connector connector = scb.build();
+            server.addConnector(connector);
+            return connector;
 
         }
     }
