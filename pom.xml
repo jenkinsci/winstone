@@ -40,8 +40,9 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>prepare-testwebapp</id>
@@ -50,7 +51,7 @@
               <goal>run</goal>
             </goals>
             <configuration>
-              <tasks>
+              <target>
                 <copy overwrite="true" todir="${project.build.directory}">
                   <fileset dir="${basedir}/src" includes="testwebapp/**" />
                 </copy>
@@ -60,7 +61,7 @@
                 <war destfile="${project.build.directory}/test-classes/test.war">
                   <fileset dir="${project.build.directory}/testwebapp" />
                 </war>
-              </tasks>
+              </target>
             </configuration>
           </execution>
         </executions>
