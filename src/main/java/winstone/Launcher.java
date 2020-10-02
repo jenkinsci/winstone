@@ -166,7 +166,7 @@ public class Launcher implements Runnable {
             // add LowResourceMonitor
             LowResourceMonitor lowResourceMonitor = new LowResourceMonitor(this.server);
             lowResourceMonitor.setMonitorThreads(true);
-            this.server.addBean( lowResourceMonitor );
+            this.server.addBean(lowResourceMonitor);
 
 
             // Open the web apps
