@@ -24,6 +24,7 @@ import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http2.HTTP2Cipher;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -43,14 +44,14 @@ import java.util.Map;
  */
 public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
     @Override
-    public boolean start( Map args, Server server ) throws IOException
+    public Connector start( Map args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
         String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
 
         if ( listenPort < 0 ) {
             // not running HTTP2 listener
-            return false;
+            return null;
         }
 
 
@@ -84,10 +85,10 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
 
             ALPN.debug = Boolean.getBoolean( "alpnDebug" );
 
-            return true;
-        } catch ( IllegalStateException e ) {
+            return http2Connector;
+        } catch (IllegalStateException e) {
             Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
         }
-        return false;
+        return null;
     }
 }

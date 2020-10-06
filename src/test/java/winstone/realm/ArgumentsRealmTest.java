@@ -1,6 +1,7 @@
 package winstone.realm;
 
 import com.meterware.httpunit.AuthorizationRequiredException;
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
@@ -17,19 +18,20 @@ public class ArgumentsRealmTest extends AbstractWinstoneTest {
         Map<String,String> args = new HashMap<String,String>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
-        args.put("httpPort", "10059");
+        args.put("httpPort", "0");
         args.put("argumentsRealm.passwd.joe","eoj");
         args.put("argumentsRealm.roles.joe","loginUser");
         winstone = new Launcher(args);
-
+        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         try {
-            makeRequest("http://localhost:10059/secure/secret.txt");
+            makeRequest("http://localhost:"+port+"/secure/secret.txt");
+
             fail("should require authentication");
         } catch (AuthorizationRequiredException e) {
             // expected
         }
 
         wc.setAuthorization("joe","eoj");
-        assertEquals("diamond", makeRequest("http://localhost:10059/secure/secret.txt"));
+        assertEquals("diamond", makeRequest("http://localhost:"+port+"/secure/secret.txt"));
     }
 }

@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 
 import java.io.IOException;
@@ -22,6 +23,8 @@ public interface ConnectorFactory {
      * After the listener is loaded and initialized, this starts the thread
      * @param args
      * @param server
+     * @return the Connector instance or <code>null</code> if not started
      */
-    boolean start(Map args, Server server) throws IOException;
+    Connector start( Map args, Server server) throws IOException;
+
 }

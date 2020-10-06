@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import static org.junit.Assert.assertTrue;
+
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
@@ -20,16 +22,16 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
         Map<String,String> args = new HashMap<String,String>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
-        args.put("httpPort", "59009");
+        args.put("httpPort", "0");
         args.put("httpListenAddress", "127.0.0.2");
         /* To see it fail:
         args.put("requestFormContentSize", "999");
         */
         winstone = new Launcher(args);
-
+        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         for (int size = 1; size <= 9_999_999; size *= 3) {
             System.out.println("trying size " + size);
-            WebRequest wreq = new PostMethodWebRequest("http://127.0.0.2:59009/AcceptFormServlet");
+            WebRequest wreq = new PostMethodWebRequest("http://127.0.0.2:"+port+"/AcceptFormServlet");
             StringBuilder b = new StringBuilder();
             for (int i = 0; i < size; i++) {
                 b.append('.');

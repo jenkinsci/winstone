@@ -8,6 +8,8 @@ package winstone;
 
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
@@ -161,18 +163,26 @@ public class Launcher implements Runnable {
             queuedThreadPool.setName("Jetty (winstone)");
             this.server = new Server(queuedThreadPool);
 
+            // add LowResourceMonitor
+            LowResourceMonitor lowResourceMonitor = new LowResourceMonitor(this.server);
+            lowResourceMonitor.setMonitorThreads(true);
+            this.server.addBean(lowResourceMonitor);
+
 
             // Open the web apps
             this.hostGroup = new HostGroup(server, commonLibCL,
                     commonLibCLPaths.toArray(new File[0]), args);
 
+            List<Connector> connectors = new ArrayList<>();
             // Create connectors (http, https and ajp)
-            spawnListener(HTTP_LISTENER_CLASS);
-            spawnListener(AJP_LISTENER_CLASS);
-            spawnListener(HTTPS_LISTENER_CLASS);
-            spawnListener(HTTP2_LISTENER_CLASS);
+            spawnListener(HTTP_LISTENER_CLASS, connectors);
+            spawnListener(AJP_LISTENER_CLASS, connectors);
+            spawnListener(HTTPS_LISTENER_CLASS, connectors);
+            spawnListener(HTTP2_LISTENER_CLASS, connectors);
 
-            if(Option.USE_JMX.get( args )) {
+            lowResourceMonitor.setMonitoredConnectors(connectors);
+
+            if(Option.USE_JMX.get(args)) {
                 // Setup JMX if needed
                 MBeanContainer mbeanContainer = new MBeanContainer( ManagementFactory.getPlatformMBeanServer());
                 server.addBean(mbeanContainer);
@@ -204,12 +214,16 @@ public class Launcher implements Runnable {
      * don't do anything too adventurous in the constructor, or if you do,
      * catch and log any errors locally before rethrowing.
      */
-    protected void spawnListener(String listenerClassName) throws IOException {
+    protected Connector spawnListener(String listenerClassName, List<Connector> connectors) throws IOException {
         try {
             ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
-            connectorFactory.start(args, server);
+            Connector connector = connectorFactory.start(args, server);
+            if(connector!=null){
+                connectors.add(connector);
+            }
+            return connector;
         } catch (Throwable err) {
-            throw (IOException)new IOException("Failed to start a listener: "+listenerClassName).initCause(err);
+            throw new IOException("Failed to start a listener: "+listenerClassName, err);
         }
     }
 

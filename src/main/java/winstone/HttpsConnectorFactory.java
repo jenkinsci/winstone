@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -24,13 +25,13 @@ import java.util.Map;
  */
 public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
 
-    public boolean start(Map args, Server server) throws IOException {
+    public Connector start( Map args, Server server) throws IOException {
 
         int listenPort = Option.HTTPS_PORT.get(args);
 
         if (listenPort<0) {
             // not running HTTPS listener
-            return false;
+            return null;
         }
 
         if(Option.HTTPS_REDIRECT_HTTP.get(args)) {
@@ -60,8 +61,8 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
             .withKeepAliveTimeout(Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args))
             .withSslContext(getSSLContext(args));
-        server.addConnector(scb.build());
-        return true;
-
+        Connector connector = scb.build();
+        server.addConnector(connector);
+        return connector;
     }
 }

@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import winstone.cmdline.Option;
 
@@ -20,11 +21,11 @@ import java.util.Map;
  * @version $Id: Ajp13ConnectorFactory.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
 public class Ajp13ConnectorFactory implements ConnectorFactory {
-    public boolean start(Map args, Server server) throws IOException {
+    public Connector start( Map args, Server server) throws IOException {
         int listenPort = Option.AJP13_PORT.get(args);
 
         if (listenPort < 0) {
-            return false;
+            return null;
         }
 
         throw new UnsupportedOperationException(
