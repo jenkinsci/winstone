@@ -1,6 +1,7 @@
 package winstone.accesslog;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
@@ -22,17 +23,17 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         logFile.delete();
 
         // Initialise container
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/examples");
-        args.put("httpPort", "10003");
+        args.put("httpPort", "0");
         args.put("accessLoggerClassName",SimpleAccessLogger.class.getName());
         args.put("simpleAccessLogger.file",logFile.getAbsolutePath());
         args.put("simpleAccessLogger.format","###ip### - ###user### ###uriLine### ###status###");
         winstone = new Launcher(args);
-
+        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         // make a request
-        makeRequest("http://localhost:10003/examples/CountRequestsServlet");
+        makeRequest("http://localhost:"+port+"/examples/CountRequestsServlet");
 
         // check the log file
         String text = FileUtils.readFileToString(logFile);

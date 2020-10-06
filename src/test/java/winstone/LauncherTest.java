@@ -1,6 +1,7 @@
 package winstone;
 
 import com.meterware.httpunit.WebResponse;
+import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import winstone.Launcher;
 
@@ -16,11 +17,11 @@ public class LauncherTest extends AbstractWinstoneTest {
         Map<String,String> args = new HashMap<String,String>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
-        args.put("httpPort", "59009");
+        args.put("httpPort", "0");
         args.put("mimeTypes", "xxx=text/xxx");
         winstone = new Launcher(args);
-
-        WebResponse r = wc.getResponse("http://127.0.0.2:59009/test.xxx");
+        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
+        WebResponse r = wc.getResponse("http://127.0.0.2:"+port+"/test.xxx");
         assertEquals("text/xxx",r.getContentType());
         assertEquals("Hello",r.getText());
     }

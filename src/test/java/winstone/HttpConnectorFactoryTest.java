@@ -21,7 +21,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpPort", "0");
         args.put("httpListenAddress", "127.0.0.2");
         winstone = new Launcher(args);
-        int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
+        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         assertConnectionRefused("127.0.0.1",port);
 
         makeRequest("http://127.0.0.2:"+port+"/CountRequestsServlet");
