@@ -9,7 +9,7 @@
 
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>5.12</version>
+  <version>${revision}${changelist}</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
