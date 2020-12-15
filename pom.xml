@@ -9,7 +9,7 @@
 
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>5.13</version>
+  <version>${revision}${changelist}</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -17,7 +17,7 @@
   <url>https://github.com/jenkinsci/winstone</url>
 
   <properties>
-    <revision>5.13</revision>
+    <revision>5.14</revision>
     <changelist>-SNAPSHOT</changelist>
     <jetty.version>9.4.35.v20201120</jetty.version>
     <alpn.api.version>1.1.3.v20160715</alpn.api.version>
@@ -189,7 +189,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
-    <tag>winstone-5.13</tag>
+    <tag>winstone-5.12</tag>
   </scm>
 
   <dependencyManagement>
