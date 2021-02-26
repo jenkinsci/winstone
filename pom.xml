@@ -235,6 +235,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>rhino</groupId>
+      <artifactId>js</artifactId>
+      <version>1.6R5</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
