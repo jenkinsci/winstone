@@ -219,7 +219,7 @@
     <dependency>
       <groupId>httpunit</groupId>
       <artifactId>httpunit</artifactId>
-      <version>1.6</version>
+      <version>1.7</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -227,6 +227,12 @@
           <artifactId>servlet-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>rhino</groupId>
+      <artifactId>js</artifactId>
+      <version>1.6R5</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
