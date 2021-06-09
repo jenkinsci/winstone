@@ -22,7 +22,7 @@ Map branches = [:]
             withEnv(["MAVEN_SETTINGS=$settingsXml"]) {
                 stage('Build') {
                     timeout(30) {
-                        infra.runMaven(["-Dset.changelist", "-Dmaven.test.failure.ignore", "install"])
+                        infra.runMaven(["-Dset.changelist", "-Dmaven.test.failure.ignore", "install javadoc:javadoc"])
                     }
                 }
 
