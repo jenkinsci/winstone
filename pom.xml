@@ -9,7 +9,7 @@
 
   <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>5.20</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -189,7 +189,7 @@
     <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
     <url>http://github.com/jenkinsci/winstone</url>
-    <tag>HEAD</tag>
+    <tag>winstone-5.20</tag>
   </scm>
 
   <dependencyManagement>
