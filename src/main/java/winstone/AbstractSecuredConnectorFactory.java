@@ -61,14 +61,14 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 throw new WinstoneException(MessageFormat.format("--{0} and --{1} are mutually exclusive", Option.HTTPS_KEY_STORE, Option.HTTPS_PRIVATE_KEY));
 
             if (keyStore!=null) {
-                // load from Java style JKS
+                // load from default Keystore
                 if (!keyStore.exists() || !keyStore.isFile())
                     throw new WinstoneException(SSL_RESOURCES.getString(
                         "HttpsListener.KeyStoreNotFound", keyStore.getPath()));
 
                 this.keystorePassword = pwd;
 
-                keystore = KeyStore.getInstance("JKS");
+                keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 try(InputStream inputStream = new FileInputStream(keyStore)){
                     keystore.load( inputStream, this.keystorePassword.toCharArray());
                 }
@@ -81,7 +81,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     PrivateKey key = readPEMRSAPrivateKey(fileReader);
 
                     this.keystorePassword = "changeit";
-                    keystore = KeyStore.getInstance( "JKS" );
+                    keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                     keystore.load( null );
                     keystore.setKeyEntry( "hudson", key, keystorePassword.toCharArray(), new Certificate[]{ cert } );
                 }
