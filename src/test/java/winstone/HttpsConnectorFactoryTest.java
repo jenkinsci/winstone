@@ -102,8 +102,11 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         // TODO not sure why but random port doesn't work when using redirect
-        args.put("httpPort", "55708"); // 0
-        args.put("httpsPort", "55709"); // 0
+        // use a "user port" rather than a "dynamic" one for less collisions (1024-49151) vs (49152-65535)
+        // https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+        args.put("httpPort", "0");
+        args.put("httpsPort", "23058"); // 0
+        args.put("httpsListenAddress", "localhost");
         args.put("httpsRedirectHttp", "true");
         winstone = new Launcher(args);
         List<ServerConnector> serverConnectors =
