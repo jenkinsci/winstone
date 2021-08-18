@@ -1,6 +1,7 @@
 package winstone;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
@@ -101,20 +102,24 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
-        // TODO not sure why but random port doesn't work when using redirect
-        args.put("httpPort", "55708"); // 0
-        args.put("httpsPort", "55709"); // 0
+        args.put("httpPort", "0");
+        args.put("httpsPort", "0");
         args.put("httpsRedirectHttp", "true");
         winstone = new Launcher(args);
         List<ServerConnector> serverConnectors =
             Arrays.asList( winstone.server.getConnectors() )
                 .stream().map(connector -> (ServerConnector)connector ).collect(Collectors.toList());
-        int httpPort = serverConnectors.stream()
-                            .filter(serverConnector -> !serverConnector.getDefaultProtocol().startsWith("SSL"))
-                            .findFirst().get().getLocalPort();
+        
         int httpsPort = serverConnectors.stream()
                             .filter(serverConnector -> serverConnector.getDefaultProtocol().startsWith("SSL"))
                             .findFirst().get().getLocalPort();
+        ServerConnector scNonSsl = serverConnectors.stream()
+                .filter(serverConnector -> !serverConnector.getDefaultProtocol().startsWith("SSL"))
+                .findFirst().get();
+        int httpPort = scNonSsl.getLocalPort();
+
+        scNonSsl.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration().setSecurePort(httpsPort);
+
         requestRedirect(new TrustEveryoneManager(), httpPort, httpsPort);
 
         // also verify that directly accessing the resource works.
