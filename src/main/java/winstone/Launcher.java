@@ -16,8 +16,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.util.log.JavaUtilLog;
-import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
@@ -380,7 +378,6 @@ public class Launcher implements Runnable {
               }
           }
         }
-        Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
         Map<String, String> args = getArgsFromCommandLine(argv);
 

@@ -1,5 +1,6 @@
 package winstone;
 
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -18,7 +19,7 @@ class ServerConnectorBuilder {
     private int responseHeaderSize;
     private String listenerAddress;
     private Server server;
-    private SslContextFactory sslContextFactory;
+    private SslContextFactory.Server sslContextFactory;
 
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
@@ -55,7 +56,7 @@ class ServerConnectorBuilder {
         return this;
     }
 
-    public ServerConnectorBuilder withSslContext(SslContextFactory sslContextFactory) {
+    public ServerConnectorBuilder withSslContext(SslContextFactory.Server sslContextFactory) {
         this.sslContextFactory = sslContextFactory;
         return this;
     }
@@ -88,6 +89,7 @@ class ServerConnectorBuilder {
         if(secureListenerPort > 0) {
             hc.setSecurePort(secureListenerPort);
         }
+        hc.setUriCompliance(UriCompliance.LEGACY);
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);

@@ -104,8 +104,9 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         in = !in;
                         continue;
                     }
+
                     if ( in ) {
-                        baos.write(Base64.getDecoder().decode(line.trim()));
+                        baos.write( Base64.getDecoder().decode(line.getBytes(StandardCharsets.UTF_8) ) );
                     }
                 }
             } catch (InvalidPathException e) {
@@ -137,7 +138,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    protected SslContextFactory getSSLContext( Map<String, String> args) {
+    protected SslContextFactory.Server getSSLContext( Map<String, String> args) {
         try {
             String privateKeyPassword;
 
