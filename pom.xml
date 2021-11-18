@@ -24,6 +24,7 @@
     <java.level>8</java.level>
     <!-- TODO: remove once SpotBugs issues are fixed. 57 so far -->
     <spotbugs.failOnError>false</spotbugs.failOnError>
+    <githubRepo>jenkinsci/winstone</githubRepo>
   </properties>
 
   <licenses>
@@ -186,10 +187,10 @@
   </pluginRepositories>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
-    <url>http://github.com/jenkinsci/winstone</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <url>http://github.com/${gitHubRepo}</url>
+    <tag>${scmTag}</tag>
   </scm>
 
   <dependencyManagement>
