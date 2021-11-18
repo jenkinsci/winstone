@@ -152,7 +152,7 @@
         <executions>
           <execution>
             <id>flatten</id>
-            <phase>package</phase>
+            <phase>pre-integration-test</phase> <!-- MNG-5987: anything after package -->
             <goals>
               <goal>flatten</goal>
             </goals>
