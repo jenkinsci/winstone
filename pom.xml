@@ -24,7 +24,7 @@
     <java.level>8</java.level>
     <!-- TODO: remove once SpotBugs issues are fixed. 57 so far -->
     <spotbugs.failOnError>false</spotbugs.failOnError>
-    <githubRepo>jenkinsci/winstone</githubRepo>
+    <gitHubRepo>jenkinsci/winstone</gitHubRepo>
   </properties>
 
   <licenses>
