@@ -7,8 +7,8 @@
 package winstone;
 
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
@@ -223,7 +223,7 @@ public class Launcher implements Runnable {
                 File portFile = new File(portFileName);
                 File portDir = portFile.getParentFile();
                 portDir.mkdirs();
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(portFile))) {
+                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(portFile), StandardCharsets.UTF_8)) {
                     writer.write(Integer.toString(port));
                 }
             }
