@@ -152,7 +152,7 @@
         <executions>
           <execution>
             <id>flatten</id>
-            <phase>package</phase>
+            <phase>pre-integration-test</phase> <!-- MNG-5987: anything after package -->
             <goals>
               <goal>flatten</goal>
             </goals>
@@ -296,7 +296,7 @@
     <dependency>
       <groupId>org.jenkins-ci</groupId>
       <artifactId>test-annotations</artifactId>
-      <version>1.3</version>
+      <version>1.4</version>
       <scope>provided</scope>
     </dependency>
 
