@@ -22,6 +22,7 @@ class ServerConnectorBuilder {
     private Server server;
     private SslContextFactory.Server sslContextFactory;
     private boolean sniHostCheck = true;
+    private boolean sniRequired = false;
 
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
@@ -78,6 +79,11 @@ class ServerConnectorBuilder {
         return this;
     }
 
+    public ServerConnectorBuilder withSniRequired(boolean sniRequired) {
+        this.sniRequired = sniRequired;
+        return this;
+    }
+
     public ServerConnector build() {
 
         ServerConnector sc;
@@ -104,6 +110,9 @@ class ServerConnectorBuilder {
         SecureRequestCustomizer src = hc.getCustomizer(SecureRequestCustomizer.class);
         if(src!=null&&!sniHostCheck){
             src.setSniHostCheck(false);
+        }
+        if(src!=null&&sniRequired){
+            src.setSniRequired(true);
         }
         return sc;
 

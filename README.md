@@ -85,6 +85,8 @@ To run different web applications for diffent virtual hosts:
          / --httpsCertificate     file and the corresponding certificate file
        --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
        --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
+       -- httpsSniHostCheck     = if the SNI Host name must match when there is an SNI certificate. Check disabled per default
+       --httpsSniRequired       = if a SNI certificate is required. Disabled per default
        --http2ListenAddress     = set the http2 listening address. Default is all interfaces
        --excludeCipherSuites    = set the ciphers to exclude (comma separated, use blank quote " " to exclude none) (default is 
                                // Exclude weak / insecure ciphers 
