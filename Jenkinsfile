@@ -9,7 +9,7 @@ properties([[$class: 'BuildDiscarderProperty',
  *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
  */
 Map branches = [:]
-['maven'/* TODO broken , 'maven-windows'*/].each {label ->
+['maven-11'/* TODO broken , 'maven-windows'*/].each {label ->
     branches[label] = {
         node(label) {
             stage('Checkout') {
@@ -30,7 +30,7 @@ Map branches = [:]
                     /* Archive the test results */
                     junit '**/target/surefire-reports/TEST-*.xml'
 
-                    if (label == 'maven') {
+                    if (label == 'maven-11') {
                         infra.prepareToPublishIncrementals()
                     }
                 }
