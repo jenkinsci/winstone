@@ -47,7 +47,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
     public Connector start( Map<String, String> args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
-        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
+        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get(args);
 
         if ( listenPort < 0 ) {
             // not running HTTP2 listener
@@ -64,7 +64,9 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             HttpConfiguration https_config = new HttpConfiguration();
             https_config.setSecureScheme("https");
             https_config.setSecurePort(listenPort);
-            https_config.addCustomizer(new SecureRequestCustomizer());
+            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+            secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
+            https_config.addCustomizer(secureRequestCustomizer);
 
             // HTTP/2 Connection Factory
             HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);

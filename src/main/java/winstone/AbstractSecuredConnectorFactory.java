@@ -106,7 +106,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     }
 
                     if ( in ) {
-                        baos.write( Base64.getDecoder().decode(line.getBytes(StandardCharsets.UTF_8) ) );
+                        baos.write(Base64.getDecoder().decode(line.trim()));
                     }
                 }
             } catch (InvalidPathException e) {
@@ -125,7 +125,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 // p1, p2, exp1, exp2, crtCoef
                 privExpo = (BigInteger) getBigInteger.invoke( seq[3] );
             } catch ( Exception x ) {
-                throw new WinstoneException( SSL_RESOURCES.getString( "HttpsConnectorFactory.LoadPrivateKeyError" ), x );
+                throw new WinstoneException(SSL_RESOURCES.getString( "HttpsConnectorFactory.LoadPrivateKeyError" ), x );
             }
             Logger.log( Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.LoadPrivateKey" );
 

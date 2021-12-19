@@ -4,6 +4,7 @@ import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -20,6 +21,7 @@ class ServerConnectorBuilder {
     private String listenerAddress;
     private Server server;
     private SslContextFactory.Server sslContextFactory;
+    private boolean sniHostCheck = true;
 
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
@@ -71,6 +73,11 @@ class ServerConnectorBuilder {
       return this;
   }
 
+    public ServerConnectorBuilder withSniHostCheck(boolean sniHostCheck) {
+        this.sniHostCheck = sniHostCheck;
+        return this;
+    }
+
     public ServerConnector build() {
 
         ServerConnector sc;
@@ -94,6 +101,10 @@ class ServerConnectorBuilder {
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);
 
+        SecureRequestCustomizer src = hc.getCustomizer(SecureRequestCustomizer.class);
+        if(src!=null&&!sniHostCheck){
+            src.setSniHostCheck(false);
+        }
         return sc;
 
     }

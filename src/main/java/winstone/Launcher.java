@@ -249,7 +249,8 @@ public class Launcher implements Runnable {
      */
     protected Connector spawnListener(String listenerClassName, List<Connector> connectors) throws IOException {
         try {
-            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
+            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName)
+                    .getDeclaredConstructor().newInstance();
             Connector connector = connectorFactory.start(args, server);
             if(connector!=null){
                 connectors.add(connector);

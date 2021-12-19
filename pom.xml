@@ -73,6 +73,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+<!--          <systemPropertyVariables>-->
+<!--            <java.util.logging.config.file>src/test/resources/jul.properties</java.util.logging.config.file>-->
+<!--          </systemPropertyVariables>-->
           <trimStackTrace>false</trimStackTrace> <!-- SUREFIRE-1226 workaround -->
         </configuration>
       </plugin>

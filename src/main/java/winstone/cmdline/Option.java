@@ -72,6 +72,7 @@ public class Option<T> {
     public static final OFile HTTPS_PRIVATE_KEY=file("httpsPrivateKey");
     public static final OString HTTPS_EXCLUDE_CIPHER_SUITES=string("excludeCipherSuites");
     public static final OBoolean HTTPS_REDIRECT_HTTP=bool("httpsRedirectHttp", false);
+    public static final OBoolean HTTPS_SNI_HOST_CHECK=bool("httpsSniHostCheck", false);
 
     public static final OInt AJP13_PORT=integer("ajp13"+_PORT,-1);
     public static final OString AJP13_LISTEN_ADDRESS=string("ajp13"+_LISTEN_ADDRESS);
