@@ -8,7 +8,6 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -33,6 +32,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.logging.Level;
@@ -134,7 +134,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         continue;
                     }
                     if ( in ) {
-                        baos.write( B64Code.decode( line ) );
+                        baos.write(Base64.getDecoder().decode(line.trim()));
                     }
                 }
             } finally {
