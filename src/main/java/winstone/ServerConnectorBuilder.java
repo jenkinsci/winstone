@@ -1,5 +1,6 @@
 package winstone;
 
+import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -102,6 +103,7 @@ class ServerConnectorBuilder {
         if(secureListenerPort > 0) {
             hc.setSecurePort(secureListenerPort);
         }
+        hc.setHttpCompliance(HttpCompliance.RFC7230);
         hc.setUriCompliance(UriCompliance.LEGACY);
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);

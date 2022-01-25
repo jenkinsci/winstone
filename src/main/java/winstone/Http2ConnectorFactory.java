@@ -22,6 +22,8 @@ package winstone;
 
 import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.HttpCompliance;
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.http2.HTTP2Cipher;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -64,6 +66,8 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             HttpConfiguration https_config = new HttpConfiguration();
             https_config.setSecureScheme("https");
             https_config.setSecurePort(listenPort);
+            https_config.setHttpCompliance(HttpCompliance.RFC7230);
+            https_config.setUriCompliance(UriCompliance.LEGACY);
             SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
             secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
             https_config.addCustomizer(secureRequestCustomizer);
