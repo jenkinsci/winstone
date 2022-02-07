@@ -42,7 +42,7 @@ public class LoadTestThread implements Runnable {
         this.url = url;
         this.loadTest = loadTest;
         this.webConv = webConv;
-        this.delayBeforeStarting = 1000 * delayedThreads;
+        this.delayBeforeStarting = 1000L * delayedThreads;
         this.interrupted = false;
         this.thread = new Thread(this);
         this.thread.setDaemon(true);
