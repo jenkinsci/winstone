@@ -80,7 +80,7 @@ public class LoadTestThread implements Runnable {
             int position = 0;
             int value = inContent.read();
             while ((value != -1)
-                    && (((contentLength >= 0) && (position < contentLength)) || (contentLength < 0))) {
+                    && (contentLength < 0 || position < contentLength)) {
                 content[position++] = (byte) value;
                 value = inContent.read();
             }
