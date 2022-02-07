@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Ignore;
+import org.junit.Test;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 
@@ -60,6 +61,7 @@ public class LoadTest {
                 this.gracePeriod + "");
     }
 
+    @Test
     public void test() throws InterruptedException {
         WebConversation wc = null;
 
