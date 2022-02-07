@@ -25,6 +25,7 @@
     <!-- TODO: remove once SpotBugs issues are fixed. 57 so far -->
     <spotbugs.failOnError>false</spotbugs.failOnError>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <licenses>
