@@ -230,6 +230,7 @@ public class Launcher implements Runnable {
     /**
      * The main run method. This handles the normal thread processing.
      */
+    @Override
     public void run() {
         boolean interrupted = false;
         try {

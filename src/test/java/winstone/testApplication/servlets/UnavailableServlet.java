@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UnavailableServlet extends HttpServlet {
     protected boolean errorAtInit;
 
+    @Override
     public void init() throws ServletException {
         String errorTime = getServletConfig().getInitParameter("errorTime");
         this.errorAtInit = ((errorTime == null) || errorTime.equals("init"));
@@ -32,6 +33,7 @@ public class UnavailableServlet extends HttpServlet {
                     "Error thrown deliberately during init");
     }
 
+    @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         if (!this.errorAtInit)

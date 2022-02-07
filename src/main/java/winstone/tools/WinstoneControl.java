@@ -36,6 +36,7 @@ public class WinstoneControl {
     public final static OInt CONTROL_PORT = Option.integer("controlPort");
     public final static OInt PORT = Option.integer("port");
     public final static OInt DEBUG = new OInt("debug", 5) {
+        @Override
         public int get(Map<String, String> args) {
             switch(super.get(args)) {
                 // before switching to java.util.Logging, winstone used a (1:9) range for log levels

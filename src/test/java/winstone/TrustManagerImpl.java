@@ -19,10 +19,12 @@ public class TrustManagerImpl implements X509TrustManager {
         cert = (X509Certificate) cf.generateCertificate(new FileInputStream("src/ssl/server.crt"));
     }
 
+    @Override
     public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
         throw new UnsupportedOperationException("Client trust not supported");
     }
 
+    @Override
     public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
         for (X509Certificate x509Certificate : xcs) {
             System.out.println("certificate: " + x509Certificate.getIssuerX500Principal().getName());
@@ -33,6 +35,7 @@ public class TrustManagerImpl implements X509TrustManager {
         throw new CertificateException("Untrusted certificate?");
     }
 
+    @Override
     public X509Certificate[] getAcceptedIssuers() {
         return new X509Certificate[]{cert};
     }

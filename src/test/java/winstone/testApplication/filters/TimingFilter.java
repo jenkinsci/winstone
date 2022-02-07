@@ -28,6 +28,7 @@ public class TimingFilter implements Filter {
 
     private ServletContext context;
 
+    @Override
     public void init(FilterConfig config) {
         String dumpRequestParams = config
                 .getInitParameter("dumpRequestParameters");
@@ -36,6 +37,7 @@ public class TimingFilter implements Filter {
         this.context = config.getServletContext();
     }
 
+    @Override
     public void destroy() {
         this.context = null;
     }
@@ -44,6 +46,7 @@ public class TimingFilter implements Filter {
      * Times the execution of the rest of the filter chain, optionally dumping
      * the request parameters to the servlet context log
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
         if (this.dumpRequestParams)

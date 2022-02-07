@@ -85,6 +85,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
                 this.fileName, patternType);
     }
 
+    @Override
     public void log(Request request, Response response) {
         String uriLine = request.getMethod() + " " + request.getRequestURI() + " " + request.getProtocol();
         int status = response.getStatus();
