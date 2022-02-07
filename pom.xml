@@ -299,7 +299,7 @@
       <groupId>org.jenkins-ci</groupId>
       <artifactId>test-annotations</artifactId>
       <version>1.4</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
