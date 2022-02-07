@@ -89,7 +89,7 @@ public class FileRealm extends HashLoginService {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);
                         }
-                        String[] roleArray = rl.toArray(new String[rl.size()]);
+                        String[] roleArray = rl.toArray(new String[0]);
                         Arrays.sort(roleArray);
                         userStore.addUser(userName, getCredential(password), roleArray);
                         count++;

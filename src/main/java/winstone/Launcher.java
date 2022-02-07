@@ -143,7 +143,7 @@ public class Launcher implements Runnable {
                         }
             }
 
-            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[jars.size()]),
+            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[0]),
                     getClass().getClassLoader());
 
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
@@ -153,7 +153,7 @@ public class Launcher implements Runnable {
 
 
             if(!extraJars.isEmpty()){
-                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[extraJars.size()]),
+                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[0]),
                                                              getClass().getClassLoader());
                 Thread.currentThread().setContextClassLoader( extraClassLoader );
             }

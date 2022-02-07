@@ -56,7 +56,7 @@ public class ArgumentsRealm extends HashLoginService {
                         String currentRole = st.nextToken();
                         rl.add(currentRole);
                     }
-                    roleArray = rl.toArray(new String[rl.size()]);
+                    roleArray = rl.toArray(new String[0]);
                     Arrays.sort(roleArray);
                 }
                 userStore.addUser(userName, getCredential(password), roleArray);
