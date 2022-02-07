@@ -8,6 +8,7 @@ import winstone.Launcher;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
     @Test
     public void testSimpleConnection() throws Exception {
         File logFile = new File("target/test.log");
-        logFile.delete();
+        Files.deleteIfExists(logFile.toPath());
 
         // Initialise container
         Map<String,String> args = new HashMap<>();
