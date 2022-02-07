@@ -97,9 +97,7 @@ public class LoadTestThread implements Runnable {
             } else
                 throw new IOException("Only downloaded " + position + " of "
                         + contentLength + " bytes");
-        } catch (IOException err) {
-            Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
-        } catch (SAXException err) {
+        } catch (IOException | SAXException err) {
             Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
         }
     }
