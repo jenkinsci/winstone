@@ -33,7 +33,7 @@ public class HostGroup {
 
     public HostGroup(
             Server server, ClassLoader commonLibCL,
-            File[] commonLibCLPaths, Map args) throws IOException {
+            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
         this.server = server;
 //        this.args = args;
         this.hostConfigs = new Hashtable<>();
@@ -61,7 +61,7 @@ public class HostGroup {
 
     protected void initHost(File webappsDir, String hostname,
                             ClassLoader commonLibCL,
-                            File[] commonLibCLPaths, Map args) throws IOException {
+                            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
                 commonLibCLPaths, args, webappsDir);

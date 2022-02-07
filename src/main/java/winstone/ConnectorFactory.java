@@ -25,6 +25,6 @@ public interface ConnectorFactory {
      * @param server
      * @return the Connector instance or <code>null</code> if not started
      */
-    Connector start( Map args, Server server) throws IOException;
+    Connector start( Map<String, String> args, Server server) throws IOException;
 
 }

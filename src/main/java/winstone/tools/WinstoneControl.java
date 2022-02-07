@@ -36,7 +36,7 @@ public class WinstoneControl {
     public final static OInt CONTROL_PORT = Option.integer("controlPort");
     public final static OInt PORT = Option.integer("port");
     public final static OInt DEBUG = new OInt("debug", 5) {
-        public int get(Map args) {
+        public int get(Map<String, String> args) {
             switch(super.get(args)) {
                 // before switching to java.util.Logging, winstone used a (1:9) range for log levels
                 case 1: return Logger.MIN.intValue();
@@ -60,8 +60,8 @@ public class WinstoneControl {
     public static void main(String[] argv) throws Exception {
 
         // Load args from the config file
-        Map options = new CmdLineParser(Option.all(WinstoneControl.class)).parse(argv,"operation");
-        String operation = (String) options.get("operation");
+        Map<String, String> options = new CmdLineParser(Option.all(WinstoneControl.class)).parse(argv,"operation");
+        String operation = options.get("operation");
 
         if (operation.equals("")) {
             printUsage();

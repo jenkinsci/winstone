@@ -145,15 +145,15 @@ public class Option<T> {
         this.defaultValue = defaultValue;
     }
     
-    public void remove(Map args) {
+    public void remove(Map<String, String> args) {
         args.remove(name);
     }
 
-    public void put(Map args, String value) {
+    public void put(Map<String, String> args, String value) {
         args.put(name, value);
     }
     
-    public boolean isIn(Map args) {
+    public boolean isIn(Map<String, String> args) {
         return args.containsKey(name);
     }
 
@@ -202,11 +202,11 @@ public class Option<T> {
             super(name, Boolean.class, defaultValue);
         }
         
-        public boolean get(Map args) {
+        public boolean get(Map<String, String> args) {
             return get(args,defaultValue);
         }
 
-        public boolean get(Map args, boolean defaultValue) {
+        public boolean get(Map<String, String> args, boolean defaultValue) {
             return booleanArg(args, name, defaultValue);
         }
     }
@@ -216,11 +216,11 @@ public class Option<T> {
             super(name, Integer.class, defaultValue);
         }
 
-        public int get(Map args) {
+        public int get(Map<String, String> args) {
             return intArg(args, name, defaultValue);
         }
 
-        public int get(Map args, int defaultValue) {
+        public int get(Map<String, String> args, int defaultValue) {
             return intArg(args, name, defaultValue);
         }
     }
@@ -230,17 +230,17 @@ public class Option<T> {
             super(name, String.class, defaultValue);
         }
         
-        public String get(Map args) {
+        public String get(Map<String, String> args) {
             return get(args,defaultValue);
         }
 
-        public char[] getCharArray(Map args) {
+        public char[] getCharArray(Map<String, String> args) {
             String v = get(args);
             return v!=null ? v.toCharArray() : null;
         }
 
-        public String get(Map args, String defaultValue) {
-            String v = (String)args.get(name);
+        public String get(Map<String, String> args, String defaultValue) {
+            String v = args.get(name);
             return v!=null ? v : defaultValue;
         }
     }
@@ -250,12 +250,12 @@ public class Option<T> {
             super(name, File.class,null);
         }
         
-        public File get(Map args, File defaultValue) {
-            String v = (String)args.get(name);
+        public File get(Map<String, String> args, File defaultValue) {
+            String v = args.get(name);
             return v!=null ? new File(v) : defaultValue;
         }
 
-        public File get(Map args) {
+        public File get(Map<String, String> args) {
             return get(args,null);
         }
     }
@@ -265,12 +265,12 @@ public class Option<T> {
             super(name, Class.class, defaultValue);
         }
 
-        public <T> Class<? extends T> get(Map args, Class<T> expectedType) throws ClassNotFoundException {
+        public <T> Class<? extends T> get(Map<String, String> args, Class<T> expectedType) throws ClassNotFoundException {
             return get(args,expectedType,getClass().getClassLoader());
         }
         
-        public <T> Class<? extends T> get(Map args, Class<T> expectedType, ClassLoader cl) throws ClassNotFoundException {
-            String v = (String)args.get(name);
+        public <T> Class<? extends T> get(Map<String, String> args, Class<T> expectedType, ClassLoader cl) throws ClassNotFoundException {
+            String v = args.get(name);
             if (v==null) return defaultValue;
             
             v=v.trim();
@@ -292,19 +292,19 @@ public class Option<T> {
 //        }
 //    }
 
-    public static boolean booleanArg(Map args, String name, boolean defaultTrue) {
-        String value = (String) args.get(name);
+    public static boolean booleanArg(Map<String, String> args, String name, boolean defaultTrue) {
+        String value = args.get(name);
         if (defaultTrue)
             return (value == null) || (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
         else
             return (value != null) && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
     }
 
-    public static String stringArg(Map args, String name, String defaultValue) {
-        return (String) (args.get(name) == null ? defaultValue : args.get(name));
+    public static String stringArg(Map<String, String> args, String name, String defaultValue) {
+        return args.get(name) == null ? defaultValue : args.get(name);
     }
 
-    public static int intArg(Map args, String name, int defaultValue) {
+    public static int intArg(Map<String, String> args, String name, int defaultValue) {
         return Integer.parseInt(stringArg(args, name, "" + defaultValue));
     }
 

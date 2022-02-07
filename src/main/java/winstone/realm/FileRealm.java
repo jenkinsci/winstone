@@ -45,7 +45,7 @@ public class FileRealm extends HashLoginService {
      * Constructor - this sets up an authentication realm, using the file
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public FileRealm(Map args) {
+    public FileRealm(Map<String, String> args) {
         UserStore userStore = new UserStore();
         setUserStore( userStore );
         // Get the filename and parse the xml doc

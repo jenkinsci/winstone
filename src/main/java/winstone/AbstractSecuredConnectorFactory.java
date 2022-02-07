@@ -46,7 +46,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     protected KeyStore keystore;
     protected String keystorePassword;
 
-    protected void configureSsl( Map args, Server server ) throws IOException
+    protected void configureSsl( Map<String, String> args, Server server ) throws IOException
     {
         try {
             File opensslCert = Option.HTTPS_CERTIFICATE.get( args);
@@ -166,7 +166,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    protected SslContextFactory getSSLContext( Map args) {
+    protected SslContextFactory getSSLContext( Map<String, String> args) {
         try {
             String privateKeyPassword;
 
@@ -190,8 +190,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             kmf.init(keystore, keystorePassword.toCharArray());
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                        "HttpsListener.KeyCount", keystore.size() + "");
-            for ( Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for ( Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                            "HttpsListener.KeyFound", alias,
                            keystore.getCertificate(alias) + "");

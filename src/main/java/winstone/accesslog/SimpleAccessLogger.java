@@ -48,7 +48,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private String pattern;
     private String fileName;
 
-    public SimpleAccessLogger(String webAppName, Map startupArgs)
+    public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs)
             throws IOException {
 
         // Get pattern

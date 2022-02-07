@@ -22,7 +22,7 @@ import java.util.Map;
  * @version $Id: HttpConnectorFactory.java,v 1.15 2007/05/01 04:39:49 rickknowles Exp $
  */
 public class HttpConnectorFactory implements ConnectorFactory {
-    public Connector start( Map args, Server server) throws IOException {
+    public Connector start( Map<String, String> args, Server server) throws IOException {
         // Load resources
         int listenPort = Option.HTTP_PORT.get(args);
 

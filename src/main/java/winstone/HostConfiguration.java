@@ -46,7 +46,7 @@ import java.util.jar.JarFile;
 public class HostConfiguration {
     private final Server server;
     private String hostname;
-    private Map args;
+    private Map<String, String> args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
     private File[] commonLibCLPaths;
@@ -54,7 +54,7 @@ public class HostConfiguration {
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             File[] commonLibCLPaths, Map args, File webappsDir) throws IOException {
+                             File[] commonLibCLPaths, Map<String, String> args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;

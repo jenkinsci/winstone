@@ -60,7 +60,7 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private Map args;
+    private Map<String, String> args;
 
     public final Server server;
 
@@ -68,7 +68,7 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
-    public Launcher(Map args) throws IOException {
+    public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
         try {
             Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
@@ -346,7 +346,7 @@ public class Launcher implements Runnable {
         }
         Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
-        Map args = getArgsFromCommandLine(argv);
+        Map<String, String> args = getArgsFromCommandLine(argv);
 
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
             printUsage();
@@ -374,11 +374,11 @@ public class Launcher implements Runnable {
         }
     }
 
-    public static Map getArgsFromCommandLine(String[] argv) throws IOException {
-        Map args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
+    public static Map<String, String> getArgsFromCommandLine(String[] argv) throws IOException {
+        Map<String, String> args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
 
         // Small hack to allow re-use of the command line parsing inside the control tool
-        String firstNonSwitchArgument = (String) args.get("nonSwitch");
+        String firstNonSwitchArgument = args.get("nonSwitch");
         args.remove("nonSwitch");
 
         // Check if the non-switch arg is a file or folder, and overwrite the config
@@ -395,7 +395,7 @@ public class Launcher implements Runnable {
         return args;
     }
 
-    protected static void deployEmbeddedWarfile(Map args) throws IOException {
+    protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
                 embeddedWarfileName)) {
@@ -435,14 +435,14 @@ public class Launcher implements Runnable {
         }
     }
 
-    public static void initLogger(Map args) throws IOException {
+    public static void initLogger(Map<String, String> args) throws IOException {
         // Reset the log level
         int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
         // boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
         if (args.get("logfile") != null) {
-            logStream = new FileOutputStream((String) args.get("logfile"));
+            logStream = new FileOutputStream(args.get("logfile"));
         } else if (Option.booleanArg(args, "logToStdErr", false)) {
             logStream = System.err;
         } else {
