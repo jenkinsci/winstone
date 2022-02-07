@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -110,21 +111,14 @@ public class HostConfiguration {
     }
 
     private void loadBuiltinMimeTypes() {
-        InputStream in = getClass().getResourceAsStream("mime.properties");
-        try {
+        try (InputStream in = getClass().getResourceAsStream("mime.properties")) {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
                 mimeTypes.addMimeMapping(e.getKey().toString(),e.getValue().toString());
             }
         } catch (IOException e) {
-            throw new Error("Failed to load the built-in MIME types",e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                // ignore
-            }
+            throw new UncheckedIOException("Failed to load the built-in MIME types", e);
         }
     }
 
