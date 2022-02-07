@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -14,7 +15,7 @@
 
   <name>Winstone</name>
   <description>Winstone is a command line wrapper around Jetty</description>
-  <url>https://github.com/jenkinsci/winstone</url>
+  <url>https://github.com/jenkinsci/${project.artifactId}</url>
 
   <properties>
     <revision>5.22</revision>
@@ -30,11 +31,11 @@
   <licenses>
     <license>
       <name>GNU Lesser General Public License version 2.1</name>
-      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <url>https://opensource.org/licenses/LGPL-2.1</url>
     </license>
     <license>
       <name>COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</name>
-      <url>http://www.sun.com/cddl/cddl.html</url>
+      <url>https://opensource.org/licenses/CDDL-1.0</url>
     </license>
   </licenses>
 
