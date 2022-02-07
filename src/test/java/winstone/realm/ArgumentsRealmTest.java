@@ -1,5 +1,8 @@
 package winstone.realm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.meterware.httpunit.AuthorizationRequiredException;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;

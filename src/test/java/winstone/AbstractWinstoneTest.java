@@ -1,12 +1,14 @@
 package winstone;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class AbstractWinstoneTest extends Assert {
+public class AbstractWinstoneTest {
     protected Launcher winstone;
     protected WebConversation wc = new WebConversation();
 
