@@ -21,7 +21,7 @@ import java.util.Map;
  * @version $Id: Ajp13ConnectorFactory.java,v 1.12 2006/03/24 17:24:22 rickknowles Exp $
  */
 public class Ajp13ConnectorFactory implements ConnectorFactory {
-    public Connector start( Map args, Server server) throws IOException {
+    public Connector start( Map<String, String> args, Server server) throws IOException {
         int listenPort = Option.AJP13_PORT.get(args);
 
         if (listenPort < 0) {

@@ -7,6 +7,8 @@ import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +22,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
     @Test
     public void testSimpleConnection() throws Exception {
         File logFile = new File("target/test.log");
-        logFile.delete();
+        Files.deleteIfExists(logFile.toPath());
 
         // Initialise container
         Map<String,String> args = new HashMap<>();
@@ -36,7 +38,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         makeRequest("http://localhost:"+port+"/examples/CountRequestsServlet");
 
         // check the log file
-        String text = FileUtils.readFileToString(logFile);
+        String text = FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
         assertEquals(String.format("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200%n"),text);
     }
 

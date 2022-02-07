@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -32,7 +33,7 @@ public class AbstractWinstoneTest extends Assert {
         WebResponse wresp = wc.getResponse(wreq);
         InputStream content = wresp.getInputStream();
         assertTrue("Loading CountRequestsServlet", content.available() > 0);
-        String s = IOUtils.toString(content);
+        String s = IOUtils.toString(content, StandardCharsets.UTF_8);
         content.close();
         return s;
     }

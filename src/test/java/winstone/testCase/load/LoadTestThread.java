@@ -42,7 +42,7 @@ public class LoadTestThread implements Runnable {
         this.url = url;
         this.loadTest = loadTest;
         this.webConv = webConv;
-        this.delayBeforeStarting = 1000 * delayedThreads;
+        this.delayBeforeStarting = 1000L * delayedThreads;
         this.interrupted = false;
         this.thread = new Thread(this);
         this.thread.setDaemon(true);
@@ -75,12 +75,12 @@ public class LoadTestThread implements Runnable {
                 throw new IOException("Failed with status " + responseCode);
             InputStream inContent = wresp.getInputStream();
             int contentLength = wresp.getContentLength();
-            byte content[] = new byte[contentLength == -1 ? 100 * 1024
+            byte[] content = new byte[contentLength == -1 ? 100 * 1024
                     : contentLength];
             int position = 0;
             int value = inContent.read();
             while ((value != -1)
-                    && (((contentLength >= 0) && (position < contentLength)) || (contentLength < 0))) {
+                    && (contentLength < 0 || position < contentLength)) {
                 content[position++] = (byte) value;
                 value = inContent.read();
             }
@@ -97,9 +97,7 @@ public class LoadTestThread implements Runnable {
             } else
                 throw new IOException("Only downloaded " + position + " of "
                         + contentLength + " bytes");
-        } catch (IOException err) {
-            Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
-        } catch (SAXException err) {
+        } catch (IOException | SAXException err) {
             Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
         }
     }

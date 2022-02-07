@@ -96,7 +96,7 @@ public class HttpConnectorTest extends TestCase {
         WebRequest wreq = new GetMethodWebRequest(
                 "http://localhost:10004/examples/CountRequestsServlet");
         WebResponse wresp1 = wc.getResponse(wreq);
-        WebImage img[] = wresp1.getImages();
+        WebImage[] img = wresp1.getImages();
         for (WebImage anImg : img) wc.getResponse(anImg.getRequest());
         // Thread.sleep(2000);
         // WebResponse wresp2 = wc.getResponse(wreq);

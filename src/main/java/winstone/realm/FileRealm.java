@@ -45,7 +45,7 @@ public class FileRealm extends HashLoginService {
      * Constructor - this sets up an authentication realm, using the file
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public FileRealm(Map args) {
+    public FileRealm(Map<String, String> args) {
         UserStore userStore = new UserStore();
         setUserStore( userStore );
         // Get the filename and parse the xml doc
@@ -85,11 +85,11 @@ public class FileRealm extends HashLoginService {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
                         List<String> rl = new ArrayList<>();
-                        for (; st.hasMoreTokens();) {
+                        while (st.hasMoreTokens()) {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);
                         }
-                        String[] roleArray = rl.toArray(new String[rl.size()]);
+                        String[] roleArray = rl.toArray(new String[0]);
                         Arrays.sort(roleArray);
                         userStore.addUser(userName, getCredential(password), roleArray);
                         count++;

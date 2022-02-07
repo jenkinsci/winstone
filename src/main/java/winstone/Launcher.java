@@ -60,7 +60,7 @@ public class Launcher implements Runnable {
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
-    private Map args;
+    private Map<String, String> args;
 
     public final Server server;
 
@@ -68,7 +68,7 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
-    public Launcher(Map args) throws IOException {
+    public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
         try {
             Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
@@ -117,7 +117,7 @@ public class Launcher implements Runnable {
             if (libFolder.exists() && libFolder.isDirectory()) {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
-                File children[] = libFolder.listFiles();
+                File[] children = libFolder.listFiles();
                 if (children != null)
                     for (File aChildren : children)
                         if (aChildren.getName().endsWith(".jar")
@@ -143,7 +143,7 @@ public class Launcher implements Runnable {
                         }
             }
 
-            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[jars.size()]),
+            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[0]),
                     getClass().getClassLoader());
 
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
@@ -153,7 +153,7 @@ public class Launcher implements Runnable {
 
 
             if(!extraJars.isEmpty()){
-                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[extraJars.size()]),
+                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[0]),
                                                              getClass().getClassLoader());
                 Thread.currentThread().setContextClassLoader( extraClassLoader );
             }
@@ -336,7 +336,7 @@ public class Launcher implements Runnable {
      * Main method. This basically just accepts a few args, then initialises the
      * listener thread. For now, just shut it down with a control-C.
      */
-    public static void main(String argv[]) throws IOException {
+    public static void main(String[] argv) throws IOException {
         if (System.getProperty("java.util.logging.config.file") == null) {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
@@ -346,7 +346,7 @@ public class Launcher implements Runnable {
         }
         Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
-        Map args = getArgsFromCommandLine(argv);
+        Map<String, String> args = getArgsFromCommandLine(argv);
 
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
             printUsage();
@@ -374,11 +374,11 @@ public class Launcher implements Runnable {
         }
     }
 
-    public static Map getArgsFromCommandLine(String argv[]) throws IOException {
-        Map args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
+    public static Map<String, String> getArgsFromCommandLine(String[] argv) throws IOException {
+        Map<String, String> args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
 
         // Small hack to allow re-use of the command line parsing inside the control tool
-        String firstNonSwitchArgument = (String) args.get("nonSwitch");
+        String firstNonSwitchArgument = args.get("nonSwitch");
         args.remove("nonSwitch");
 
         // Check if the non-switch arg is a file or folder, and overwrite the config
@@ -395,7 +395,7 @@ public class Launcher implements Runnable {
         return args;
     }
 
-    protected static void deployEmbeddedWarfile(Map args) throws IOException {
+    protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
                 embeddedWarfileName)) {
@@ -423,7 +423,7 @@ public class Launcher implements Runnable {
                     tempWarfile.getAbsolutePath());
             OutputStream out = new FileOutputStream(tempWarfile, true);
             int read;
-            byte buffer[] = new byte[2048];
+            byte[] buffer = new byte[2048];
             while ((read = embeddedWarfile.read(buffer)) != -1) {
                 out.write(buffer, 0, read);
             }
@@ -435,14 +435,14 @@ public class Launcher implements Runnable {
         }
     }
 
-    public static void initLogger(Map args) throws IOException {
+    public static void initLogger(Map<String, String> args) throws IOException {
         // Reset the log level
         int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
         // boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
         if (args.get("logfile") != null) {
-            logStream = new FileOutputStream((String) args.get("logfile"));
+            logStream = new FileOutputStream(args.get("logfile"));
         } else if (Option.booleanArg(args, "logToStdErr", false)) {
             logStream = System.err;
         } else {
