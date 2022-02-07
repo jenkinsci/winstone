@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CountRequestsServlet extends HttpServlet {
     private int numberOfGets;
 
+    @Override
     public void init() {
         String offset = getServletConfig().getInitParameter("offset");
         numberOfGets = offset == null ? 0 : Integer.parseInt(offset);
@@ -32,6 +33,7 @@ public class CountRequestsServlet extends HttpServlet {
     /**
      * Get implementation - increments and shows the access count
      */
+    @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         numberOfGets++;
