@@ -49,12 +49,12 @@ public class HostConfiguration {
     private Map args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private File commonLibCLPaths[];
+    private File[] commonLibCLPaths;
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
+                             File[] commonLibCLPaths, Map args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
@@ -274,7 +274,7 @@ public class HostConfiguration {
             }
 
             // Iterate through the files
-            byte buffer[] = new byte[8192];
+            byte[] buffer = new byte[8192];
             try (JarFile warArchive = new JarFile(warfile)) {
                 for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements();) {
                     JarEntry element = e.nextElement();
@@ -344,7 +344,7 @@ public class HostConfiguration {
         } else if (!webappsDir.isDirectory()) {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
         } else {
-            File children[] = webappsDir.listFiles();
+            File[] children = webappsDir.listFiles();
             if (children != null) {
                 for (File aChildren : children) {
                     String childName = aChildren.getName();

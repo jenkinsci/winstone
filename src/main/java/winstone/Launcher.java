@@ -117,7 +117,7 @@ public class Launcher implements Runnable {
             if (libFolder.exists() && libFolder.isDirectory()) {
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
-                File children[] = libFolder.listFiles();
+                File[] children = libFolder.listFiles();
                 if (children != null)
                     for (File aChildren : children)
                         if (aChildren.getName().endsWith(".jar")
@@ -336,7 +336,7 @@ public class Launcher implements Runnable {
      * Main method. This basically just accepts a few args, then initialises the
      * listener thread. For now, just shut it down with a control-C.
      */
-    public static void main(String argv[]) throws IOException {
+    public static void main(String[] argv) throws IOException {
         if (System.getProperty("java.util.logging.config.file") == null) {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
@@ -374,7 +374,7 @@ public class Launcher implements Runnable {
         }
     }
 
-    public static Map getArgsFromCommandLine(String argv[]) throws IOException {
+    public static Map getArgsFromCommandLine(String[] argv) throws IOException {
         Map args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
 
         // Small hack to allow re-use of the command line parsing inside the control tool
@@ -423,7 +423,7 @@ public class Launcher implements Runnable {
                     tempWarfile.getAbsolutePath());
             OutputStream out = new FileOutputStream(tempWarfile, true);
             int read;
-            byte buffer[] = new byte[2048];
+            byte[] buffer = new byte[2048];
             while ((read = embeddedWarfile.read(buffer)) != -1) {
                 out.write(buffer, 0, read);
             }

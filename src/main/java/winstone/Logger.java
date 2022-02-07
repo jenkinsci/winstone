@@ -200,7 +200,7 @@ public class Logger {
     }
 
     public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object params[], Throwable error) {
+            String messageKey, Object[] params, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -209,7 +209,7 @@ public class Logger {
     }
 
     public static void log(Level level, WinstoneResourceBundle resources,
-            String streamName, String messageKey, Object params[], Throwable error) {
+            String streamName, String messageKey, Object[] params, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {

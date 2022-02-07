@@ -75,7 +75,7 @@ public class LoadTestThread implements Runnable {
                 throw new IOException("Failed with status " + responseCode);
             InputStream inContent = wresp.getInputStream();
             int contentLength = wresp.getContentLength();
-            byte content[] = new byte[contentLength == -1 ? 100 * 1024
+            byte[] content = new byte[contentLength == -1 ? 100 * 1024
                     : contentLength];
             int position = 0;
             int value = inContent.read();

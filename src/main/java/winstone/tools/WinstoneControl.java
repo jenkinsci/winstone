@@ -57,7 +57,7 @@ public class WinstoneControl {
      * Parses command line parameters, and calls the appropriate method for
      * executing the winstone operation required.
      */
-    public static void main(String argv[]) throws Exception {
+    public static void main(String[] argv) throws Exception {
 
         // Load args from the config file
         Map options = new CmdLineParser(Option.all(WinstoneControl.class)).parse(argv,"operation");

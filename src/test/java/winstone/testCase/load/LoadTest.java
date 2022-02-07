@@ -104,7 +104,7 @@ public class LoadTest {
         this.successCount++;
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         WinstoneResourceBundle resources = new WinstoneResourceBundle(
                 LOCAL_RESOURCE_FILE);
 
