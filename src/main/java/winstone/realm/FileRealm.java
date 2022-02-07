@@ -85,7 +85,7 @@ public class FileRealm extends HashLoginService {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
                         List<String> rl = new ArrayList<>();
-                        for (; st.hasMoreTokens();) {
+                        while (st.hasMoreTokens()) {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);
                         }

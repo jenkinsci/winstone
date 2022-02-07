@@ -93,7 +93,7 @@ public class HostConfiguration {
             String types = Option.MIME_TYPES.get(args);
             if (types!=null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
-                for (; mappingST.hasMoreTokens(); ) {
+                while (mappingST.hasMoreTokens()) {
                     String mapping = mappingST.nextToken();
                     int delimPos = mapping.indexOf('=');
                     if (delimPos == -1)

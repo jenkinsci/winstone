@@ -52,7 +52,7 @@ public class ArgumentsRealm extends HashLoginService {
                 } else {
                     StringTokenizer st = new StringTokenizer(roleList, ",");
                     List<String> rl = new ArrayList<>();
-                    for (; st.hasMoreTokens(); ) {
+                    while (st.hasMoreTokens()) {
                         String currentRole = st.nextToken();
                         rl.add(currentRole);
                     }
