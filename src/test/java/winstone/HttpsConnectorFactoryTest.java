@@ -13,6 +13,7 @@ import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509TrustManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         con.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(con.getInputStream());
+        IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -139,7 +140,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         secureCon.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(secureCon.getInputStream());
+        IOUtils.toString(secureCon.getInputStream(), StandardCharsets.UTF_8);
     }
 
 }
