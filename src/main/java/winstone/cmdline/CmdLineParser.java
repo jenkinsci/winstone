@@ -1,5 +1,6 @@
 package winstone.cmdline;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import winstone.Launcher;
 import winstone.Logger;
 
@@ -26,6 +27,7 @@ public class CmdLineParser {
         this.options = options;
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "TODO needs triage")
     public Map<String,String> parse(String[] argv, String nonSwitchArgName) throws IOException {
         Map<String,String> args = new HashMap<>();
 

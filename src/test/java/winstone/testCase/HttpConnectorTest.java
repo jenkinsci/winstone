@@ -8,6 +8,7 @@ package winstone.testCase;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
@@ -88,7 +89,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
@@ -124,7 +125,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection

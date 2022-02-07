@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
@@ -29,7 +30,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -375,6 +381,7 @@ public class Launcher implements Runnable {
         }
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "TODO needs triage")
     public static Map<String, String> getArgsFromCommandLine(String[] argv) throws IOException {
         Map<String, String> args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
 
@@ -442,15 +449,23 @@ public class Launcher implements Runnable {
         // boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
         OutputStream logStream;
+        Charset logCharset;
         if (args.get("logfile") != null) {
-            logStream = new FileOutputStream(args.get("logfile"));
+            try {
+                logStream = Files.newOutputStream(Paths.get(args.get("logfile")), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            } catch (InvalidPathException e) {
+                throw new IOException(e);
+            }
+            logCharset = StandardCharsets.UTF_8;
         } else if (Option.booleanArg(args, "logToStdErr", false)) {
             logStream = System.err;
+            logCharset = Charset.defaultCharset();
         } else {
             logStream = System.out;
+            logCharset = Charset.defaultCharset();
         }
 //        Logger.init(logLevel, logStream, showThrowingLineNo, showThrowingThread);
-        Logger.init(Level.parse(String.valueOf(logLevel)), logStream, showThrowingThread);
+        Logger.init(Level.parse(String.valueOf(logLevel)), logStream, logCharset, showThrowingThread);
     }
 
     protected static void printUsage() {
@@ -473,5 +488,6 @@ public class Launcher implements Runnable {
     /**
      * Overridable usage screen
      */
+    @SuppressFBWarnings(value = "MS_SHOULD_BE_FINAL", justification = "Intentionally overridable")
     public static String USAGE;
 }

@@ -16,12 +16,13 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
@@ -75,10 +76,9 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             } else if (opensslCert!=null) {
                 // load from openssl style key files
                 CertificateFactory cf = CertificateFactory.getInstance("X509");
-                try(InputStream inputStream = new FileInputStream( opensslCert); //
-                    FileReader fileReader = new FileReader(opensslKey)) {
+                try (InputStream inputStream = new FileInputStream(opensslCert)) {
                     Certificate cert = cf.generateCertificate(inputStream);
-                    PrivateKey key = readPEMRSAPrivateKey(fileReader);
+                    PrivateKey key = readPEMRSAPrivateKey(opensslKey);
 
                     this.keystorePassword = "changeit";
                     keystore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -122,10 +122,10 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     }
 
 
-    private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
+    private static PrivateKey readPEMRSAPrivateKey(File opensslKey) throws IOException, GeneralSecurityException {
         // TODO: should have more robust format error handling
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (BufferedReader r = new BufferedReader( reader )) {
+            try (BufferedReader r = Files.newBufferedReader(opensslKey.toPath(), StandardCharsets.US_ASCII)) {
                 String line;
                 boolean in = false;
                 while ( ( line = r.readLine() ) != null ) {
@@ -137,8 +137,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         baos.write(Base64.getDecoder().decode(line.trim()));
                     }
                 }
-            } finally {
-                reader.close();
+            } catch (InvalidPathException e) {
+                throw new IOException(e);
             }
 
             BigInteger mod, privExpo;
