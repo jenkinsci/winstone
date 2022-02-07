@@ -21,8 +21,6 @@ import java.util.Map;
 public interface ConnectorFactory {
     /**
      * After the listener is loaded and initialized, this starts the thread
-     * @param args
-     * @param server
      * @return the Connector instance or <code>null</code> if not started
      */
     Connector start( Map<String, String> args, Server server) throws IOException;
