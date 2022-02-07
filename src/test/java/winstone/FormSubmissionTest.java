@@ -19,7 +19,7 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
     @Issue("JENKINS-60409")
     @Test
     public void largeForm() throws Exception {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");

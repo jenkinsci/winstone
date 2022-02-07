@@ -58,7 +58,7 @@ public class HostConfiguration {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
-        this.webapps = new Hashtable<String,WebAppContext>();
+        this.webapps = new Hashtable<>();
         this.commonLibCL = commonLibCL;
         this.commonLibCLPaths = commonLibCLPaths;
 
