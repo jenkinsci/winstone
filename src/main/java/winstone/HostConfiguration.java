@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
