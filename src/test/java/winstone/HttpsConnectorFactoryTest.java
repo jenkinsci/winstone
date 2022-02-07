@@ -108,8 +108,8 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpsRedirectHttp", "true");
         winstone = new Launcher(args);
         List<ServerConnector> serverConnectors =
-            Arrays.asList( winstone.server.getConnectors() )
-                .stream().map(connector -> (ServerConnector)connector ).collect(Collectors.toList());
+            Arrays.stream( winstone.server.getConnectors() )
+                .map(connector -> (ServerConnector)connector ).collect(Collectors.toList());
         
         int httpsPort = serverConnectors.stream()
                             .filter(serverConnector -> serverConnector.getDefaultProtocol().startsWith("SSL"))
