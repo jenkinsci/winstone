@@ -68,7 +68,7 @@ public class HostConfiguration {
             Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
             loginService = (LoginService) realmConstr.newInstance(args);
         } catch (Throwable err) {
-            throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
+            throw new IOException("Failed to setup authentication realm", err);
         }
 
         // Is this the single or multiple configuration ? Check args

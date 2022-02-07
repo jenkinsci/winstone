@@ -117,7 +117,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
             }
         } catch (GeneralSecurityException e) {
-            throw (IOException)new IOException("Failed to handle keys").initCause(e);
+            throw new IOException("Failed to handle keys", e);
         }
     }
 
