@@ -8,7 +8,6 @@
     <relativePath />
   </parent>
 
-  <groupId>org.jenkins-ci</groupId>
   <artifactId>winstone</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>jar</packaging>
