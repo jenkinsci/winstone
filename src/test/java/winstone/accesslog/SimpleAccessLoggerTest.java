@@ -1,5 +1,7 @@
 package winstone.accesslog;
 
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;

@@ -1,9 +1,12 @@
 package winstone;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
-import winstone.Launcher;
 
 import java.util.HashMap;
 import java.util.Map;

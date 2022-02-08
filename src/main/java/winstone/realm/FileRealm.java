@@ -8,6 +8,7 @@ package winstone.realm;
 
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.util.security.Credential;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import winstone.Logger;
@@ -25,8 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import static org.eclipse.jetty.util.security.Credential.*;
 
 /**
  * @author rickk
@@ -91,7 +90,7 @@ public class FileRealm extends HashLoginService {
                         }
                         String[] roleArray = rl.toArray(new String[0]);
                         Arrays.sort(roleArray);
-                        userStore.addUser(userName, getCredential(password), roleArray);
+                        userStore.addUser(userName, Credential.getCredential(password), roleArray);
                         count++;
                     }
                 }
