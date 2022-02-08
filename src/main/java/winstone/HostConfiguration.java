@@ -49,18 +49,16 @@ public class HostConfiguration {
     private Map<String, String> args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private File[] commonLibCLPaths;
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             File[] commonLibCLPaths, Map<String, String> args, File webappsDir) throws IOException {
+                             Map<String, String> args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
         this.webapps = new Hashtable<>();
         this.commonLibCL = commonLibCL;
-        this.commonLibCLPaths = commonLibCLPaths;
 
         try {
             // Build the realm

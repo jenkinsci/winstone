@@ -33,7 +33,7 @@ public class HostGroup {
 
     public HostGroup(
             Server server, ClassLoader commonLibCL,
-            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
+            Map<String, String> args) throws IOException {
         this.server = server;
 //        this.args = args;
         this.hostConfigs = new Hashtable<>();
@@ -42,8 +42,7 @@ public class HostGroup {
         File webappsDir = Option.WEBAPPS_DIR.get(args);
 
         // If host mode
-        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
-                commonLibCLPaths, args);
+        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL, args);
         this.defaultHostName = DEFAULT_HOSTNAME;
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                 this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
@@ -61,10 +60,10 @@ public class HostGroup {
 
     protected void initHost(File webappsDir, String hostname,
                             ClassLoader commonLibCL,
-                            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
+                            Map<String, String> args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
-                commonLibCLPaths, args, webappsDir);
+                args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }
 }
