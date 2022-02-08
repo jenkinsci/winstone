@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -14,7 +13,6 @@ import org.junit.Test;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509TrustManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -63,30 +61,6 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
     }
 
-    /**
-     * Without specifying the certificate and key, it uses the random key
-     */
-    @Test
-    public void testHttpsRandomCert() throws Exception {
-        Map<String,String> args = new HashMap<>();
-        args.put("warfile", "target/test-classes/test.war");
-        args.put("prefix", "/");
-        args.put("httpPort", "-1");
-        args.put("httpsPort", "0");
-        winstone = new Launcher(args);
-        int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-
-
-        try {
-            request(new TrustManagerImpl(), port);
-            fail("we should have generated a unique key");
-        } catch (SSLHandshakeException e) {
-            // expected
-        }
-
-        request(new TrustEveryoneManager(), port);
-    }
-
     @Issue("JENKINS-60857")
     @Test
     public void wildcard() throws Exception {
@@ -110,6 +84,8 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("prefix", "/");
         args.put("httpPort", "0");
         args.put("httpsPort", "0");
+        args.put("httpsKeyStore", "src/ssl/wildcard.jks");
+        args.put("httpsKeyStorePassword", "changeit");
         args.put("httpsRedirectHttp", "true");
         winstone = new Launcher(args);
         List<ServerConnector> serverConnectors =

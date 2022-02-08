@@ -29,7 +29,6 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -86,35 +85,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     keystore.setKeyEntry( "hudson", key, keystorePassword.toCharArray(), new Certificate[]{ cert } );
                 }
             } else {
-                // use self-signed certificate
-                this.keystorePassword = "changeit";
-                System.out.println("Using one-time self-signed certificate");
-
-                X509Certificate cert;
-                PrivateKey privKey;
-                Object ckg;
-
-                try { // TODO switch to (shaded?) Bouncy Castle
-                    // TODO: Cleanup when JDK 7 support is removed.
-                    try {
-                        ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                    } catch (ClassNotFoundException cnfe) {
-                        // Java 8
-                        ckg = Class.forName("sun.security.tools.keytool.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                    }
-                    ckg.getClass().getDeclaredMethod("generate", int.class).invoke(ckg, 1024);
-                    privKey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
-                    Class<?> x500Name = Class.forName("sun.security.x509.X500Name");
-                    Object xn = x500Name.getConstructor(String.class, String.class, String.class, String.class).newInstance("Test site", "Unknown", "Unknown", "Unknown");
-                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", x500Name, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
-                } catch (Exception x) {
-                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.SelfSignedError"), x);
-                }
-                Logger.log( Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.SelfSigned");
-
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
+                throw new WinstoneException(MessageFormat.format("Please set --{0}", Option.HTTPS_KEY_STORE));
             }
         } catch (GeneralSecurityException e) {
             throw new IOException("Failed to handle keys", e);
