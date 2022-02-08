@@ -22,6 +22,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");
+        // see https://superuser.com/a/458877/714797 for getting this to work on macOS
         args.put("httpListenAddress", "127.0.0.2");
         winstone = new Launcher(args);
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
