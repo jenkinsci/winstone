@@ -375,7 +375,7 @@ public class Launcher implements Runnable {
         if (System.getProperty("java.util.logging.config.file") == null) {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
-                  h.setFormatter(new SupportLogFormatter());
+                  ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
               }
           }
         }
