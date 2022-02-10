@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>winstone</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>5.23</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -191,7 +191,7 @@
     <connection>scm:git:git://github.com/${gitHubRepo}.git</connection>
     <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
     <url>https://github.com/${gitHubRepo}</url>
-    <tag>${scmTag}</tag>
+    <tag>winstone-5.23</tag>
   </scm>
 
   <dependencyManagement>
