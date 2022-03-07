@@ -223,16 +223,23 @@ public class Launcher implements Runnable {
     private void writePortToFileIfNeeded() throws IOException {
         String portFileName = System.getProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
         if (portFileName != null) {
-            Connector connector = server.getConnectors()[0];
-            if (connector instanceof ServerConnector) {
-                int port = ((ServerConnector) connector).getLocalPort();
-                File portFile = new File(portFileName);
-                File portDir = portFile.getParentFile();
-                portDir.mkdirs();
-                try (FileOutputStream fos = new FileOutputStream(portFile);
-                     OutputStreamWriter writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
-                    writer.write(Integer.toString(port));
+            Connector[] connectors = server.getConnectors();
+            if (connectors.length > 0) {
+                Connector connector = connectors[0];
+                if (connector instanceof ServerConnector) {
+                    int port = ((ServerConnector) connector).getLocalPort();
+                    File portFile = new File(portFileName);
+                    File portDir = portFile.getParentFile();
+                    portDir.mkdirs();
+                    try (FileOutputStream fos = new FileOutputStream(portFile);
+                         OutputStreamWriter writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+                        writer.write(Integer.toString(port));
+                    }
+                } else {
+                    throw new IllegalStateException("Only ServerConnector is supported");
                 }
+            } else {
+                throw new IllegalStateException("No connectors found");
             }
         }
     }
