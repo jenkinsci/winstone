@@ -229,7 +229,8 @@ public class Launcher implements Runnable {
                 File portFile = new File(portFileName);
                 File portDir = portFile.getParentFile();
                 portDir.mkdirs();
-                try (FileOutputStream fos = new FileOutputStream(portFile); OutputStreamWriter writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+                try (FileOutputStream fos = new FileOutputStream(portFile);
+                     OutputStreamWriter writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
                     writer.write(Integer.toString(port));
                 }
             }
