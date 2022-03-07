@@ -17,7 +17,7 @@ import winstone.WinstoneResourceBundle;
  */
 public class WinstoneResourceBundleTest extends TestCase {
 
-    public static void testGlobalReplace() throws Exception {
+    public void testGlobalReplace() {
         assertEquals("One token", "Foo = bar squared", WinstoneResourceBundle.globalReplace(
                 "Foo = [#0] squared", "[#0]", "bar"));
         assertEquals("Repeated token", "Foo = bar bar squared", WinstoneResourceBundle.globalReplace(

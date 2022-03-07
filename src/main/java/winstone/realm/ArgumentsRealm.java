@@ -8,6 +8,7 @@ package winstone.realm;
 
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.util.security.Credential;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
@@ -17,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import static org.eclipse.jetty.util.security.Credential.*;
 
 /**
  * Base class for authentication realms. Subclasses provide the source of
@@ -36,15 +35,14 @@ public class ArgumentsRealm extends HashLoginService {
      * Constructor - this sets up an authentication realm, using the arguments
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public ArgumentsRealm(Map args) {
+    public ArgumentsRealm(Map<String, String> args) {
         UserStore userStore = new UserStore();
         setUserStore( userStore );
         int count=0;
-        for (Object o : args.keySet()) {
-            String key = (String) o;
+        for (String key : args.keySet()) {
             if (key.startsWith(Option.ARGUMENTS_REALM_PASSWORD.name)) {
                 String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
-                String password = (String) args.get(key);
+                String password = args.get(key);
 
                 String roleList = Option.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 String[] roleArray = new String[0];
@@ -53,14 +51,14 @@ public class ArgumentsRealm extends HashLoginService {
                 } else {
                     StringTokenizer st = new StringTokenizer(roleList, ",");
                     List<String> rl = new ArrayList<>();
-                    for (; st.hasMoreTokens(); ) {
+                    while (st.hasMoreTokens()) {
                         String currentRole = st.nextToken();
                         rl.add(currentRole);
                     }
-                    roleArray = rl.toArray(new String[rl.size()]);
+                    roleArray = rl.toArray(new String[0]);
                     Arrays.sort(roleArray);
                 }
-                userStore.addUser(userName, getCredential(password), roleArray);
+                userStore.addUser(userName, Credential.getCredential(password), roleArray);
                 count++;
             }
         }

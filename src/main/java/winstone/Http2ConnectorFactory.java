@@ -44,7 +44,7 @@ import java.util.Map;
  */
 public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
     @Override
-    public Connector start( Map args, Server server ) throws IOException
+    public Connector start( Map<String, String> args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
         String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );

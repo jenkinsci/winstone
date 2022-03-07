@@ -22,10 +22,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -46,19 +46,19 @@ import java.util.jar.JarFile;
 public class HostConfiguration {
     private final Server server;
     private String hostname;
-    private Map args;
+    private Map<String, String> args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private File commonLibCLPaths[];
+    private File[] commonLibCLPaths;
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             File commonLibCLPaths[], Map args, File webappsDir) throws IOException {
+                             File[] commonLibCLPaths, Map<String, String> args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
-        this.webapps = new Hashtable<String,WebAppContext>();
+        this.webapps = new Hashtable<>();
         this.commonLibCL = commonLibCL;
         this.commonLibCLPaths = commonLibCLPaths;
 
@@ -68,7 +68,7 @@ public class HostConfiguration {
             Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
             loginService = (LoginService) realmConstr.newInstance(args);
         } catch (Throwable err) {
-            throw (IOException)new IOException("Failed to setup authentication realm").initCause(err);
+            throw new IOException("Failed to setup authentication realm", err);
         }
 
         // Is this the single or multiple configuration ? Check args
@@ -93,7 +93,7 @@ public class HostConfiguration {
             String types = Option.MIME_TYPES.get(args);
             if (types!=null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
-                for (; mappingST.hasMoreTokens(); ) {
+                while (mappingST.hasMoreTokens()) {
                     String mapping = mappingST.nextToken();
                     int delimPos = mapping.indexOf('=');
                     if (delimPos == -1)
@@ -111,21 +111,14 @@ public class HostConfiguration {
     }
 
     private void loadBuiltinMimeTypes() {
-        InputStream in = getClass().getResourceAsStream("mime.properties");
-        try {
+        try (InputStream in = getClass().getResourceAsStream("mime.properties")) {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
                 mimeTypes.addMimeMapping(e.getKey().toString(),e.getValue().toString());
             }
         } catch (IOException e) {
-            throw new Error("Failed to load the built-in MIME types",e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                // ignore
-            }
+            throw new UncheckedIOException("Failed to load the built-in MIME types", e);
         }
     }
 
@@ -274,7 +267,7 @@ public class HostConfiguration {
             }
 
             // Iterate through the files
-            byte buffer[] = new byte[8192];
+            byte[] buffer = new byte[8192];
             try (JarFile warArchive = new JarFile(warfile)) {
                 for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements();) {
                     JarEntry element = e.nextElement();
@@ -344,7 +337,7 @@ public class HostConfiguration {
         } else if (!webappsDir.isDirectory()) {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
         } else {
-            File children[] = webappsDir.listFiles();
+            File[] children = webappsDir.listFiles();
             if (children != null) {
                 for (File aChildren : children) {
                     String childName = aChildren.getName();

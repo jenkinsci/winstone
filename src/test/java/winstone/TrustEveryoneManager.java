@@ -11,12 +11,15 @@ public class TrustEveryoneManager implements X509TrustManager {
     public TrustEveryoneManager() throws Exception {
     }
 
+    @Override
     public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
     }
 
+    @Override
     public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
     }
 
+    @Override
     public X509Certificate[] getAcceptedIssuers() {
         return new X509Certificate[0];
     }

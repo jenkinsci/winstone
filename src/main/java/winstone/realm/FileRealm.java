@@ -8,6 +8,7 @@ package winstone.realm;
 
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.util.security.Credential;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import winstone.Logger;
@@ -26,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import static org.eclipse.jetty.util.security.Credential.*;
-
 /**
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
@@ -45,7 +44,7 @@ public class FileRealm extends HashLoginService {
      * Constructor - this sets up an authentication realm, using the file
      * supplied on the command line as a source of userNames/passwords/roles.
      */
-    public FileRealm(Map args) {
+    public FileRealm(Map<String, String> args) {
         UserStore userStore = new UserStore();
         setUserStore( userStore );
         // Get the filename and parse the xml doc
@@ -85,13 +84,13 @@ public class FileRealm extends HashLoginService {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
                         List<String> rl = new ArrayList<>();
-                        for (; st.hasMoreTokens();) {
+                        while (st.hasMoreTokens()) {
                             String currentRole = st.nextToken();
                             rl.add(currentRole);
                         }
-                        String[] roleArray = rl.toArray(new String[rl.size()]);
+                        String[] roleArray = rl.toArray(new String[0]);
                         Arrays.sort(roleArray);
-                        userStore.addUser(userName, getCredential(password), roleArray);
+                        userStore.addUser(userName, Credential.getCredential(password), roleArray);
                         count++;
                     }
                 }

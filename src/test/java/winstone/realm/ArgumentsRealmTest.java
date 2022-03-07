@@ -1,5 +1,8 @@
 package winstone.realm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.meterware.httpunit.AuthorizationRequiredException;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
@@ -15,7 +18,7 @@ import java.util.Map;
 public class ArgumentsRealmTest extends AbstractWinstoneTest {
     @Test
     public void realm() throws Exception {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");

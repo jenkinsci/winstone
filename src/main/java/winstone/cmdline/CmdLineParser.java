@@ -1,5 +1,6 @@
 package winstone.cmdline;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import winstone.Launcher;
 import winstone.Logger;
 
@@ -11,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import static winstone.Launcher.*;
 
 /**
  * Command line argument parser, Winstone style.
@@ -26,11 +25,12 @@ public class CmdLineParser {
         this.options = options;
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "TODO needs triage")
     public Map<String,String> parse(String[] argv, String nonSwitchArgName) throws IOException {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
 
         // Load embedded properties file
-        String embeddedPropertiesFilename = RESOURCES.getString(
+        String embeddedPropertiesFilename = Launcher.RESOURCES.getString(
                 "Launcher.EmbeddedPropertiesFile");
 
         try (InputStream embeddedPropsStream = Launcher.class.getResourceAsStream(
@@ -41,7 +41,7 @@ public class CmdLineParser {
         }
 
         // Get command line args
-        String configFilename = RESOURCES.getString("Launcher.DefaultPropertyFile");
+        String configFilename = Launcher.RESOURCES.getString("Launcher.DefaultPropertyFile");
         for (String option : argv) {
             if (option.startsWith("--")) {
                 int equalPos = option.indexOf('=');
@@ -49,7 +49,7 @@ public class CmdLineParser {
                         equalPos == -1 ? option.length() : equalPos);
                 Option<?> opt = toOption(paramName);
                 if (opt == null)
-                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.UnrecognizedOption", option));
+                    throw new IllegalArgumentException(Launcher.RESOURCES.getString("CmdLineParser.UnrecognizedOption", option));
 
                 if (equalPos != -1) {
                     args.put(paramName, option.substring(equalPos + 1));
@@ -57,14 +57,14 @@ public class CmdLineParser {
                     if (opt.type == Boolean.class)
                         args.put(paramName, "true");
                     else
-                        throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.OperandExpected", option));
+                        throw new IllegalArgumentException(Launcher.RESOURCES.getString("CmdLineParser.OperandExpected", option));
                 }
                 if (paramName.equals(Option.CONFIG.name)) {
                     configFilename = args.get(paramName);
                 }
             } else {
                 if (args.containsKey(nonSwitchArgName))
-                    throw new IllegalArgumentException(RESOURCES.getString("CmdLineParser.MultipleArgs", option));
+                    throw new IllegalArgumentException(Launcher.RESOURCES.getString("CmdLineParser.MultipleArgs", option));
                 args.put(nonSwitchArgName, option);
             }
         }
@@ -75,11 +75,11 @@ public class CmdLineParser {
             try (InputStream inConfig = new FileInputStream(configFile)) {
                 loadPropsFromStream( inConfig, args );
                 inConfig.close();
-                initLogger( args );
-                Logger.log( Logger.DEBUG, RESOURCES, "Launcher.UsingPropertyFile", configFilename );
+                Launcher.initLogger( args );
+                Logger.log( Logger.DEBUG, Launcher.RESOURCES, "Launcher.UsingPropertyFile", configFilename );
             }
         } else {
-            initLogger(args);
+            Launcher.initLogger(args);
         }
         return args;
     }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -45,7 +46,7 @@ public class Logger {
      * Initialises default streams
      */
     public static void init(Level level) {
-        init(level, System.out, false);
+        init(level, System.out, Charset.defaultCharset(), false);
     }
 
     public static void init(int level) {
@@ -54,8 +55,22 @@ public class Logger {
 
     /**
      * Initialises default streams
+     *
+     * @deprecated use {@link #init(Level, OutputStream, Charset, boolean)}
      */
-    public static void init(Level level, OutputStream defaultStream,
+    @Deprecated
+    public static void init(
+            Level level, OutputStream defaultStream, boolean showThrowingThreadArg) {
+        init(level, defaultStream, Charset.defaultCharset(), showThrowingThreadArg);
+    }
+
+    /**
+     * Initialize default streams
+     */
+    public static void init(
+            Level level,
+            OutputStream defaultStream,
+            Charset defaultStreamCharset,
             boolean showThrowingThreadArg) {
         synchronized (semaphore) {
             if (!initialised) { // recheck in case we were blocking on another init
@@ -64,7 +79,7 @@ public class Logger {
                 namedStreams = new HashMap<>();
 //                nullStreams = new ArrayList();
                 initialised = true;
-                setStream(DEFAULT_STREAM, defaultStream);
+                setStream(DEFAULT_STREAM, defaultStream, defaultStreamCharset);
                 showThrowingThread = showThrowingThreadArg;
             }
         }
@@ -72,9 +87,19 @@ public class Logger {
 
     /**
      * Allocates a stream for redirection to a file etc
+     *
+     * @deprecated Use {@link #setStream(String, OutputStream, Charset)}
      */
+    @Deprecated
     public static void setStream(String name, OutputStream stream) {
-        setStream(name, stream != null ? new OutputStreamWriter(stream) : null);
+        setStream(name, stream, Charset.defaultCharset());
+    }
+
+    /**
+     * Allocate a stream for redirection to a file etc
+     */
+    public static void setStream(String name, OutputStream stream, Charset charset) {
+        setStream(name, stream != null ? new OutputStreamWriter(stream, charset) : null);
     }
 
     /**
@@ -200,7 +225,7 @@ public class Logger {
     }
 
     public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object params[], Throwable error) {
+            String messageKey, Object[] params, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -209,7 +234,7 @@ public class Logger {
     }
 
     public static void log(Level level, WinstoneResourceBundle resources,
-            String streamName, String messageKey, Object params[], Throwable error) {
+            String streamName, String messageKey, Object[] params, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {

@@ -8,6 +8,7 @@ package winstone.testCase;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
@@ -88,7 +89,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
@@ -96,7 +97,7 @@ public class HttpConnectorTest extends TestCase {
         WebRequest wreq = new GetMethodWebRequest(
                 "http://localhost:10004/examples/CountRequestsServlet");
         WebResponse wresp1 = wc.getResponse(wreq);
-        WebImage img[] = wresp1.getImages();
+        WebImage[] img = wresp1.getImages();
         for (WebImage anImg : img) wc.getResponse(anImg.getRequest());
         // Thread.sleep(2000);
         // WebResponse wresp2 = wc.getResponse(wreq);
@@ -124,7 +125,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, true);
+        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection

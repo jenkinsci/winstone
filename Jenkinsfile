@@ -1,45 +1,10 @@
-#!/usr/bin/env groovy
-
-/* Only keep the 10 most recent builds. */
-properties([[$class: 'BuildDiscarderProperty',
-                strategy: [$class: 'LogRotator', numToKeepStr: '10']]])
-
-
-/* These platforms correspond to labels in ci.jenkins.io, see:
- *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
+/*
+ * While this is not a plugin, it is much simpler to reuse the pipeline code for CI. This allows for
+ * easy Linux/Windows testing and produces incrementals. The only feature that relates to plugins is
+ * allowing one to test against multiple Jenkins versions.
  */
-Map branches = [:]
-['maven'/* TODO broken , 'maven-windows'*/].each {label ->
-    branches[label] = {
-        node(label) {
-            stage('Checkout') {
-                checkout scm
-            }
-
-            def settingsXml = "${pwd tmp: true}/settings-azure.xml"
-            def ok = infra.retrieveMavenSettingsFile(settingsXml)
-            assert ok
-            withEnv(["MAVEN_SETTINGS=$settingsXml"]) {
-                stage('Build') {
-                    timeout(30) {
-                        infra.runMaven(["-Dset.changelist", "-Dmaven.test.failure.ignore", "install javadoc:javadoc"])
-                    }
-                }
-
-                stage('Archive') {
-                    /* Archive the test results */
-                    junit '**/target/surefire-reports/TEST-*.xml'
-
-                    if (label == 'maven') {
-                        infra.prepareToPublishIncrementals()
-                    }
-                }
-            }
-        }
-    }
-}
-
-/* Execute our platforms in parallel */
-parallel(branches)
-
-infra.maybePublishIncrementals()
+buildPlugin(useContainerAgent: true, configurations: [
+  [ platform: 'linux', jdk: '8' ],
+  [ platform: 'linux', jdk: '11' ],
+  [ platform: 'windows', jdk: '11' ]
+])

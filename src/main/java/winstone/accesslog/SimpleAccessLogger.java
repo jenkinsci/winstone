@@ -16,11 +16,14 @@ import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,7 +51,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private String pattern;
     private String fileName;
 
-    public SimpleAccessLogger(String webAppName, Map startupArgs)
+    public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs)
             throws IOException {
 
         // Get pattern
@@ -78,13 +81,18 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         } catch (Exception ex) {
             Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentFile.getAbsolutePath(), ex);
         }
-        this.outStream = new FileOutputStream(file, true);
-        this.outWriter = new PrintWriter(this.outStream, true);
+        try {
+            this.outStream = Files.newOutputStream(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (InvalidPathException e) {
+            throw new IOException(e);
+        }
+        this.outWriter = new PrintWriter(new OutputStreamWriter(this.outStream, StandardCharsets.UTF_8), true);
 
         Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
                 this.fileName, patternType);
     }
 
+    @Override
     public void log(Request request, Response response) {
         String uriLine = request.getMethod() + " " + request.getRequestURI() + " " + request.getProtocol();
         int status = response.getStatus();

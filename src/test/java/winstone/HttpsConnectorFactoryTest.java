@@ -1,18 +1,22 @@
 package winstone;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
-import winstone.Launcher;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509TrustManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -54,31 +58,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         con.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(con.getInputStream());
-    }
-
-    /**
-     * Without specifying the certificate and key, it uses the random key
-     */
-    @Test
-    public void testHttpsRandomCert() throws Exception {
-        Map<String,String> args = new HashMap<>();
-        args.put("warfile", "target/test-classes/test.war");
-        args.put("prefix", "/");
-        args.put("httpPort", "-1");
-        args.put("httpsPort", "0");
-        winstone = new Launcher(args);
-        int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-
-
-        try {
-            request(new TrustManagerImpl(), port);
-            fail("we should have generated a unique key");
-        } catch (SSLHandshakeException e) {
-            // expected
-        }
-
-        request(new TrustEveryoneManager(), port);
+        IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
     }
 
     @Issue("JENKINS-60857")
@@ -104,11 +84,13 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("prefix", "/");
         args.put("httpPort", "0");
         args.put("httpsPort", "0");
+        args.put("httpsKeyStore", "src/ssl/wildcard.jks");
+        args.put("httpsKeyStorePassword", "changeit");
         args.put("httpsRedirectHttp", "true");
         winstone = new Launcher(args);
         List<ServerConnector> serverConnectors =
-            Arrays.asList( winstone.server.getConnectors() )
-                .stream().map(connector -> (ServerConnector)connector ).collect(Collectors.toList());
+            Arrays.stream( winstone.server.getConnectors() )
+                .map(connector -> (ServerConnector)connector ).collect(Collectors.toList());
         
         int httpsPort = serverConnectors.stream()
                             .filter(serverConnector -> serverConnector.getDefaultProtocol().startsWith("SSL"))
@@ -139,7 +121,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         secureCon.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(secureCon.getInputStream());
+        IOUtils.toString(secureCon.getInputStream(), StandardCharsets.UTF_8);
     }
 
 }

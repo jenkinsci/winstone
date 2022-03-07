@@ -8,7 +8,6 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
@@ -17,22 +16,23 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,7 +46,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
     protected KeyStore keystore;
     protected String keystorePassword;
 
-    protected void configureSsl( Map args, Server server ) throws IOException
+    protected void configureSsl( Map<String, String> args, Server server ) throws IOException
     {
         try {
             File opensslCert = Option.HTTPS_CERTIFICATE.get( args);
@@ -75,10 +75,9 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             } else if (opensslCert!=null) {
                 // load from openssl style key files
                 CertificateFactory cf = CertificateFactory.getInstance("X509");
-                try(InputStream inputStream = new FileInputStream( opensslCert); //
-                    FileReader fileReader = new FileReader(opensslKey)) {
+                try (InputStream inputStream = new FileInputStream(opensslCert)) {
                     Certificate cert = cf.generateCertificate(inputStream);
-                    PrivateKey key = readPEMRSAPrivateKey(fileReader);
+                    PrivateKey key = readPEMRSAPrivateKey(opensslKey);
 
                     this.keystorePassword = "changeit";
                     keystore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -86,46 +85,18 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     keystore.setKeyEntry( "hudson", key, keystorePassword.toCharArray(), new Certificate[]{ cert } );
                 }
             } else {
-                // use self-signed certificate
-                this.keystorePassword = "changeit";
-                System.out.println("Using one-time self-signed certificate");
-
-                X509Certificate cert;
-                PrivateKey privKey;
-                Object ckg;
-
-                try { // TODO switch to (shaded?) Bouncy Castle
-                    // TODO: Cleanup when JDK 7 support is removed.
-                    try {
-                        ckg = Class.forName("sun.security.x509.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                    } catch (ClassNotFoundException cnfe) {
-                        // Java 8
-                        ckg = Class.forName("sun.security.tools.keytool.CertAndKeyGen").getDeclaredConstructor(String.class, String.class, String.class).newInstance("RSA", "SHA1WithRSA", null);
-                    }
-                    ckg.getClass().getDeclaredMethod("generate", int.class).invoke(ckg, 1024);
-                    privKey = (PrivateKey) ckg.getClass().getMethod("getPrivateKey").invoke(ckg);
-                    Class<?> x500Name = Class.forName("sun.security.x509.X500Name");
-                    Object xn = x500Name.getConstructor(String.class, String.class, String.class, String.class).newInstance("Test site", "Unknown", "Unknown", "Unknown");
-                    cert = (X509Certificate) ckg.getClass().getMethod("getSelfCertificate", x500Name, long.class).invoke(ckg, xn, 3650L * 24 * 60 * 60);
-                } catch (Exception x) {
-                    throw new WinstoneException(SSL_RESOURCES.getString("HttpsConnectorFactory.SelfSignedError"), x);
-                }
-                Logger.log( Level.WARNING, SSL_RESOURCES, "HttpsConnectorFactory.SelfSigned");
-
-                keystore = KeyStore.getInstance("JKS");
-                keystore.load(null);
-                keystore.setKeyEntry("hudson", privKey, keystorePassword.toCharArray(), new Certificate[]{cert});
+                throw new WinstoneException(MessageFormat.format("Please set --{0}", Option.HTTPS_KEY_STORE));
             }
         } catch (GeneralSecurityException e) {
-            throw (IOException)new IOException("Failed to handle keys").initCause(e);
+            throw new IOException("Failed to handle keys", e);
         }
     }
 
 
-    private static PrivateKey readPEMRSAPrivateKey(Reader reader) throws IOException, GeneralSecurityException {
+    private static PrivateKey readPEMRSAPrivateKey(File opensslKey) throws IOException, GeneralSecurityException {
         // TODO: should have more robust format error handling
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            try (BufferedReader r = new BufferedReader( reader )) {
+            try (BufferedReader r = Files.newBufferedReader(opensslKey.toPath(), StandardCharsets.US_ASCII)) {
                 String line;
                 boolean in = false;
                 while ( ( line = r.readLine() ) != null ) {
@@ -134,11 +105,11 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         continue;
                     }
                     if ( in ) {
-                        baos.write( B64Code.decode( line ) );
+                        baos.write(Base64.getDecoder().decode(line.trim()));
                     }
                 }
-            } finally {
-                reader.close();
+            } catch (InvalidPathException e) {
+                throw new IOException(e);
             }
 
             BigInteger mod, privExpo;
@@ -166,7 +137,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    protected SslContextFactory getSSLContext( Map args) {
+    protected SslContextFactory getSSLContext( Map<String, String> args) {
         try {
             String privateKeyPassword;
 
@@ -190,8 +161,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             kmf.init(keystore, keystorePassword.toCharArray());
             Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                        "HttpsListener.KeyCount", keystore.size() + "");
-            for ( Enumeration e = keystore.aliases(); e.hasMoreElements();) {
-                String alias = (String) e.nextElement();
+            for ( Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+                String alias = e.nextElement();
                 Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
                            "HttpsListener.KeyFound", alias,
                            keystore.getCertificate(alias) + "");
@@ -213,7 +184,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 
-            /**
+            /*
              * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
              * If false, which is the default, don't do so.
              * Technically speaking, there's the equivalent of "SSLVerifyClient optional", but IE doesn't

@@ -25,7 +25,8 @@ import java.util.Map;
  */
 public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
 
-    public Connector start( Map args, Server server) throws IOException {
+    @Override
+    public Connector start( Map<String, String> args, Server server) throws IOException {
 
         int listenPort = Option.HTTPS_PORT.get(args);
 

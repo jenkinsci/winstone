@@ -1,9 +1,10 @@
 package winstone;
 
+import static org.junit.Assert.assertEquals;
+
 import com.meterware.httpunit.WebResponse;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
-import winstone.Launcher;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class LauncherTest extends AbstractWinstoneTest {
     @Test
     public void mimeType() throws Exception {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");

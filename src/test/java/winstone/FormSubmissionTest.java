@@ -1,5 +1,8 @@
 package winstone;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
@@ -8,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
@@ -19,7 +21,7 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
     @Issue("JENKINS-60409")
     @Test
     public void largeForm() throws Exception {
-        Map<String,String> args = new HashMap<String,String>();
+        Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");

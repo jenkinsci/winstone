@@ -1,23 +1,26 @@
 package winstone;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class AbstractWinstoneTest extends Assert {
+public class AbstractWinstoneTest {
     protected Launcher winstone;
     protected WebConversation wc = new WebConversation();
 
@@ -32,7 +35,7 @@ public class AbstractWinstoneTest extends Assert {
         WebResponse wresp = wc.getResponse(wreq);
         InputStream content = wresp.getInputStream();
         assertTrue("Loading CountRequestsServlet", content.available() > 0);
-        String s = IOUtils.toString(content);
+        String s = IOUtils.toString(content, StandardCharsets.UTF_8);
         content.close();
         return s;
     }
