@@ -8,10 +8,14 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
+import java.io.BufferedWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.log.JavaUtilLog;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -31,7 +35,6 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -59,6 +62,7 @@ public class Launcher implements Runnable {
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
+    public static final String WINSTONE_PORT_FILE_NAME_PROPERTY = "winstone.portFileName";
 
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
 
@@ -196,6 +200,8 @@ public class Launcher implements Runnable {
 
             try {
                 server.start();
+                writePortToFileIfNeeded();
+
             } catch (Exception e) {
                 throw new IOException("Failed to start Jetty",e);
             }
@@ -212,6 +218,29 @@ public class Launcher implements Runnable {
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+    }
+
+    private void writePortToFileIfNeeded() throws IOException {
+        String portFileName = System.getProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
+        if (portFileName != null) {
+            Connector[] connectors = server.getConnectors();
+            if (connectors.length > 0) {
+                Connector connector = connectors[0];
+                if (connector instanceof ServerConnector) {
+                    int port = ((ServerConnector) connector).getLocalPort();
+                    Path portFile = Paths.get(portFileName);
+                    Path portDir = portFile.getParent();
+                    Files.createDirectories(portDir);
+                    try (BufferedWriter writer = Files.newBufferedWriter(portFile, StandardCharsets.UTF_8)) {
+                        writer.write(Integer.toString(port));
+                    }
+                } else {
+                    throw new IllegalStateException("Only ServerConnector is supported");
+                }
+            } else {
+                throw new IllegalStateException("No connectors found");
+            }
+        }
     }
 
     /**
