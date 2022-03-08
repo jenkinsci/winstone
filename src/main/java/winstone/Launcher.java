@@ -8,8 +8,9 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
-import java.io.OutputStreamWriter;
+import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
@@ -34,7 +35,6 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -228,11 +228,10 @@ public class Launcher implements Runnable {
                 Connector connector = connectors[0];
                 if (connector instanceof ServerConnector) {
                     int port = ((ServerConnector) connector).getLocalPort();
-                    File portFile = new File(portFileName);
-                    File portDir = portFile.getParentFile();
-                    portDir.mkdirs();
-                    try (FileOutputStream fos = new FileOutputStream(portFile);
-                         OutputStreamWriter writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+                    Path portFile = Paths.get(portFileName);
+                    Path portDir = portFile.getParent();
+                    Files.createDirectories(portDir);
+                    try (BufferedWriter writer = Files.newBufferedWriter(portFile, StandardCharsets.UTF_8)) {
                         writer.write(Integer.toString(port));
                     }
                 } else {

@@ -1,8 +1,10 @@
 package winstone;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jetty.server.LowResourceMonitor;
@@ -50,15 +52,14 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");
-        File portFile = new File(tmp.getRoot(), "subdir/jenkins.port");
-        System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.getAbsolutePath());
+
+        Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
+        System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
         try {
             winstone = new Launcher(args);
             int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
-
-            try (FileReader fr = new FileReader(portFile);
-                 BufferedReader br = new BufferedReader(fr)) {
-                String portInFile = br.readLine();
+            try (BufferedReader reader = Files.newBufferedReader(portFile, StandardCharsets.UTF_8)) {
+                String portInFile = reader.readLine();
                 assertEquals(Integer.toString(port), portInFile);
             }
         } finally {
