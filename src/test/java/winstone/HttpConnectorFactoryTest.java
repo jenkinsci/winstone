@@ -50,13 +50,15 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");
-        File portFile = tmp.newFile("jenkins.port");
+        File portFile = new File(tmp.getRoot(), "subdir/jenkins.port");
         System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.getAbsolutePath());
         try {
             winstone = new Launcher(args);
             int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
-            try (BufferedReader reader = new BufferedReader(new FileReader(portFile))) {
-                String portInFile = reader.readLine();
+
+            try (FileReader fr = new FileReader(portFile);
+                 BufferedReader br = new BufferedReader(fr)) {
+                String portInFile = br.readLine();
                 assertEquals(Integer.toString(port), portInFile);
             }
         } finally {
