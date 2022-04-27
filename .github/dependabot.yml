@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "master"
+    ignore:
+      # Restrict updates to jetty in the 9.4.x space
+      - dependency-name: "org.eclipse.jetty:*"
+        versions: [ ">=10" ]
 
   - package-ecosystem: "github-actions"
     directory: "/"
