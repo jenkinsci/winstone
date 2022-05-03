@@ -15,6 +15,7 @@ class ServerConnectorBuilder {
     private int acceptors;
     private int selectors;
     private int requestHeaderSize;
+    private int responseHeaderSize;
     private String listenerAddress;
     private Server server;
     private SslContextFactory sslContextFactory;
@@ -64,6 +65,11 @@ class ServerConnectorBuilder {
         return this;
     }
 
+    public ServerConnectorBuilder withResponseHeaderSize(int responseHeaderSize) {
+      this.responseHeaderSize = responseHeaderSize;
+      return this;
+  }
+
     public ServerConnector build() {
 
         ServerConnector sc;
@@ -84,6 +90,7 @@ class ServerConnectorBuilder {
         }
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
+        hc.setResponseHeaderSize(responseHeaderSize);
 
         return sc;
 
