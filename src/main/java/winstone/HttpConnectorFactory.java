@@ -6,12 +6,13 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Server;
-import winstone.cmdline.Option;
-
 import java.io.IOException;
 import java.util.Map;
+
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+
+import winstone.cmdline.Option;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -39,6 +40,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
                 .withSecureListenerPort(Option.HTTPS_PORT.get(args, -1))
                 .withListenerAddress(Option.HTTP_LISTEN_ADDRESS.get(args))
                 .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
+                .withResponseHeaderSize(Option.RESPONSE_HEADER_SIZE.get(args))
                 .withKeepAliveTimeout(Option.HTTP_KEEP_ALIVE_TIMEOUT.get(args));
             Connector connector = scb.build();
             server.addConnector(connector);

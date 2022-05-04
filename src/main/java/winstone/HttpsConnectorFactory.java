@@ -6,15 +6,16 @@
  */
 package winstone;
 
+import java.io.IOException;
+import java.util.Map;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
-import winstone.cmdline.Option;
 
-import java.io.IOException;
-import java.util.Map;
+import winstone.cmdline.Option;
 
 /**
  * Implements the main listener daemon thread. This is the class that gets
@@ -60,6 +61,7 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             .withListenerPort(listenPort)
             .withListenerAddress(Option.HTTPS_LISTEN_ADDRESS.get(args))
             .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
+            .withResponseHeaderSize(Option.RESPONSE_HEADER_SIZE.get(args))
             .withKeepAliveTimeout(Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args))
             .withSslContext(getSSLContext(args));
         Connector connector = scb.build();

@@ -1,14 +1,14 @@
 package winstone.cmdline;
 
-import winstone.Launcher;
-import winstone.realm.ArgumentsRealm;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import winstone.Launcher;
+import winstone.realm.ArgumentsRealm;
 
 /**
  * Command line options used in {@link Launcher}.
@@ -113,6 +113,7 @@ public class Option<T> {
     public static final OInt SESSION_TIMEOUT=integer("sessionTimeout",-1);
     public static final OInt SESSION_EVICTION=integer("sessionEviction",1800);
     public static final OInt REQUEST_HEADER_SIZE=integer("requestHeaderSize",8192); // default for jetty 9
+    public static final OInt RESPONSE_HEADER_SIZE=integer("responseHeaderSize",8192); // default for jetty 9
     public static final OInt REQUEST_FORM_CONTENT_SIZE=integer("requestFormContentSize",-1); // no limit (compat with old winstone)
     public static final OBoolean HELP=bool("help",false);
 
