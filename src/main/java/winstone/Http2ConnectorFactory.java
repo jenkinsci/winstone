@@ -69,7 +69,9 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             // HTTP/2 Connection Factory
             HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
             ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
-            alpn.setDefaultProtocol("h2");
+
+            // fallback to http/1.1 for pre-ALPN clients
+            alpn.setDefaultProtocol("http/1.1");
 
             // SSL Connection Factory
             SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory,alpn.getProtocol());
