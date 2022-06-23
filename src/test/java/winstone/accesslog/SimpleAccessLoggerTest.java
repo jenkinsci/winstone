@@ -40,8 +40,14 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         makeRequest("http://localhost:"+port+"/examples/CountRequestsServlet");
 
         // check the log file
-        Thread.sleep(5000);
-        String text = FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
+        // check the log file every 100ms for 5s
+        String text = "";
+        for(int i=0; i < 50; ++i) {
+            Thread.sleep(100);
+            text = FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
+            if (!"".equals(text))
+                break;
+        }
         assertEquals(String.format("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200%n"),text);
     }
 
