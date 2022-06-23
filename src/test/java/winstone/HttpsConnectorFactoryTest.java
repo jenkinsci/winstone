@@ -53,7 +53,12 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpsKeyStorePassword", "changeit");
         winstone = new Launcher(args);
         int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
+        assertConnectionRefused("127.0.0.2", port);
         request(new TrustEveryoneManager(), port);
+        LowResourceMonitor lowResourceMonitor = winstone.server.getBean( LowResourceMonitor.class);
+        assertNotNull(lowResourceMonitor);
+        assertFalse(lowResourceMonitor.isLowOnResources());
+        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
     }
 
     @Test
