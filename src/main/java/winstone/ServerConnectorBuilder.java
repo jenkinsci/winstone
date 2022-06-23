@@ -1,8 +1,10 @@
 package winstone;
 
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -18,7 +20,9 @@ class ServerConnectorBuilder {
     private int responseHeaderSize;
     private String listenerAddress;
     private Server server;
-    private SslContextFactory sslContextFactory;
+    private SslContextFactory.Server sslContextFactory;
+    private boolean sniHostCheck = true;
+    private boolean sniRequired = false;
 
     public ServerConnectorBuilder withListenerPort(int listenerPort) {
         this.listenerPort = listenerPort;
@@ -55,7 +59,7 @@ class ServerConnectorBuilder {
         return this;
     }
 
-    public ServerConnectorBuilder withSslContext(SslContextFactory sslContextFactory) {
+    public ServerConnectorBuilder withSslContext(SslContextFactory.Server sslContextFactory) {
         this.sslContextFactory = sslContextFactory;
         return this;
     }
@@ -69,6 +73,16 @@ class ServerConnectorBuilder {
       this.responseHeaderSize = responseHeaderSize;
       return this;
   }
+
+    public ServerConnectorBuilder withSniHostCheck(boolean sniHostCheck) {
+        this.sniHostCheck = sniHostCheck;
+        return this;
+    }
+
+    public ServerConnectorBuilder withSniRequired(boolean sniRequired) {
+        this.sniRequired = sniRequired;
+        return this;
+    }
 
     public ServerConnector build() {
 
@@ -88,10 +102,18 @@ class ServerConnectorBuilder {
         if(secureListenerPort > 0) {
             hc.setSecurePort(secureListenerPort);
         }
+        hc.setUriCompliance(UriCompliance.LEGACY);
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);
 
+        SecureRequestCustomizer src = hc.getCustomizer(SecureRequestCustomizer.class);
+        if (src != null && !sniHostCheck) {
+            src.setSniHostCheck(false);
+        }
+        if (src != null && sniRequired) {
+            src.setSniRequired(true);
+        }
         return sc;
 
     }
