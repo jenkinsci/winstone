@@ -12,30 +12,16 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
 import javax.net.ssl.KeyManagerFactory;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.spec.RSAPrivateKeySpec;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  *
