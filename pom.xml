@@ -288,6 +288,7 @@
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>websocket-jetty-server</artifactId> <!-- or websocket-javax-server -->
+      <!-- until Jetty release including https://github.com/eclipse/jetty.project/pull/8199 -->
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.jetty</groupId>
