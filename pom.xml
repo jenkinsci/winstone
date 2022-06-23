@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>winstone</artifactId>
-  <version>5.26</version>
+  <version>5.27-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
