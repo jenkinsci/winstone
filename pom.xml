@@ -327,16 +327,4 @@
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>jdk17</id>
-      <activation>
-        <jdk>17</jdk>
-      </activation>
-      <properties>
-        <argLine>--add-opens=java.base/sun.security.util=ALL-UNNAMED</argLine>
-      </properties>
-    </profile>
-  </profiles>
-
 </project>
