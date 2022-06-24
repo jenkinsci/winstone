@@ -35,7 +35,6 @@ public class HostGroup {
             Server server, ClassLoader commonLibCL,
             File[] commonLibCLPaths, Map<String, String> args) throws IOException {
         this.server = server;
-//        this.args = args;
         this.hostConfigs = new Hashtable<>();
 
         // Is this the single or multiple configuration ? Check args

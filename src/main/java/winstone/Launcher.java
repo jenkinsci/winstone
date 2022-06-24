@@ -16,8 +16,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.util.log.JavaUtilLog;
-import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
@@ -251,7 +249,8 @@ public class Launcher implements Runnable {
      */
     protected Connector spawnListener(String listenerClassName, List<Connector> connectors) throws IOException {
         try {
-            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName).newInstance();
+            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName)
+                    .getDeclaredConstructor().newInstance();
             Connector connector = connectorFactory.start(args, server);
             if(connector!=null){
                 connectors.add(connector);
@@ -376,11 +375,10 @@ public class Launcher implements Runnable {
         if (System.getProperty("java.util.logging.config.file") == null) {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
-                  h.setFormatter(new SupportLogFormatter());
+                  ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
               }
           }
         }
-        Log.setLog(new JavaUtilLog());  // force java.util.logging for consistency & backward compatibility
 
         Map<String, String> args = getArgsFromCommandLine(argv);
 
