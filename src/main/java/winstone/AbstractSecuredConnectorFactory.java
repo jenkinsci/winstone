@@ -62,7 +62,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    protected SslContextFactory getSSLContext( Map<String, String> args) {
+    protected SslContextFactory.Server getSSLContext( Map<String, String> args) {
         try {
             String privateKeyPassword;
 

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 
@@ -63,9 +64,11 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             .withRequestHeaderSize(Option.REQUEST_HEADER_SIZE.get(args))
             .withResponseHeaderSize(Option.RESPONSE_HEADER_SIZE.get(args))
             .withKeepAliveTimeout(Option.HTTPS_KEEP_ALIVE_TIMEOUT.get(args))
+            .withSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args))
+            .withSniRequired(Option.HTTPS_SNI_REQUIRED.get(args))
             .withSslContext(getSSLContext(args));
-        Connector connector = scb.build();
-        server.addConnector(connector);
-        return connector;
+        ServerConnector sc = scb.build();
+        server.addConnector(sc);
+        return sc;
     }
 }

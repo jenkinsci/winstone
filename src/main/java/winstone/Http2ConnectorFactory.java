@@ -22,6 +22,8 @@ package winstone;
 
 import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http.HttpCompliance;
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.http2.HTTP2Cipher;
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -47,7 +49,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
     public Connector start( Map<String, String> args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
-        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get( args );
+        String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get(args);
 
         if ( listenPort < 0 ) {
             // not running HTTP2 listener
@@ -57,14 +59,18 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
 
         try {
             configureSsl( args, server );
-            SslContextFactory sslContextFactory = getSSLContext( args );
+            SslContextFactory.Server sslContextFactory = getSSLContext( args );
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
             // HTTPS Configuration
             HttpConfiguration https_config = new HttpConfiguration();
             https_config.setSecureScheme("https");
             https_config.setSecurePort(listenPort);
-            https_config.addCustomizer(new SecureRequestCustomizer());
+            https_config.setHttpCompliance(HttpCompliance.RFC7230);
+            https_config.setUriCompliance(UriCompliance.LEGACY);
+            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+            secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
+            https_config.addCustomizer(secureRequestCustomizer);
 
             // HTTP/2 Connection Factory
             HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
