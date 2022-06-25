@@ -81,8 +81,6 @@ To run different web applications for diffent virtual hosts:
        --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
        --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
-       --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
-         / --httpsCertificate     file and the corresponding certificate file
        --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
        --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
        --httpsSniHostCheck      = if the SNI Host name must match when there is an SNI certificate. Check disabled per default

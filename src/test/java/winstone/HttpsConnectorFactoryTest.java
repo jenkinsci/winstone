@@ -31,28 +31,6 @@ import org.jvnet.hudson.test.Issue;
  * @author Kohsuke Kawaguchi
  */
 public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
-    @Test
-    public void testHttps() throws Exception {
-        Map<String,String> args = new HashMap<>();
-        args.put("warfile", "target/test-classes/test.war");
-        args.put("prefix", "/");
-        args.put("httpPort", "-1");
-        args.put("httpsPort", "0");
-        args.put("httpsListenAddress", "localhost");
-        args.put("httpsPrivateKey", "src/ssl/server.key");
-        args.put("httpsCertificate", "src/ssl/server.crt");
-        winstone = new Launcher(args);
-        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-
-        assertConnectionRefused("127.0.0.2", port);
-
-        request(new TrustManagerImpl(), port);
-
-        LowResourceMonitor lowResourceMonitor = winstone.server.getBean( LowResourceMonitor.class);
-        assertNotNull(lowResourceMonitor);
-        assertFalse(lowResourceMonitor.isLowOnResources());
-        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
-    }
 
     private void request(X509TrustManager tm, int port) throws Exception {
         HttpsURLConnection con = (HttpsURLConnection)new URL("https://localhost:"+port+"/CountRequestsServlet").openConnection();
@@ -76,7 +54,12 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("httpsKeyStorePassword", "changeit");
         winstone = new Launcher(args);
         int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
+        assertConnectionRefused("127.0.0.2", port);
         request(new TrustEveryoneManager(), port);
+        LowResourceMonitor lowResourceMonitor = winstone.server.getBean( LowResourceMonitor.class);
+        assertNotNull(lowResourceMonitor);
+        assertFalse(lowResourceMonitor.isLowOnResources());
+        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
     }
 
     @Test

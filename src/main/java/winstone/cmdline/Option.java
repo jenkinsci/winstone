@@ -67,9 +67,7 @@ public class Option<T> {
     public static final OString HTTPS_PRIVATE_KEY_PASSWORD=string("httpsPrivateKeyPassword");
     public static final OString HTTPS_KEY_MANAGER_TYPE=string("httpsKeyManagerType","SunX509");
     public static final OBoolean HTTPS_VERIFY_CLIENT=bool("httpsVerifyClient",false);
-    public static final OFile HTTPS_CERTIFICATE=file("httpsCertificate");
     public static final OString HTTPS_CERTIFICATE_ALIAS=string("httpsCertificateAlias");
-    public static final OFile HTTPS_PRIVATE_KEY=file("httpsPrivateKey");
     public static final OString HTTPS_EXCLUDE_CIPHER_SUITES=string("excludeCipherSuites");
     public static final OBoolean HTTPS_REDIRECT_HTTP=bool("httpsRedirectHttp", false);
     public static final OBoolean HTTPS_SNI_HOST_CHECK=bool("httpsSniHostCheck", false);
