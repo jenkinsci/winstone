@@ -26,12 +26,12 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -184,7 +184,7 @@ public class HostConfiguration {
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
-        wac.getSessionHandler().setSessionTrackingModes(Collections.singleton(SessionTrackingMode.COOKIE));
+        wac.getSessionHandler().setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
         wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
         this.webapps.put(wac.getContextPath(),wac);
         return wac;
