@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 /**
  * Manages the references to individual webapps within the container. This object handles
@@ -181,6 +182,7 @@ public class HostConfiguration {
                 getSessionHandler().getSessionCache().setEvictionPolicy( sessionEviction );
             }
         };
+        JettyWebSocketServletContainerInitializer.configure(wac, null);
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
