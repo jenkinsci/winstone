@@ -1,6 +1,6 @@
 # What is Winstone?
-Winstone is a command line interface around Jetty 9.4, which implements
-servlet 3.1, WebSocket/JSR-356, and HTTP/2 support. It is used as the default
+Winstone is a command line interface around Jetty 10.0.x, which implements
+Servlet 4.0 (JakartaEE 8/`javax.servlet.*`), WebSocket/JSR-356, and HTTP/2 support. It is used as the default
 embedded servlet container in Jenkins (via [executable-war](https://github.com/jenkinsci/extras-executable-war) module)
 and can be used by any other web applications that wants to be self-contained.
 
@@ -52,7 +52,7 @@ To run different web applications for diffent virtual hosts:
 
 ## Command-line options
 
-    Winstone Servlet Engine v4.0, (c) 2003-2006 Rick Knowles
+    Winstone Servlet Engine, (c) 2003-2006 Rick Knowles
     Usage: java winstone.jar [--option=value] [--option=value] [etc]
     
     Required options: either --webroot OR --warfile OR --webappsDir OR --hostsDir
@@ -81,8 +81,6 @@ To run different web applications for diffent virtual hosts:
        --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
        --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
-       --httpsPrivateKey        = this switch with --httpsCertificate can be used to run HTTPS with OpenSSL secret key
-         / --httpsCertificate     file and the corresponding certificate file
        --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
        --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
        --httpsSniHostCheck      = if the SNI Host name must match when there is an SNI certificate. Check disabled per default
@@ -107,6 +105,8 @@ To run different web applications for diffent virtual hosts:
        --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 180. -1 never evict, 0 evict on exit
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
+       --requestHeaderSize=N    = set the maximum size in bytes of the request header. Default is 8192.
+       --responseHeaderSize=N   = set the maximum size in bytes of the response header. Default is 8192.
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
        --useJmx                 = Enable Jetty Jmx

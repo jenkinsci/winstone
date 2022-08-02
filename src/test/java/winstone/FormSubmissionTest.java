@@ -34,11 +34,7 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
         for (int size = 1; size <= 9_999_999; size *= 3) {
             System.out.println("trying size " + size);
             WebRequest wreq = new PostMethodWebRequest("http://127.0.0.2:"+port+"/AcceptFormServlet");
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < size; i++) {
-                b.append('.');
-            }
-            wreq.setParameter("x", b.toString());
+            wreq.setParameter("x", ".".repeat(size));
             WebResponse wresp = wc.getResponse(wreq);
             try (InputStream content = wresp.getInputStream()) {
                 assertTrue("Loading AcceptFormServlet at size " + size, content.available() > 0);
