@@ -16,7 +16,7 @@ import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import winstone.cmdline.Option;
 
-import javax.servlet.SessionTrackingMode;
+import jakarta.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

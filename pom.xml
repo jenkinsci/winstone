@@ -19,7 +19,7 @@
   <properties>
     <revision>6.2</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>10.0.11</jetty.version>
+    <jetty.version>11.0.11</jetty.version>
     <alpn.api.version>1.1.3.v20160715</alpn.api.version>
     <!-- TODO: remove once SpotBugs issues are fixed. 29 so far -->
     <spotbugs.threshold>High</spotbugs.threshold>
@@ -287,7 +287,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-jetty-server</artifactId> <!-- or websocket-javax-server -->
+      <artifactId>websocket-jetty-server</artifactId> <!-- or websocket-jakarta-server -->
       <!-- until Jetty release including https://github.com/eclipse/jetty.project/pull/8199 -->
       <exclusions>
         <exclusion>
