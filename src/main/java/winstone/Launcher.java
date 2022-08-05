@@ -234,12 +234,13 @@ public class Launcher implements Runnable {
                     Path tmpPath = Files.createTempFile(portDir, "temp", "");
                     try (BufferedWriter writer = Files.newBufferedWriter(tmpPath, StandardCharsets.UTF_8)) {
                         writer.write(Integer.toString(port));
-                        try {
-                            Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
-                        } catch (AtomicMoveNotSupportedException e) {
-                            Logger.logDirectMessage(Level.WARNING, "", "Atomic move does not supported", e);
-                            Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
-                        }
+                    }
+
+                    try {
+                        Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Logger.logDirectMessage(Level.WARNING, "", "Atomic move does not supported", e);
+                        Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
                     } finally {
                         tmpPath.toFile().deleteOnExit();
                     }
