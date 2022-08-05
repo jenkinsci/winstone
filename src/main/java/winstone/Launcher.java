@@ -10,6 +10,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
@@ -233,7 +234,12 @@ public class Launcher implements Runnable {
                     Path tmpPath = Files.createTempFile(portDir, "temp", "");
                     try (BufferedWriter writer = Files.newBufferedWriter(tmpPath, StandardCharsets.UTF_8)) {
                         writer.write(Integer.toString(port));
-                        Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
+                        try {
+                            Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
+                        } catch (AtomicMoveNotSupportedException e) {
+                            Logger.logDirectMessage(Level.WARNING, "", "Atomic move does not supported", e);
+                            Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
+                        }
                     } finally {
                         tmpPath.toFile().deleteOnExit();
                     }
