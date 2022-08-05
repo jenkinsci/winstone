@@ -1,7 +1,6 @@
 package winstone;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +11,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Rule;
@@ -56,28 +57,19 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
     public void writePortInFile() throws Exception {
-        Callable<String> asyncVerifier = () -> {
+        Callable<String> parallelVerifier = () -> {
             System.out.println("Async Verifier started!");
+            Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
 
-            while (true) {
+            Awaitility.await()
+                    .pollInterval(1, TimeUnit.MICROSECONDS)
+                    .atMost(5, TimeUnit.SECONDS)
+                    .until(() -> Files.exists(portFile));
 
-                Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
-                if (Files.exists(portFile)) {
-                    try {
-                        return FileUtils.readFileToString(portFile.toFile(), StandardCharsets.UTF_8);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            return FileUtils.readFileToString(portFile.toFile(), StandardCharsets.UTF_8);
         };
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> futurePort = executorService.submit(asyncVerifier);
+        Future<String> futurePort = executorService.submit(parallelVerifier);
 
         Map<String,String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
