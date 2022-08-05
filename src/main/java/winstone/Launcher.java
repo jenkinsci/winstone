@@ -36,6 +36,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,8 +230,12 @@ public class Launcher implements Runnable {
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
                     Files.createDirectories(portDir);
-                    try (BufferedWriter writer = Files.newBufferedWriter(portFile, StandardCharsets.UTF_8)) {
+                    Path tmpPath = Files.createTempFile(portDir, "temp", "");
+                    try (BufferedWriter writer = Files.newBufferedWriter(tmpPath, StandardCharsets.UTF_8)) {
                         writer.write(Integer.toString(port));
+                        Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
+                    } finally {
+                        tmpPath.toFile().deleteOnExit();
                     }
                 } else {
                     throw new IllegalStateException("Only ServerConnector is supported");
