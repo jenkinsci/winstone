@@ -66,7 +66,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
                     .atMost(5, TimeUnit.SECONDS)
                     .until(() -> Files.exists(portFile));
 
-            return FileUtils.readFileToString(portFile.toFile(), StandardCharsets.UTF_8);
+            return Files.readString(portFile, StandardCharsets.UTF_8);
         };
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<String> futurePort = executorService.submit(parallelVerifier);
