@@ -239,7 +239,7 @@ public class Launcher implements Runnable {
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
                     } catch (AtomicMoveNotSupportedException e) {
-                        Logger.logDirectMessage(Level.WARNING, "", "Atomic move does not supported", e);
+                        Logger.logDirectMessage(Logger.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
                         Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
                     } finally {
                         tmpPath.toFile().deleteOnExit();
