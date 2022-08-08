@@ -231,7 +231,7 @@ public class Launcher implements Runnable {
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
                     Files.createDirectories(portDir);
-                    Path tmpPath = Files.createTempFile(portDir, "temp", "");
+                    Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
                     try (BufferedWriter writer = Files.newBufferedWriter(tmpPath, StandardCharsets.UTF_8)) {
                         writer.write(Integer.toString(port));
                     }
