@@ -246,8 +246,6 @@ public class Launcher implements Runnable {
                             e2.addSuppressed(e);
                             throw e2;
                         }
-                    } finally {
-                        tmpPath.toFile().deleteOnExit();
                     }
                 } else {
                     throw new IllegalStateException("Only ServerConnector is supported");
