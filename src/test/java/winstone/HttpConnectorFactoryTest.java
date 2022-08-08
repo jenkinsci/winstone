@@ -6,8 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -55,34 +53,28 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
     public void writePortInFile() throws Exception {
-        Callable<String> parallelVerifier = () -> {
-            System.out.println("Async Verifier started!");
-            Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
-
-            Awaitility.await()
-                    .pollInterval(1, TimeUnit.MICROSECONDS)
-                    .atMost(5, TimeUnit.SECONDS)
-                    .until(() -> Files.exists(portFile));
-
-            return Files.readString(portFile, StandardCharsets.UTF_8);
-        };
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> futurePort = executorService.submit(parallelVerifier);
-
-        Map<String,String> args = new HashMap<>();
-        args.put("warfile", "target/test-classes/test.war");
-        args.put("prefix", "/");
-        args.put("httpPort", "0");
-
         Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
-        System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
-        try {
-            winstone = new Launcher(args);
-            int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
-            assertEquals(Integer.toString(port), Files.readString(portFile, StandardCharsets.UTF_8));
-            assertFalse("Port value should not be empty in any time", futurePort.get().isEmpty());
-        } finally {
-            System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
-        }
+        Future<Integer> futurePort = Executors.newSingleThreadExecutor().submit(() -> {
+            Map<String, String> args = new HashMap<>();
+            args.put("warfile", "target/test-classes/test.war");
+            args.put("prefix", "/");
+            System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
+            try {
+                winstone = new Launcher(args);
+                int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+                assertEquals(Integer.toString(port), Files.readString(portFile, StandardCharsets.UTF_8));
+                return ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+            } finally {
+                System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
+            }
+        });
+
+        Awaitility.await()
+                .pollInterval(1, TimeUnit.MICROSECONDS)
+                .atMost(5, TimeUnit.SECONDS)
+                .until(() -> Files.exists(portFile));
+        String portFileString = Files.readString(portFile, StandardCharsets.UTF_8);
+        assertEquals(Integer.toString(futurePort.get()), portFileString);
+        assertFalse("Port value should not be empty in any time", portFileString.isEmpty());
     }
 }
