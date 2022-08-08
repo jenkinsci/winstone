@@ -232,9 +232,7 @@ public class Launcher implements Runnable {
                     Path portDir = portFile.getParent();
                     Files.createDirectories(portDir);
                     Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
-                    try (BufferedWriter writer = Files.newBufferedWriter(tmpPath, StandardCharsets.UTF_8)) {
-                        writer.write(Integer.toString(port));
-                    }
+                    Files.writeString(tmpPath, Integer.toString(port));
 
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
