@@ -9,7 +9,6 @@ package winstone;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
@@ -33,6 +32,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
@@ -231,8 +231,7 @@ public class Launcher implements Runnable {
                     Path portDir = portFile.getParent();
                     Files.createDirectories(portDir);
                     Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
-                    Files.writeString(tmpPath, Integer.toString(port));
-
+                    Files.writeString(tmpPath, Integer.toString(port), StandardCharsets.UTF_8);
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
                     } catch (AtomicMoveNotSupportedException e) {

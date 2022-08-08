@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
 import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
@@ -19,6 +18,7 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
@@ -58,11 +58,10 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
             Map<String, String> args = new HashMap<>();
             args.put("warfile", "target/test-classes/test.war");
             args.put("prefix", "/");
+            args.put("httpPort", "0");
             System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
             try {
                 winstone = new Launcher(args);
-                int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
-                assertEquals(Integer.toString(port), Files.readString(portFile, StandardCharsets.UTF_8));
                 return ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
             } finally {
                 System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
@@ -74,7 +73,8 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
                 .atMost(5, TimeUnit.SECONDS)
                 .until(() -> Files.exists(portFile));
         String portFileString = Files.readString(portFile, StandardCharsets.UTF_8);
+        assertFalse("Port value should not be empty at any time", portFileString.isEmpty());
         assertEquals(Integer.toString(futurePort.get()), portFileString);
-        assertFalse("Port value should not be empty in any time", portFileString.isEmpty());
+        assertNotEquals(8080, futurePort.get().longValue());
     }
 }
