@@ -8,7 +8,6 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
-import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
@@ -33,9 +32,11 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,8 +230,18 @@ public class Launcher implements Runnable {
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
                     Files.createDirectories(portDir);
-                    try (BufferedWriter writer = Files.newBufferedWriter(portFile, StandardCharsets.UTF_8)) {
-                        writer.write(Integer.toString(port));
+                    Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
+                    Files.writeString(tmpPath, Integer.toString(port), StandardCharsets.UTF_8);
+                    try {
+                        Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException e) {
+                        Logger.logDirectMessage(Logger.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
+                        try {
+                            Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e2) {
+                            e2.addSuppressed(e);
+                            throw e2;
+                        }
                     }
                 } else {
                     throw new IllegalStateException("Only ServerConnector is supported");

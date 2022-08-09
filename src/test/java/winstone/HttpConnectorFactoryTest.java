@@ -1,12 +1,15 @@
 package winstone;
 
-import java.io.BufferedReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Rule;
@@ -15,6 +18,7 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
@@ -49,22 +53,28 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
     public void writePortInFile() throws Exception {
-        Map<String,String> args = new HashMap<>();
-        args.put("warfile", "target/test-classes/test.war");
-        args.put("prefix", "/");
-        args.put("httpPort", "0");
-
         Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
-        System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
-        try {
-            winstone = new Launcher(args);
-            int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
-            try (BufferedReader reader = Files.newBufferedReader(portFile, StandardCharsets.UTF_8)) {
-                String portInFile = reader.readLine();
-                assertEquals(Integer.toString(port), portInFile);
+        Future<Integer> futurePort = Executors.newSingleThreadExecutor().submit(() -> {
+            Map<String, String> args = new HashMap<>();
+            args.put("warfile", "target/test-classes/test.war");
+            args.put("prefix", "/");
+            args.put("httpPort", "0");
+            System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
+            try {
+                winstone = new Launcher(args);
+                return ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+            } finally {
+                System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
             }
-        } finally {
-            System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
-        }
+        });
+
+        Awaitility.await()
+                .pollInterval(1, TimeUnit.MICROSECONDS)
+                .atMost(5, TimeUnit.SECONDS)
+                .until(() -> Files.exists(portFile));
+        String portFileString = Files.readString(portFile, StandardCharsets.UTF_8);
+        assertFalse("Port value should not be empty at any time", portFileString.isEmpty());
+        assertEquals(Integer.toString(futurePort.get()), portFileString);
+        assertNotEquals(8080, futurePort.get().longValue());
     }
 }
