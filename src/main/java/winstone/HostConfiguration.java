@@ -281,7 +281,7 @@ public class HostConfiguration {
                     // If archive date is newer than unzipped file, overwrite
                     File outFile = new File(unzippedDir, elemName);
 
-                    // Protect against Zip Slip attack
+                    // Disallow unzipping files outside the target dir
                     if (!outFile.toPath().normalize().startsWith(unzippedDir.toPath().normalize())) {
                         throw new IOException("Bad zip entry: " + elemName);
                     }
