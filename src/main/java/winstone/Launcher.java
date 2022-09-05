@@ -94,7 +94,6 @@ public class Launcher implements Runnable {
 
             // Check for java home
             List<URL> jars = new ArrayList<>();
-            List<File> commonLibCLPaths = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
@@ -115,7 +114,6 @@ public class Launcher implements Runnable {
             // Add tools jar to classloader path
             if (toolsJar.exists()) {
                 jars.add(toolsJar.toURI().toURL());
-                commonLibCLPaths.add(toolsJar);
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                         toolsJar.getName());
             } else if (Option.USE_JASPER.get(args))
@@ -132,7 +130,6 @@ public class Launcher implements Runnable {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             jars.add(aChildren.toURI().toURL());
-                            commonLibCLPaths.add(aChildren);
                             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                                     aChildren.getName());
                         }
@@ -157,8 +154,6 @@ public class Launcher implements Runnable {
 
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                     commonLibCL.toString());
-            Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
-                    commonLibCLPaths.toString());
 
 
             if(!extraJars.isEmpty()){
@@ -179,8 +174,7 @@ public class Launcher implements Runnable {
 
 
             // Open the web apps
-            this.hostGroup = new HostGroup(server, commonLibCL,
-                    commonLibCLPaths.toArray(new File[0]), args);
+            this.hostGroup = new HostGroup(server, commonLibCL, args);
 
             List<Connector> connectors = new ArrayList<>();
             // Create connectors (http, https and ajp)

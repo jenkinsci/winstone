@@ -50,24 +50,22 @@ public class HostConfiguration {
     private Map<String, String> args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private File[] commonLibCLPaths;
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             File[] commonLibCLPaths, Map<String, String> args, File webappsDir) throws IOException {
+                             Map<String, String> args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = args;
         this.webapps = new Hashtable<>();
         this.commonLibCL = commonLibCL;
-        this.commonLibCLPaths = commonLibCLPaths;
 
         try {
             // Build the realm
             Class<? extends LoginService> realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
             Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
-            loginService = (LoginService) realmConstr.newInstance(args);
+            loginService = realmConstr.newInstance(args);
         } catch (Throwable err) {
             throw new IOException("Failed to setup authentication realm", err);
         }
@@ -136,7 +134,7 @@ public class HostConfiguration {
                 Constructor<? extends RequestLog> loggerConstr = loggerClass.getConstructor(String.class, Map.class);
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setHandler(handler);
-                rlh.setRequestLog((RequestLog) loggerConstr.newInstance(webAppName, args));
+                rlh.setRequestLog(loggerConstr.newInstance(webAppName, args));
                 return rlh;
             } else {
                 Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
