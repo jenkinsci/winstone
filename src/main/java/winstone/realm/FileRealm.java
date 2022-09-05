@@ -6,6 +6,7 @@
  */
 package winstone.realm;
 
+import javax.xml.XMLConstants;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.util.security.Credential;
@@ -111,6 +112,7 @@ public class FileRealm extends HashLoginService {
         try {
             // Use JAXP to create a document builder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             factory.setExpandEntityReferences(false);
             factory.setValidating(false);
             factory.setNamespaceAware(false);

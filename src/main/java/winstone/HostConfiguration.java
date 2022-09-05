@@ -6,6 +6,10 @@
  */
 package winstone;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.file.Path;
+import java.util.HashMap;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
@@ -54,30 +58,30 @@ public class HostConfiguration {
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             Map<String, String> args, File webappsDir) throws IOException {
+                             @NonNull Map<String, String> args, File webappsDir) throws IOException {
         this.server = server;
         this.hostname = hostname;
-        this.args = args;
+        this.args = new HashMap<>(args);
         this.webapps = new Hashtable<>();
         this.commonLibCL = commonLibCL;
 
         try {
             // Build the realm
-            Class<? extends LoginService> realmClass = Option.REALM_CLASS_NAME.get(args, LoginService.class, commonLibCL);
+            Class<? extends LoginService> realmClass = Option.REALM_CLASS_NAME.get(this.args, LoginService.class, commonLibCL);
             Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
-            loginService = realmConstr.newInstance(args);
+            loginService = realmConstr.newInstance(this.args);
         } catch (Throwable err) {
             throw new IOException("Failed to setup authentication realm", err);
         }
 
         // Is this the single or multiple configuration ? Check args
-        File warfile = Option.WARFILE.get(args);
-        File webroot = Option.WEBROOT.get(args);
+        File warfile = Option.WARFILE.get(this.args);
+        File webroot = Option.WEBROOT.get(this.args);
 
         Handler handler;
         // If single-webapp mode
         if (webappsDir == null && ((warfile != null) || (webroot != null))) {
-            String prefix = Option.PREFIX.get(args);
+            String prefix = Option.PREFIX.get(this.args);
             if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
                 prefix = prefix.substring(0,prefix.length()-1);
             handler = configureAccessLog(create(getWebRoot(webroot,warfile), prefix),"webapp");
@@ -89,7 +93,7 @@ public class HostConfiguration {
 
         {// load additional mime types
             loadBuiltinMimeTypes();
-            String types = Option.MIME_TYPES.get(args);
+            String types = Option.MIME_TYPES.get(this.args);
             if (types!=null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
                 while (mappingST.hasMoreTokens()) {
@@ -213,6 +217,7 @@ public class HostConfiguration {
      * war file is newer than. If none is supplied, use the default temp
      * directory.
      */
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, we're not being called from a webapp")
     protected File getWebRoot(File requestedWebroot, File warfile) throws IOException {
         if (warfile != null) {
             Logger.log(Logger.INFO, Launcher.RESOURCES,
@@ -278,9 +283,10 @@ public class HostConfiguration {
 
                     // If archive date is newer than unzipped file, overwrite
                     File outFile = new File(unzippedDir, elemName);
+                    Path outPath = outFile.toPath();
 
                     // Disallow unzipping files outside the target dir
-                    if (!outFile.toPath().normalize().startsWith(unzippedDir.toPath().normalize())) {
+                    if (!outPath.normalize().startsWith(unzippedDir.toPath().normalize())) {
                         throw new IOException("Bad zip entry: " + elemName);
                     }
 
@@ -288,7 +294,12 @@ public class HostConfiguration {
                         continue;
                     }
                     try {
-                        Files.createDirectories(outFile.toPath().getParent());
+                        Path parent = outPath.getParent();
+                        if (parent == null) {
+                            Logger.logDirectMessage(Logger.WARNING, null, outPath + "has no parent dir ", null);
+                        } else {
+                            Files.createDirectories(parent);
+                        }
                     } catch (IOException | InvalidPathException | SecurityException ex) {
                         Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
                     }
@@ -332,6 +343,7 @@ public class HostConfiguration {
         }
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, we're not being called from a webapp")
     protected ContextHandlerCollection initMultiWebappDir(File webappsDir) {
         ContextHandlerCollection webApps = new ContextHandlerCollection();
 

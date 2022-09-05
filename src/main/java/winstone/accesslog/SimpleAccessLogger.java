@@ -6,6 +6,7 @@
  */
 package winstone.accesslog;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
@@ -51,6 +52,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private String pattern;
     private String fileName;
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, webAppName come from command line")
     public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs)
             throws IOException {
 
@@ -150,10 +152,11 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         if (this.outStream != null) {
             try {
                 this.outStream.close();
-            } catch (IOException err) {}
+            } catch (IOException err) {
+                Logger.logDirectMessage(Logger.WARNING, null, "Failed to close access logger output stream", err);
+            }
             this.outStream = null;
         }
         this.fileName = null;
-//        this.webAppConfig = null;
     }
 }

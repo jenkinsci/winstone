@@ -77,6 +77,7 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
+    @SuppressFBWarnings(value ="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
         try {
@@ -223,8 +224,11 @@ public class Launcher implements Runnable {
                     int port = ((ServerConnector) connector).getLocalPort();
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
+                    if (portDir == null) {
+                        throw new IllegalArgumentException("Given port file name doesn't have a parent: " + portFileName);
+                    }
                     Files.createDirectories(portDir);
-                    Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
+                    Path tmpPath = Files.createTempFile(portDir, portFileName, null);
                     Files.writeString(tmpPath, Integer.toString(port), StandardCharsets.UTF_8);
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
@@ -435,6 +439,7 @@ public class Launcher implements Runnable {
         return args;
     }
 
+    @SuppressFBWarnings(value = { "NP_LOAD_OF_KNOWN_NULL_VALUE", "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" }, justification = "false positive https://github.com/spotbugs/spotbugs/issues/1338")
     protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
@@ -475,6 +480,7 @@ public class Launcher implements Runnable {
         }
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, args come from command line")
     public static void initLogger(Map<String, String> args) throws IOException {
         // Reset the log level
         int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
