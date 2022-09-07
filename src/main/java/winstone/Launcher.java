@@ -214,6 +214,7 @@ public class Launcher implements Runnable {
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Not applicable, this is called from command line")
     private void writePortToFileIfNeeded() throws IOException {
         String portFileName = System.getProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
         if (portFileName != null) {
@@ -228,7 +229,12 @@ public class Launcher implements Runnable {
                         throw new IllegalArgumentException("Given port file name doesn't have a parent: " + portFileName);
                     }
                     Files.createDirectories(portDir);
-                    Path tmpPath = Files.createTempFile(portDir, portFileName, null);
+                    Path fileName = portFile.getFileName();
+                    if (fileName == null) {
+                        // Should never happen, but spotbugs
+                        throw new IllegalArgumentException("Given port file name doesn't have a name: " + portFileName);
+                    }
+                    Path tmpPath = Files.createTempFile(portDir, fileName.toString(), null);
                     Files.writeString(tmpPath, Integer.toString(port), StandardCharsets.UTF_8);
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
