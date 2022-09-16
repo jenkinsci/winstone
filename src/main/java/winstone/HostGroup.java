@@ -33,7 +33,7 @@ public class HostGroup {
 
     public HostGroup(
             Server server, ClassLoader commonLibCL,
-            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
+            Map<String, String> args) throws IOException {
         this.server = server;
         this.hostConfigs = new Hashtable<>();
 
@@ -42,7 +42,7 @@ public class HostGroup {
 
         // If host mode
         initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
-                commonLibCLPaths, args);
+                args);
         this.defaultHostName = DEFAULT_HOSTNAME;
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                 this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
@@ -50,20 +50,20 @@ public class HostGroup {
 
     public HostConfiguration getHostByName(String hostname) {
         if ((hostname != null) && (this.hostConfigs.size() > 1)) {
-            HostConfiguration host = (HostConfiguration) this.hostConfigs.get(hostname);
+            HostConfiguration host = this.hostConfigs.get(hostname);
             if (host != null) {
                 return host;
             }
         }
-        return (HostConfiguration) this.hostConfigs.get(this.defaultHostName);
+        return this.hostConfigs.get(this.defaultHostName);
     }
 
     protected void initHost(File webappsDir, String hostname,
                             ClassLoader commonLibCL,
-                            File[] commonLibCLPaths, Map<String, String> args) throws IOException {
+                            Map<String, String> args) throws IOException {
         Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
-                commonLibCLPaths, args, webappsDir);
+                args, webappsDir);
         this.hostConfigs.put(hostname, config);
     }
 }

@@ -16,6 +16,7 @@ import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -111,6 +112,9 @@ public class FileRealm extends HashLoginService {
         try {
             // Use JAXP to create a document builder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setXIncludeAware(false);
             factory.setExpandEntityReferences(false);
             factory.setValidating(false);
             factory.setNamespaceAware(false);

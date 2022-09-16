@@ -8,8 +8,6 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
@@ -32,9 +30,11 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -77,6 +77,7 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
+    @SuppressFBWarnings(value ="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
         try {
@@ -94,7 +95,6 @@ public class Launcher implements Runnable {
 
             // Check for java home
             List<URL> jars = new ArrayList<>();
-            List<File> commonLibCLPaths = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
@@ -115,7 +115,6 @@ public class Launcher implements Runnable {
             // Add tools jar to classloader path
             if (toolsJar.exists()) {
                 jars.add(toolsJar.toURI().toURL());
-                commonLibCLPaths.add(toolsJar);
                 Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                         toolsJar.getName());
             } else if (Option.USE_JASPER.get(args))
@@ -132,7 +131,6 @@ public class Launcher implements Runnable {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             jars.add(aChildren.toURI().toURL());
-                            commonLibCLPaths.add(aChildren);
                             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
                                     aChildren.getName());
                         }
@@ -157,8 +155,6 @@ public class Launcher implements Runnable {
 
             Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
                     commonLibCL.toString());
-            Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
-                    commonLibCLPaths.toString());
 
 
             if(!extraJars.isEmpty()){
@@ -179,8 +175,7 @@ public class Launcher implements Runnable {
 
 
             // Open the web apps
-            this.hostGroup = new HostGroup(server, commonLibCL,
-                    commonLibCLPaths.toArray(new File[0]), args);
+            this.hostGroup = new HostGroup(server, commonLibCL, args);
 
             List<Connector> connectors = new ArrayList<>();
             // Create connectors (http, https and ajp)
@@ -219,6 +214,7 @@ public class Launcher implements Runnable {
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Not applicable, this is called from command line")
     private void writePortToFileIfNeeded() throws IOException {
         String portFileName = System.getProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
         if (portFileName != null) {
@@ -229,8 +225,16 @@ public class Launcher implements Runnable {
                     int port = ((ServerConnector) connector).getLocalPort();
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
+                    if (portDir == null) {
+                        throw new IllegalArgumentException("Given port file name doesn't have a parent: " + portFileName);
+                    }
                     Files.createDirectories(portDir);
-                    Path tmpPath = Files.createTempFile(portDir, portFile.getFileName().toString(), null);
+                    Path fileName = portFile.getFileName();
+                    if (fileName == null) {
+                        // Should never happen, but spotbugs
+                        throw new IllegalArgumentException("Given port file name doesn't have a name: " + portFileName);
+                    }
+                    Path tmpPath = Files.createTempFile(portDir, fileName.toString(), null);
                     Files.writeString(tmpPath, Integer.toString(port), StandardCharsets.UTF_8);
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
@@ -441,6 +445,7 @@ public class Launcher implements Runnable {
         return args;
     }
 
+    @SuppressFBWarnings(value = { "NP_LOAD_OF_KNOWN_NULL_VALUE", "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" }, justification = "false positive https://github.com/spotbugs/spotbugs/issues/1338")
     protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
@@ -481,6 +486,7 @@ public class Launcher implements Runnable {
         }
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, args come from command line")
     public static void initLogger(Map<String, String> args) throws IOException {
         // Reset the log level
         int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());

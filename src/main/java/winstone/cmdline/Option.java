@@ -1,5 +1,6 @@
 package winstone.cmdline;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -245,12 +246,13 @@ public class Option<T> {
             return v!=null ? v : defaultValue;
         }
     }
-    
+
     public static class OFile extends Option<File> {
         public OFile(String name) {
             super(name, File.class,null);
         }
-        
+
+        @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, args come from command line")
         public File get(Map<String, String> args, File defaultValue) {
             String v = args.get(name);
             return v!=null ? new File(v) : defaultValue;

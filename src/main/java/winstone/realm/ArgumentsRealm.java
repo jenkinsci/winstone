@@ -39,10 +39,11 @@ public class ArgumentsRealm extends HashLoginService {
         UserStore userStore = new UserStore();
         setUserStore( userStore );
         int count=0;
-        for (String key : args.keySet()) {
+        for (Map.Entry<String, String> entry : args.entrySet()) {
+            String key = entry.getKey();
             if (key.startsWith(Option.ARGUMENTS_REALM_PASSWORD.name)) {
                 String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
-                String password = args.get(key);
+                String password = entry.getValue();
 
                 String roleList = Option.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 String[] roleArray = new String[0];
