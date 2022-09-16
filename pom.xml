@@ -196,12 +196,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.codehaus.mojo.signature</groupId>
-        <artifactId>java18</artifactId>
-        <version>1.0</version>
-        <type>signature</type>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-bom</artifactId>
         <version>${jetty.version}</version>
