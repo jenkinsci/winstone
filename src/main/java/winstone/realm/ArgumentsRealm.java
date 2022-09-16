@@ -41,10 +41,9 @@ public class ArgumentsRealm extends HashLoginService {
         int count=0;
         for (Map.Entry<String, String> entry : args.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();
             if (key.startsWith(Option.ARGUMENTS_REALM_PASSWORD.name)) {
                 String userName = key.substring(Option.ARGUMENTS_REALM_PASSWORD.name.length());
-                String password = value;
+                String password = entry.getValue();
 
                 String roleList = Option.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 String[] roleArray = new String[0];
