@@ -113,6 +113,8 @@ public class FileRealm extends HashLoginService {
             // Use JAXP to create a document builder
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setXIncludeAware(false);
             factory.setExpandEntityReferences(false);
             factory.setValidating(false);
             factory.setNamespaceAware(false);
