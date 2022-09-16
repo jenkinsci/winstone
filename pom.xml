@@ -74,7 +74,6 @@
 <!--          <systemPropertyVariables>-->
 <!--            <java.util.logging.config.file>src/test/resources/jul.properties</java.util.logging.config.file>-->
 <!--          </systemPropertyVariables>-->
-          <trimStackTrace>false</trimStackTrace> <!-- SUREFIRE-1226 workaround -->
         </configuration>
       </plugin>
 
