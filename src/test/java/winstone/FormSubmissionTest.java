@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
 
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
             WebResponse wresp = wc.getResponse(wreq);
             try (InputStream content = wresp.getInputStream()) {
                 assertTrue("Loading AcceptFormServlet at size " + size, content.available() > 0);
-                assertEquals("correct response at size " + size, "received " + (size + "x=".length()) + " bytes", IOUtils.toString(content, StandardCharsets.US_ASCII));
+                assertEquals("correct response at size " + size, "received " + (size + "x=".length()) + " bytes", new String(content.readAllBytes(), StandardCharsets.US_ASCII));
             }
         }
     }

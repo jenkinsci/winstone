@@ -7,7 +7,6 @@ import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.xml.sax.SAXException;
 
@@ -35,7 +34,7 @@ public class AbstractWinstoneTest {
         WebResponse wresp = wc.getResponse(wreq);
         InputStream content = wresp.getInputStream();
         assertTrue("Loading CountRequestsServlet", content.available() > 0);
-        String s = IOUtils.toString(content, StandardCharsets.UTF_8);
+        String s = new String(content.readAllBytes(), StandardCharsets.UTF_8);
         content.close();
         return s;
     }
