@@ -1,7 +1,7 @@
 package winstone;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
@@ -39,11 +39,11 @@ public class AbstractWinstoneTest {
         return s;
     }
 
-    protected void assertConnectionRefused(String host, int port) throws IOException {
-        try (Socket s = new Socket(host,port)) {
-            fail("shouldn't be listening on 127.0.0.1");
-        } catch (ConnectException e) {
-            // expected
-        }
+    protected void assertConnectionRefused(String host, int port) {
+        assertThrows(ConnectException.class, () -> {
+            try (Socket s = new Socket(host, port)) {
+                // shouldn't be listening on 127.0.0.1
+            }
+        });
     }
 }

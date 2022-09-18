@@ -1,7 +1,7 @@
 package winstone.realm;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import com.meterware.httpunit.AuthorizationRequiredException;
 import org.eclipse.jetty.server.ServerConnector;
@@ -26,13 +26,7 @@ public class ArgumentsRealmTest extends AbstractWinstoneTest {
         args.put("argumentsRealm.roles.joe","loginUser");
         winstone = new Launcher(args);
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-        try {
-            makeRequest("http://localhost:"+port+"/secure/secret.txt");
-
-            fail("should require authentication");
-        } catch (AuthorizationRequiredException e) {
-            // expected
-        }
+        assertThrows(AuthorizationRequiredException.class, () -> makeRequest("http://localhost:" + port + "/secure/secret.txt"));
 
         wc.setAuthorization("joe","eoj");
         assertEquals("diamond", makeRequest("http://localhost:"+port+"/secure/secret.txt"));
