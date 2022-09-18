@@ -1,27 +1,25 @@
 package winstone;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
 import org.junit.After;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.HttpURLConnection;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 /**
  * @author Kohsuke Kawaguchi
  */
 public class AbstractWinstoneTest {
     protected Launcher winstone;
-    protected WebConversation wc = new WebConversation();
 
     @After
     public void tearDown() {
@@ -29,14 +27,13 @@ public class AbstractWinstoneTest {
             winstone.shutdown();
     }
 
-    public String makeRequest(String url) throws IOException, SAXException {
-        WebRequest wreq = new GetMethodWebRequest(url);
-        WebResponse wresp = wc.getResponse(wreq);
-        InputStream content = wresp.getInputStream();
-        assertTrue("Loading CountRequestsServlet", content.available() > 0);
-        String s = new String(content.readAllBytes(), StandardCharsets.UTF_8);
-        content.close();
-        return s;
+    public String makeRequest(String url)
+            throws URISyntaxException, IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder(new URI(url)).GET().build();
+        HttpResponse<String> response =
+                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+        return response.body();
     }
 
     protected void assertConnectionRefused(String host, int port) {

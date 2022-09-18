@@ -43,7 +43,9 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         assertConnectionRefused("127.0.0.1",port);
 
-        makeRequest("http://127.0.0.2:"+port+"/CountRequestsServlet");
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                makeRequest("http://127.0.0.2:" + port + "/CountRequestsServlet"));
 
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);

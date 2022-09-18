@@ -7,17 +7,14 @@
 package winstone.testCase.load;
 
 import java.io.IOException;
-import java.io.InputStream;
-
-import org.xml.sax.SAXException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
-
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
 
 /**
  * A single worked thread in the load testing program
@@ -30,18 +27,18 @@ public class LoadTestThread implements Runnable {
     private String url;
     private long delayBeforeStarting;
     private LoadTest loadTest;
-    private WebConversation webConv;
+    private HttpClient client;
     private Thread thread;
     private boolean interrupted;
     private LoadTestThread next;
 
     public LoadTestThread(String url, LoadTest loadTest,
-            WinstoneResourceBundle resources, WebConversation webConv,
+            WinstoneResourceBundle resources, HttpClient client,
             int delayedThreads) {
         this.resources = resources;
         this.url = url;
         this.loadTest = loadTest;
-        this.webConv = webConv;
+        this.client = client;
         this.delayBeforeStarting = 1000L * delayedThreads;
         this.interrupted = false;
         this.thread = new Thread(this);
@@ -50,7 +47,7 @@ public class LoadTestThread implements Runnable {
 
         // Launch the next second's getter
         if (delayedThreads > 0)
-            this.next = new LoadTestThread(url, loadTest, resources, webConv,
+            this.next = new LoadTestThread(url, loadTest, resources, client,
                     delayedThreads - 1);
     }
 
@@ -65,40 +62,23 @@ public class LoadTestThread implements Runnable {
         long startTime = System.currentTimeMillis();
 
         try {
-            if (this.webConv == null)
-                this.webConv = new WebConversation();
+            if (this.client == null) {
+                this.client = HttpClient.newHttpClient();
+            }
 
             // Access the URL
-            WebRequest wreq = new GetMethodWebRequest(this.url);
-            WebResponse wresp = this.webConv.getResponse(wreq);
-            int responseCode = wresp.getResponseCode();
+            HttpRequest request = HttpRequest.newBuilder(new URI(this.url)).GET().build();
+            HttpResponse<String> response =
+                    this.client.send(request, HttpResponse.BodyHandlers.ofString());
+            int responseCode = response.statusCode();
             if (responseCode >= 400)
                 throw new IOException("Failed with status " + responseCode);
-            InputStream inContent = wresp.getInputStream();
-            int contentLength = wresp.getContentLength();
-            byte[] content = new byte[contentLength == -1 ? 100 * 1024
-                    : contentLength];
-            int position = 0;
-            int value = inContent.read();
-            while ((value != -1)
-                    && (contentLength < 0 || position < contentLength)) {
-                content[position++] = (byte) value;
-                value = inContent.read();
+            if (this.interrupted) {
+                return;
             }
-            inContent.close();
-
-            // Confirm the result is the same size the content-length said it
-            // was
-            if ((position == contentLength) || (contentLength == -1)) {
-                if (this.interrupted)
-                    return;
-                this.loadTest.incTimeTotal(System.currentTimeMillis()
-                        - startTime);
-                this.loadTest.incSuccessCount();
-            } else
-                throw new IOException("Only downloaded " + position + " of "
-                        + contentLength + " bytes");
-        } catch (IOException | SAXException err) {
+            this.loadTest.incTimeTotal(System.currentTimeMillis() - startTime);
+            this.loadTest.incSuccessCount();
+        } catch (IOException | InterruptedException | URISyntaxException err) {
             Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
         }
     }

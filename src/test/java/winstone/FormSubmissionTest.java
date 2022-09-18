@@ -1,13 +1,12 @@
 package winstone;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import com.meterware.httpunit.PostMethodWebRequest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +31,13 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         for (int size = 1; size <= 9_999_999; size *= 3) {
             System.out.println("trying size " + size);
-            WebRequest wreq = new PostMethodWebRequest("http://127.0.0.2:"+port+"/AcceptFormServlet");
-            wreq.setParameter("x", ".".repeat(size));
-            WebResponse wresp = wc.getResponse(wreq);
-            try (InputStream content = wresp.getInputStream()) {
-                assertTrue("Loading AcceptFormServlet at size " + size, content.available() > 0);
-                assertEquals("correct response at size " + size, "received " + (size + "x=".length()) + " bytes", new String(content.readAllBytes(), StandardCharsets.US_ASCII));
-            }
+            HttpRequest request = HttpRequest.newBuilder(new URI("http://127.0.0.2:" + port + "/AcceptFormServlet"))
+                    .POST(HttpRequest.BodyPublishers.ofString("x=" + ".".repeat(size)))
+                    .build();
+            HttpResponse<String> response =
+                    HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+            assertEquals("correct response at size " + size, "received " + (size + "x=".length()) + " bytes", response.body());
         }
     }
 

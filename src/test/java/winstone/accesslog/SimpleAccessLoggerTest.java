@@ -37,7 +37,9 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         winstone = new Launcher(args);
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         // make a request
-        makeRequest("http://localhost:"+port+"/examples/CountRequestsServlet");
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                makeRequest("http://localhost:" + port + "/examples/CountRequestsServlet"));
 
         // check the log file
         // check the log file every 100ms for 5s

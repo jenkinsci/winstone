@@ -6,8 +6,15 @@
  */
 package winstone.testCase;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,16 +23,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.xml.sax.SAXException;
-
 import winstone.Launcher;
 import winstone.Logger;
-
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebImage;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
 
 /**
  * Test case for the Http Connector to Winstone. Simulates a simple connect and
@@ -49,8 +48,8 @@ public class HttpConnectorTest extends TestCase {
     /**
      * Test the simple case of connecting, retrieving and disconnecting
      */
-    public void testSimpleConnection() throws IOException, SAXException,
-            InterruptedException {
+    public void testSimpleConnection()
+            throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
         Map<String,String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
@@ -64,13 +63,14 @@ public class HttpConnectorTest extends TestCase {
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
-        WebConversation wc = new WebConversation();
-        WebRequest wreq = new GetMethodWebRequest(
-                "http://localhost:10003/examples/CountRequestsServlet");
-        WebResponse wresp = wc.getResponse(wreq);
-        InputStream content = wresp.getInputStream();
-        assertTrue("Loading CountRequestsServlet", content.available() > 0);
-        content.close();
+        HttpRequest request =
+                HttpRequest.newBuilder(new URI("http://localhost:10003/examples/CountRequestsServlet")).GET().build();
+        HttpResponse<String> response =
+                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                response.body());
         winstone.shutdown();
         Thread.sleep(500);
     }
@@ -78,44 +78,8 @@ public class HttpConnectorTest extends TestCase {
     /**
      * Test the keep alive case
      */
-    public void testKeepAliveConnection() throws IOException,
-            InterruptedException, SAXException {
-        // Initialise container
-        Map<String,String> args = new HashMap<>();
-        args.put("webroot", "target/testwebapp");
-        args.put("prefix", "/examples");
-        args.put("httpPort", "10004");
-        args.put("ajp13Port", "-1");
-        args.put("controlPort", "-1");
-        args.put("debug", "8");
-        args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
-        Launcher winstone = new Launcher(args);
-
-        // Check for a simple connection
-        WebConversation wc = new WebConversation();
-        WebRequest wreq = new GetMethodWebRequest(
-                "http://localhost:10004/examples/CountRequestsServlet");
-        WebResponse wresp1 = wc.getResponse(wreq);
-        WebImage[] img = wresp1.getImages();
-        for (WebImage anImg : img) wc.getResponse(anImg.getRequest());
-        // Thread.sleep(2000);
-        // WebResponse wresp2 = wc.getResponse(wreq);
-        // Thread.sleep(2000);
-        //WebResponse wresp3 = wc.getResponse(wreq);
-        InputStream content = wresp1.getInputStream();
-        assertTrue("Loading CountRequestsServlet + child images", content
-                .available() > 0);
-        content.close();
-        winstone.shutdown();
-        Thread.sleep(500);
-    }
-
-    /**
-     * Test the keep alive case
-     */
-    public void testWriteAfterServlet() throws IOException,
-            InterruptedException, SAXException {
+    public void testWriteAfterServlet()
+            throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
         Map<String,String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
@@ -129,12 +93,14 @@ public class HttpConnectorTest extends TestCase {
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
-        WebConversation wc = new WebConversation();
-        WebRequest wreq = new GetMethodWebRequest(
-                "http://localhost:10005/examples/TestWriteAfterServlet");
-        WebResponse wresp1 = wc.getResponse(wreq);
-        Logger.logDirectMessage(Logger.INFO, "log", "Output: " + wresp1.getText(), null);
-        assertTrue(wresp1.getText().endsWith("Hello"));
+        HttpRequest request =
+                HttpRequest.newBuilder(new URI("http://localhost:10005/examples/TestWriteAfterServlet")).GET().build();
+        HttpResponse<String> response =
+                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\nHello",
+                response.body());
         winstone.shutdown();
         Thread.sleep(500);
     }
