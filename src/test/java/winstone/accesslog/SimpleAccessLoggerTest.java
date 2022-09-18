@@ -2,15 +2,15 @@ package winstone.accesslog;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +23,8 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
      */
     @Test
     public void testSimpleConnection() throws Exception {
-        File logFile = new File("target/test.log");
-        Files.deleteIfExists(logFile.toPath());
+        Path logFile = Paths.get("target/test.log");
+        Files.deleteIfExists(logFile);
 
         // Initialise container
         Map<String,String> args = new HashMap<>();
@@ -32,7 +32,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         args.put("prefix", "/examples");
         args.put("httpPort", "0");
         args.put("accessLoggerClassName",SimpleAccessLogger.class.getName());
-        args.put("simpleAccessLogger.file",logFile.getAbsolutePath());
+        args.put("simpleAccessLogger.file",logFile.toAbsolutePath().toString());
         args.put("simpleAccessLogger.format","###ip### - ###user### ###uriLine### ###status###");
         winstone = new Launcher(args);
         int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
@@ -44,7 +44,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         String text = "";
         for(int i=0; i < 50; ++i) {
             Thread.sleep(100);
-            text = FileUtils.readFileToString(logFile, StandardCharsets.UTF_8);
+            text = Files.readString(logFile, StandardCharsets.UTF_8);
             if (!"".equals(text))
                 break;
         }

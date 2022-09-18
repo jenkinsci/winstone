@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
@@ -14,7 +12,6 @@ import org.junit.Test;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.X509TrustManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,7 +35,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         con.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
+        new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
     
     @Issue("JENKINS-60857")
@@ -106,7 +103,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         SSLContext ssl = SSLContext.getInstance("SSL");
         ssl.init(null, new X509TrustManager[] {tm}, null);
         secureCon.setSSLSocketFactory(ssl.getSocketFactory());
-        IOUtils.toString(secureCon.getInputStream(), StandardCharsets.UTF_8);
+        new String(secureCon.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 
 }
