@@ -6,6 +6,7 @@
  */
 package winstone.testCase.load;
 
+import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,6 @@ import org.junit.Test;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 
-import com.meterware.httpunit.WebConversation;
 import winstone.cmdline.Option;
 
 /**
@@ -24,7 +24,7 @@ import winstone.cmdline.Option;
  * works by hitting a supplied URL with parallel threads (with keep-alives or
  * without) at an escalating rate, and counting the no of failures.
  *
- * It uses HttpUnit's WebConversation class for the connection.
+ * It uses {@link java.net.http.HttpClient} for the connection.
  *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: LoadTest.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
@@ -63,19 +63,19 @@ public class LoadTest {
 
     @Test
     public void test() throws InterruptedException {
-        WebConversation wc = null;
+        HttpClient client = null;
 
         // Loop through in steps
         for (int n = this.startThreads; n <= this.endThreads; n += this.stepSize) {
             if (this.useKeepAlives)
-                wc = new WebConversation();
+                client = HttpClient.newHttpClient();
 
             // Spawn the threads
             int noOfSeconds = (int) this.stepPeriod / 1000;
             List<LoadTestThread> threads = new ArrayList<>();
             for (int m = 0; m < n; m++)
                 threads.add(new LoadTestThread(this.url, this, this.resources,
-                        wc, noOfSeconds - 1));
+                        client, noOfSeconds - 1));
 
             // Sleep for step period
             Thread.sleep(this.stepPeriod + gracePeriod);
