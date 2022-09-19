@@ -113,6 +113,11 @@
               </excludes>
             </filter>
           </filters>
+          <artifactSet>
+            <excludes>
+              <exclude>com.github.spotbugs:spotbugs-annotations</exclude>
+            </excludes>
+          </artifactSet>
           <!-- Jetty uses reflection in various places and that breaks relocation
           <relocations>
             <relocation>
