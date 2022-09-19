@@ -10,12 +10,13 @@ import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,13 +30,29 @@ import org.jvnet.hudson.test.Issue;
  */
 public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
 
-    private void request(X509TrustManager tm, int port) throws Exception {
-        HttpsURLConnection con = (HttpsURLConnection)new URL("https://localhost:"+port+"/CountRequestsServlet").openConnection();
-        con.setHostnameVerifier( ( s, sslSession ) -> true );
-        SSLContext ssl = SSLContext.getInstance("SSL");
-        ssl.init(null, new X509TrustManager[] {tm}, null);
-        con.setSSLSocketFactory(ssl.getSocketFactory());
-        new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    private static final String DISABLE_HOSTNAME_VERIFICATION =
+            "jdk.internal.httpclient.disableHostnameVerification";
+
+    private String request(X509TrustManager tm, int port) throws Exception {
+        String disableHostnameVerification = System.getProperty(DISABLE_HOSTNAME_VERIFICATION);
+        try {
+            System.setProperty(DISABLE_HOSTNAME_VERIFICATION, Boolean.TRUE.toString());
+            HttpRequest request =
+                    HttpRequest.newBuilder(new URI("https://localhost:" + port + "/CountRequestsServlet")).GET().build();
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, new X509TrustManager[] {tm}, null);
+            HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+            return response.body();
+        } finally {
+            if (disableHostnameVerification != null) {
+                System.setProperty(DISABLE_HOSTNAME_VERIFICATION, disableHostnameVerification);
+            } else {
+                System.clearProperty(DISABLE_HOSTNAME_VERIFICATION);
+            }
+        }
     }
     
     @Issue("JENKINS-60857")
@@ -52,7 +69,9 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         winstone = new Launcher(args);
         int port = (( ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
         assertConnectionRefused("127.0.0.2", port);
-        request(new TrustEveryoneManager(), port);
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                request(new TrustEveryoneManager(), port));
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean( LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
         assertFalse(lowResourceMonitor.isLowOnResources());
@@ -84,26 +103,44 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
 
         scNonSsl.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration().setSecurePort(httpsPort);
 
-        requestRedirect(new TrustEveryoneManager(), httpPort, httpsPort);
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                requestRedirect(new TrustEveryoneManager(), httpPort, httpsPort));
 
         // also verify that directly accessing the resource works.
-        request(new TrustEveryoneManager(), httpsPort);
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1002 times</body></html>\r\n",
+                request(new TrustEveryoneManager(), httpsPort));
     }
 
-    private void requestRedirect(X509TrustManager tm, int httpPort, int httpsPort) throws Exception {
-        HttpURLConnection con = (HttpURLConnection)new URL("http://localhost:"+httpPort+"/CountRequestsServlet").openConnection();
-        assertEquals(302, con.getResponseCode());
-        assertTrue("Should have a Location header of the resource", con.getHeaderFields().containsKey("Location"));
-        String newUrl = con.getHeaderField("Location");
+    private String requestRedirect(X509TrustManager tm, int httpPort, int httpsPort) throws Exception {
+        HttpRequest request =
+                HttpRequest.newBuilder(new URI("http://localhost:" + httpPort + "/CountRequestsServlet")).GET().build();
+        HttpResponse<String> response =
+                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_MOVED_TEMP, response.statusCode());
+        assertTrue(response.body().isEmpty());
+        String newUrl = response.headers().firstValue("Location").orElse(null);
         assertNotNull(newUrl);
-        assertTrue(newUrl.contains("https"));
-        assertTrue(newUrl.contains(Integer.toString(httpsPort)));
-        HttpsURLConnection secureCon = (HttpsURLConnection)new URL(newUrl).openConnection();
-        secureCon.setHostnameVerifier( ( s, sslSession ) -> true );
-        SSLContext ssl = SSLContext.getInstance("SSL");
-        ssl.init(null, new X509TrustManager[] {tm}, null);
-        secureCon.setSSLSocketFactory(ssl.getSocketFactory());
-        new String(secureCon.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        assertEquals("https://localhost:" + httpsPort + "/CountRequestsServlet", newUrl);
+
+        String disableHostnameVerification = System.getProperty(DISABLE_HOSTNAME_VERIFICATION);
+        try {
+            System.setProperty(DISABLE_HOSTNAME_VERIFICATION, Boolean.TRUE.toString());
+            request = HttpRequest.newBuilder(new URI(newUrl)).GET().build();
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, new X509TrustManager[] {tm}, null);
+            HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+            return response.body();
+        } finally {
+            if (disableHostnameVerification != null) {
+                System.setProperty(DISABLE_HOSTNAME_VERIFICATION, disableHostnameVerification);
+            } else {
+                System.clearProperty(DISABLE_HOSTNAME_VERIFICATION);
+            }
+        }
     }
 
 }

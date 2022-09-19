@@ -70,6 +70,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <reuseForks>false</reuseForks>
+          <runOrder>alphabetical</runOrder>
 <!--          Uncomment to enable extra logging for debugging          -->
 <!--          <systemPropertyVariables>-->
 <!--            <java.util.logging.config.file>src/test/resources/jul.properties</java.util.logging.config.file>-->
