@@ -20,8 +20,6 @@
 
 package winstone;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.eclipse.jetty.alpn.ALPN;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
@@ -47,7 +45,6 @@ import java.util.Map;
  */
 public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
     @Override
-    @SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "There is only one instance of this connector factory")
     public Connector start( Map<String, String> args, Server server ) throws IOException
     {
         int listenPort = Option.HTTP2_PORT.get( args );
@@ -92,9 +89,6 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             http2Connector.setHost( listenAddress );
             server.addConnector(http2Connector);
             server.setDumpAfterStart( Boolean.getBoolean( "dumpAfterStart" ) );
-
-            // ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD
-            ALPN.debug = Boolean.getBoolean( "alpnDebug" );
 
             return http2Connector;
         } catch (IllegalStateException e) {
