@@ -175,29 +175,6 @@ becomes the default host.
 
 * `java -jar winstone.jar --hostsDir=<dir containing multiple host directories>`
 
-## HTTP/2 Support
-
-*Old versions of* Java 8 doesn't come with ALPN support. So you need to include alpn jar in the bootclasspath.
-
-The version to use depends on your used jvm version.
-
-To include in the bootclasspath, simply add an option ``` -Xbootclasspath/p: ``` to your jvm start script, this must contains
-a path to the alpn boot jar.
-Sample
-
-``` -Xbootclasspath/p:/Users/olamy/repository/org/mortbay/jetty/alpn/alpn-boot/8.1.11.v20170118/alpn-boot-8.1.11.v20170118.jar ```
-
-To find the version to use you can look at this [table](https://www.eclipse.org/jetty/documentation/current/alpn-chapter.html#alpn-versions)
-
-You have to include the used ALPN processor with an extra configuration option. You can download the version from:
-* [openjdk8](http://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-alpn-openjdk8-server/9.4.11.v20180605/)
-* [conscrypt](http://repo.maven.apache.org/maven2/org/eclipse/jetty/jetty-alpn-conscrypt-server/9.4.11.v20180605/)
-
-
-The jar must be included using the option: ``` --extraLibFolder=extra ``` (path to a directory containing the jars)
-
-With JDK 8u252+ or Java 9+ you do not need anymore to include the ALPN jar in the bootclasspath but only the jar jetty-alpn-java-server in the ``` extraLibFolder ```
-
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
 
