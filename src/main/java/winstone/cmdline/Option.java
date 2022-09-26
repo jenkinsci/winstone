@@ -38,7 +38,6 @@ public class Option<T> {
     public static final OFile WARFILE=file("warfile");
     public static final OFile WEBAPPS_DIR=file("webappsDir");
     public static final OFile JAVA_HOME=file("javaHome");
-    public static final OFile TOOLS_JAR=file("toolsJar");
     public static final OFile CONFIG=file("config");
     public static final OString PREFIX=string("prefix","");
     public static final OFile COMMON_LIB_FOLDER=file("commonLibFolder");
@@ -107,7 +106,6 @@ public class Option<T> {
     public static final OInt JETTY_ACCEPTORS=integer("jettyAcceptorsCount",-1);
     public static final OInt JETTY_SELECTORS=integer("jettySelectorsCount",0);
 
-    public static final OBoolean USE_JASPER=bool("useJasper",false);
     public static final OString MIME_TYPES=string("mimeTypes");
     public static final OInt MAX_PARAM_COUNT=integer("maxParamCount",-1);
     public static final OBoolean USAGE=bool("usage",false);

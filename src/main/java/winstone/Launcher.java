@@ -98,27 +98,6 @@ public class Launcher implements Runnable {
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
-            File toolsJar = Option.TOOLS_JAR.get(args);
-            if (toolsJar == null) {
-                toolsJar = new File(javaHome, "lib/tools.jar");
-
-                // first try - if it doesn't exist, try up one dir since we might have
-                // the JRE home by mistake
-                if (!toolsJar.exists()) {
-                    File toolsJar2 = new File(javaHome.getParentFile(), "lib/tools.jar");
-                    if (toolsJar2.exists()) {
-                        toolsJar = toolsJar2;
-                    }
-                }
-            }
-
-            // Add tools jar to classloader path
-            if (toolsJar.exists()) {
-                jars.add(toolsJar.toURI().toURL());
-                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
-                        toolsJar.getName());
-            } else if (Option.USE_JASPER.get(args))
-                Logger.log(Logger.WARNING, RESOURCES, "Launcher.ToolsJarNotFound");
 
             // Set up common lib class loader
             File libFolder = Option.COMMON_LIB_FOLDER.get(args,new File("lib"));
