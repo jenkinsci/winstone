@@ -1,7 +1,7 @@
 # What is Winstone?
 Winstone is a command line interface around Jetty 10.0.x, which implements
 Servlet 4.0 (JakartaEE 8/`javax.servlet.*`), WebSocket/JSR-356, and HTTP/2 support. It is used as the default
-embedded servlet container in Jenkins (via [executable-war](https://github.com/jenkinsci/extras-executable-war) module)
+embedded servlet container in Jenkins (via the `executable` package in the `war` module)
 and can be used by any other web applications that wants to be self-contained.
 
 ## History
