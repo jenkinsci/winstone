@@ -61,7 +61,6 @@ To run different web applications for diffent virtual hosts:
        --webappsDir             = set directory for multiple webapps to be deployed from
     Other options:
        --javaHome               = Override the JAVA_HOME variable
-       --toolsJar               = The location of tools.jar. Default is JAVA_HOME/lib/tools.jar
        --config                 = load configuration properties from here. Default is ./winstone.properties
        --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
        --commonLibFolder        = folder for additional jar files. Default is ./lib
@@ -100,7 +99,6 @@ To run different web applications for diffent virtual hosts:
                                "^.*_anon_.*$" 
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
     
-       --useJasper              = enable jasper JSP handling (true/false). Default is false
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
        --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 180. -1 never evict, 0 evict on exit
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
