@@ -120,6 +120,7 @@ public class Launcher implements Runnable {
             File extraLibFolder = Option.EXTRA_LIB_FOLDER.get(args);
             List<URL> extraJars = new ArrayList<>();
             if(extraLibFolder != null && extraLibFolder.exists()){
+                Logger.log(Logger.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
                 File[] children = extraLibFolder.listFiles();
                 if (children != null)
                     for (File aChildren : children)
