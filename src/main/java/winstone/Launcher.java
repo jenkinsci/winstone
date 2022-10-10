@@ -86,13 +86,6 @@ public class Launcher implements Runnable {
             this.args = args;
             this.controlPort =Option.CONTROL_PORT.get(args);
 
-            if( Option.HANDLER_COUNT_MAX.get( args, -1 )!=-1){
-                Logger.log(Logger.WARNING, RESOURCES, Option.HANDLER_COUNT_MAX.name);
-            }
-            if( Option.HANDLER_COUNT_MAX_IDLE.get( args, -1 )!=-1){
-                Logger.log(Logger.WARNING, RESOURCES, Option.HANDLER_COUNT_MAX_IDLE.name);
-            }
-
             // Check for java home
             List<URL> jars = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");

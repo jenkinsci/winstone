@@ -83,25 +83,6 @@ public class Option<T> {
 
     public static final OBoolean USE_JMX=bool("useJmx",false);
 
-    /**
-     * @deprecated NOT USED
-     * How many requests do we handle concurrently?
-     *
-     * If the system gets really loaded, too many concurrent threads will create vicious cycles
-     * and make everyone slow (or worst case choke every request by OOME), so better to err
-     * on the conservative side (and have inbound connections wait in the queue)
-     */
-    @Deprecated
-    public static final OInt HANDLER_COUNT_MAX     =integer("handlerCountMax",-1);
-
-    /**
-     * @deprecated NOT USED
-     * Leave this number of request handler threads in the pool even when they are idle.
-     * Other threads are destroyed when they are idle to free up resources.
-     */
-    @Deprecated
-    public static final OInt HANDLER_COUNT_MAX_IDLE=integer("handlerCountMaxIdle",-1);
-
     public static final OInt QTP_MAXTHREADS=integer("qtpMaxThreadsCount",-1);
     public static final OInt JETTY_ACCEPTORS=integer("jettyAcceptorsCount",-1);
     public static final OInt JETTY_SELECTORS=integer("jettySelectorsCount",0);
