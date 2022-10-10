@@ -73,9 +73,6 @@ public class Option<T> {
     public static final OBoolean HTTPS_SNI_HOST_CHECK=bool("httpsSniHostCheck", false);
     public static final OBoolean HTTPS_SNI_REQUIRED=bool("httpsSniRequired", false);
 
-    public static final OInt AJP13_PORT=integer("ajp13"+_PORT,-1);
-    public static final OString AJP13_LISTEN_ADDRESS=string("ajp13"+_LISTEN_ADDRESS);
-
     public static final OString HTTP2_LISTEN_ADDRESS=string("http2"+_LISTEN_ADDRESS);
     public static final OInt HTTP2_PORT=integer("http2"+_PORT,-1);
 
@@ -286,7 +283,7 @@ public class Option<T> {
     }
     
     //    static {
-//        String[] protocols = {"http","https","ajp13"};
+//        String[] protocols = {"http","https"};
 //        for (int i=0; i<protocols.length; i++) {
 //            String protocol = protocols[i];
 //            String[]

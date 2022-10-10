@@ -55,7 +55,6 @@ public class HttpConnectorTest extends TestCase {
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10003");
-        args.put("ajp13Port", "-1");
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
@@ -85,7 +84,6 @@ public class HttpConnectorTest extends TestCase {
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10005");
-        args.put("ajp13Port", "-1");
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
