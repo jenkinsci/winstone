@@ -40,10 +40,9 @@ public class UnavailableServlet extends HttpServlet {
             throw new UnavailableException(
                     "Error thrown deliberately during get");
 
-        Writer out = response.getWriter();
-        out
-                .write("This should not be shown, because we've thrown unavailable exceptions");
-        out.close();
+        try (Writer out = response.getWriter()) {
+            out.write("This should not be shown, because we've thrown unavailable exceptions");
+        }
     }
 
 }
