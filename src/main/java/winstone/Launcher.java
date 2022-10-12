@@ -57,7 +57,6 @@ public class Launcher implements Runnable {
     static final String HTTP_LISTENER_CLASS = "winstone.HttpConnectorFactory";
     static final String HTTPS_LISTENER_CLASS = "winstone.HttpsConnectorFactory";
     static final String HTTP2_LISTENER_CLASS = "winstone.Http2ConnectorFactory";
-    static final String AJP_LISTENER_CLASS = "winstone.Ajp13ConnectorFactory";
 
     public static final byte SHUTDOWN_TYPE = (byte) '0';
     public static final byte RELOAD_TYPE = (byte) '4';
@@ -158,9 +157,8 @@ public class Launcher implements Runnable {
             this.hostGroup = new HostGroup(server, commonLibCL, args);
 
             List<Connector> connectors = new ArrayList<>();
-            // Create connectors (http, https and ajp)
+            // Create connectors (http & https)
             spawnListener(HTTP_LISTENER_CLASS, connectors);
-            spawnListener(AJP_LISTENER_CLASS, connectors);
             spawnListener(HTTPS_LISTENER_CLASS, connectors);
             spawnListener(HTTP2_LISTENER_CLASS, connectors);
 
