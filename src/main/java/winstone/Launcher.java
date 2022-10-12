@@ -450,13 +450,14 @@ public class Launcher implements Runnable {
 
             Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
                     tempWarfile.getAbsolutePath());
-            OutputStream out = new FileOutputStream(tempWarfile, true);
-            int read;
-            byte[] buffer = new byte[2048];
-            while ((read = embeddedWarfile.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
+            try (OutputStream out = new FileOutputStream(tempWarfile, true)) {
+                // TODO use Files#copy(InputStream,Path,CopyOption...)
+                int read;
+                byte[] buffer = new byte[2048];
+                while ((read = embeddedWarfile.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
             }
-            out.close();
 
             Option.WARFILE.put(args, tempWarfile.getAbsolutePath());
             Option.WARFILE.put(args, tempWebroot.getAbsolutePath());
