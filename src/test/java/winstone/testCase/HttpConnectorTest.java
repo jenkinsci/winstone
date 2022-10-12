@@ -15,9 +15,9 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -58,7 +58,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
+        Logger.init(Level.FINEST, true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
@@ -87,7 +87,7 @@ public class HttpConnectorTest extends TestCase {
         args.put("controlPort", "-1");
         args.put("debug", "8");
         args.put("logThrowingLineNo", "true");
-        Logger.init(Logger.FULL_DEBUG, System.out, Charset.defaultCharset(), true);
+        Logger.init(Level.FINEST, true);
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection

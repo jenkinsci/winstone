@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Simulates an apache "combined" style logger, which logs User-Agent, Referer, etc
@@ -81,7 +82,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         try {
             Files.createDirectories(parentFile.toPath());
         } catch (Exception ex) {
-            Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentFile.getAbsolutePath(), ex);
+            Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + parentFile.getAbsolutePath(), ex);
         }
         try {
             this.outStream = Files.newOutputStream(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
@@ -90,7 +91,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         }
         this.outWriter = new PrintWriter(new OutputStreamWriter(this.outStream, StandardCharsets.UTF_8), true);
 
-        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
+        Logger.log(Level.FINER, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
                 this.fileName, patternType);
     }
 
@@ -143,7 +144,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
 
     @Override
     protected void doStop() throws Exception {
-        Logger.log(Logger.DEBUG, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Close", this.fileName);
+        Logger.log(Level.FINER, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Close", this.fileName);
         if (this.outWriter != null) {
             this.outWriter.flush();
             this.outWriter.close();
@@ -153,7 +154,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             try {
                 this.outStream.close();
             } catch (IOException err) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to close access logger output stream", err);
+                Logger.logDirectMessage(Level.WARNING, null, "Failed to close access logger output stream", err);
             }
             this.outStream = null;
         }

@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import winstone.Launcher;
 import winstone.realm.ArgumentsRealm;
@@ -41,10 +42,11 @@ public class Option<T> {
     public static final OFile CONFIG=file("config");
     public static final OString PREFIX=string("prefix","");
     public static final OFile COMMON_LIB_FOLDER=file("commonLibFolder");
+    public static final OFile LOGFILE=file("logfile");
     public static final OFile EXTRA_LIB_FOLDER=file("extraLibFolder");
     public static final OBoolean LOG_THROWING_LINE_NO=bool("logThrowingLineNo",false);
     public static final OBoolean LOG_THROWING_THREAD=bool("logThrowingThread",false);
-    public static final OBoolean DEBUG=bool("debug",false);
+    public static final OInt DEBUG = new ODebugInt("debug", 5);
 
     // these are combined with protocol to form options
     private static final OInt _PORT = integer("Port");
@@ -200,6 +202,39 @@ public class Option<T> {
 
         public int get(Map<String, String> args, int defaultValue) {
             return intArg(args, name, defaultValue);
+        }
+    }
+
+    public static class ODebugInt extends OInt {
+
+        public ODebugInt(String name, int defaultValue) {
+            super(name, defaultValue);
+        }
+
+        @Override
+        public int get(Map<String, String> args) {
+            switch (super.get(args)) {
+                // before switching to java.util.Logging, winstone used a (1:9) range for log levels
+                case 1:
+                    return Level.OFF.intValue();
+                case 2:
+                    return Level.SEVERE.intValue();
+                case 3:
+                    return Level.WARNING.intValue();
+                case 4:
+                    return Level.INFO.intValue();
+                case 6:
+                    return Level.FINE.intValue();
+                case 7:
+                    return Level.FINER.intValue();
+                case 8:
+                    return Level.FINEST.intValue();
+                case 9:
+                    return Level.ALL.intValue();
+                case 5:
+                default:
+                    return Level.INFO.intValue();
+            }
         }
     }
 

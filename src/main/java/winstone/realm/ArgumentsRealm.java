@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 /**
  * Base class for authentication realms. Subclasses provide the source of
@@ -48,7 +49,7 @@ public class ArgumentsRealm extends HashLoginService {
                 String roleList = Option.stringArg(args, Option.ARGUMENTS_REALM_ROLES.name + userName, "");
                 String[] roleArray = new String[0];
                 if (roleList.equals("")) {
-                    Logger.log(Logger.WARNING, REALM_RESOURCES, "ArgumentsRealm.UndeclaredRoles", userName);
+                    Logger.log(Level.WARNING, REALM_RESOURCES, "ArgumentsRealm.UndeclaredRoles", userName);
                 } else {
                     StringTokenizer st = new StringTokenizer(roleList, ",");
                     List<String> rl = new ArrayList<>();
@@ -64,7 +65,7 @@ public class ArgumentsRealm extends HashLoginService {
             }
         }
 
-        Logger.log(Logger.DEBUG, REALM_RESOURCES, "ArgumentsRealm.Initialised",
+        Logger.log(Level.FINER, REALM_RESOURCES, "ArgumentsRealm.Initialised",
                 "" + count);
     }
 }

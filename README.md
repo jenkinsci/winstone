@@ -67,6 +67,7 @@ To run different web applications for diffent virtual hosts:
     
        --extraLibFolder         = folder for additional jar files to add to Jetty classloader
     
+       --logfile                = redirect log messages to this file
        --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
        --logThrowingThread      = show the thread that logged the message. Default is false
        --debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)

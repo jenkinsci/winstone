@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -80,7 +81,7 @@ public class Launcher implements Runnable {
     public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
         try {
-            Logger.log(Logger.MAX, RESOURCES, "Launcher.StartupArgs", args + "");
+            Logger.log(Level.ALL, RESOURCES, "Launcher.StartupArgs", args + "");
 
             this.args = args;
             this.controlPort =Option.CONTROL_PORT.get(args);
@@ -89,12 +90,12 @@ public class Launcher implements Runnable {
             List<URL> jars = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");
             File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
+            Logger.log(Level.FINER, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
 
             // Set up common lib class loader
             File libFolder = Option.COMMON_LIB_FOLDER.get(args,new File("lib"));
             if (libFolder.exists() && libFolder.isDirectory()) {
-                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.UsingCommonLib",
+                Logger.log(Level.FINER, RESOURCES, "Launcher.UsingCommonLib",
                         libFolder.getCanonicalPath());
                 File[] children = libFolder.listFiles();
                 if (children != null)
@@ -102,17 +103,17 @@ public class Launcher implements Runnable {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             jars.add(aChildren.toURI().toURL());
-                            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.AddedCommonLibJar",
+                            Logger.log(Level.FINER, RESOURCES, "Launcher.AddedCommonLibJar",
                                     aChildren.getName());
                         }
             } else {
-                Logger.log(Logger.DEBUG, RESOURCES, "Launcher.NoCommonLib");
+                Logger.log(Level.FINER, RESOURCES, "Launcher.NoCommonLib");
             }
 
             File extraLibFolder = Option.EXTRA_LIB_FOLDER.get(args);
             List<URL> extraJars = new ArrayList<>();
             if(extraLibFolder != null && extraLibFolder.exists()){
-                Logger.log(Logger.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
+                Logger.log(Level.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
                 File[] children = extraLibFolder.listFiles();
                 if (children != null)
                     for (File aChildren : children)
@@ -125,7 +126,7 @@ public class Launcher implements Runnable {
             ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[0]),
                     getClass().getClassLoader());
 
-            Logger.log(Logger.MAX, RESOURCES, "Launcher.CLClassLoader",
+            Logger.log(Level.ALL, RESOURCES, "Launcher.CLClassLoader",
                     commonLibCL.toString());
 
 
@@ -210,7 +211,7 @@ public class Launcher implements Runnable {
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
                     } catch (AtomicMoveNotSupportedException e) {
-                        Logger.logDirectMessage(Logger.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
+                        Logger.logDirectMessage(Level.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
                         try {
                             Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException e2) {
@@ -261,7 +262,7 @@ public class Launcher implements Runnable {
                 controlSocket.setSoTimeout(CONTROL_TIMEOUT);
             }
 
-            Logger.log(Logger.INFO, RESOURCES, "Launcher.StartupOK",
+            Logger.log(Level.INFO, RESOURCES, "Launcher.StartupOK",
                     RESOURCES.getString("ServerVersion"),
                     (this.controlPort > 0 ? "" + this.controlPort
                             : RESOURCES.getString("Launcher.ControlDisabled")));
@@ -284,7 +285,7 @@ public class Launcher implements Runnable {
                 } catch (InterruptedException err) {
                     interrupted = true;
                 } catch (Throwable err) {
-                    Logger.log(Logger.ERROR, RESOURCES,
+                    Logger.log(Level.SEVERE, RESOURCES,
                             "Launcher.ShutdownError", err);
                 } finally {
                     if (accepted != null) {
@@ -301,9 +302,9 @@ public class Launcher implements Runnable {
                 controlSocket.close();
             }
         } catch (Throwable err) {
-            Logger.log(Logger.ERROR, RESOURCES, "Launcher.ShutdownError", err);
+            Logger.log(Level.SEVERE, RESOURCES, "Launcher.ShutdownError", err);
         }
-        Logger.log(Logger.INFO, RESOURCES, "Launcher.ControlThreadShutdownOK");
+        Logger.log(Level.INFO, RESOURCES, "Launcher.ControlThreadShutdownOK");
     }
 
     protected void handleControlRequest(Socket csAccepted) throws IOException {
@@ -313,14 +314,14 @@ public class Launcher implements Runnable {
             inSocket = csAccepted.getInputStream();
             int reqType = inSocket.read();
             if ((byte) reqType == SHUTDOWN_TYPE) {
-                Logger.log(Logger.INFO, RESOURCES,
+                Logger.log(Level.INFO, RESOURCES,
                         "Launcher.ShutdownRequestReceived");
                 shutdown();
             } else if ((byte) reqType == RELOAD_TYPE) {
                 inControl = new ObjectInputStream(inSocket);
                 String host = inControl.readUTF();
                 String prefix = inControl.readUTF();
-                Logger.log(Logger.INFO, RESOURCES, "Launcher.ReloadRequestReceived", host + prefix);
+                Logger.log(Level.INFO, RESOURCES, "Launcher.ReloadRequestReceived", host + prefix);
                 HostConfiguration hostConfig = this.hostGroup.getHostByName(host);
                 hostConfig.reloadWebApp(prefix);
             }
@@ -338,7 +339,7 @@ public class Launcher implements Runnable {
         try {
             server.stop();
         } catch (Exception e) {
-            Logger.log(Logger.INFO, RESOURCES, "Launcher.FailedShutdown", e);
+            Logger.log(Level.INFO, RESOURCES, "Launcher.FailedShutdown", e);
         }
 
         if (this.controlThread != null) {
@@ -346,7 +347,7 @@ public class Launcher implements Runnable {
         }
         Thread.yield();
 
-        Logger.log(Logger.INFO, RESOURCES, "Launcher.ShutdownOK");
+        Logger.log(Level.INFO, RESOURCES, "Launcher.ShutdownOK");
     }
 
     public boolean isRunning() {
@@ -358,6 +359,8 @@ public class Launcher implements Runnable {
      * listener thread. For now, just shut it down with a control-C.
      */
     public static void main(String[] argv) throws IOException {
+        Map<String, String> args = getArgsFromCommandLine(argv);
+
         if (System.getProperty("java.util.logging.config.file") == null) {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
@@ -365,8 +368,6 @@ public class Launcher implements Runnable {
               }
           }
         }
-
-        Map<String, String> args = getArgsFromCommandLine(argv);
 
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
             printUsage();
@@ -389,7 +390,7 @@ public class Launcher implements Runnable {
             new Launcher(args);
         } catch (Throwable err) {
             err.printStackTrace();
-            Logger.log(Logger.ERROR, RESOURCES, "Launcher.ContainerStartupError", err);
+            Logger.log(Level.SEVERE, RESOURCES, "Launcher.ContainerStartupError", err);
             System.exit(1);
         }
     }
@@ -429,7 +430,7 @@ public class Launcher implements Runnable {
             try {
                 Files.createDirectories(parentTempWarFile.toPath());
             } catch (Exception ex) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), ex);
+                Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), ex);
             }
             tempWarfile.deleteOnExit();
 
@@ -438,10 +439,10 @@ public class Launcher implements Runnable {
             try {
                 Files.createDirectories(tempWebroot.toPath());
             } catch (Exception ex) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), ex);
+                Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), ex);
             }
 
-            Logger.log(Logger.DEBUG, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
+            Logger.log(Level.FINER, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
                     tempWarfile.getAbsolutePath());
             try (OutputStream out = new FileOutputStream(tempWarfile, true)) {
                 // TODO use Files#copy(InputStream,Path,CopyOption...)
@@ -461,27 +462,23 @@ public class Launcher implements Runnable {
     @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, args come from command line")
     public static void initLogger(Map<String, String> args) throws IOException {
         // Reset the log level
-        int logLevel = Option.intArg(args, Option.DEBUG.name, Logger.INFO.intValue());
+        int logLevel = Option.DEBUG.get(args);
         // boolean showThrowingLineNo = Option.LOG_THROWING_LINE_NO.get(args);
         boolean showThrowingThread = Option.LOG_THROWING_THREAD.get(args);
-        OutputStream logStream;
-        Charset logCharset;
         if (args.get("logfile") != null) {
+            Path logPath;
             try {
-                logStream = Files.newOutputStream(Paths.get(args.get("logfile")), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                logPath = Paths.get(args.get("logfile"));
             } catch (InvalidPathException e) {
                 throw new IOException(e);
             }
-            logCharset = StandardCharsets.UTF_8;
-        } else if (Option.booleanArg(args, "logToStdErr", false)) {
-            logStream = System.err;
-            logCharset = Charset.defaultCharset();
-        } else {
-            logStream = System.out;
-            logCharset = Charset.defaultCharset();
+            OutputStream outputStream = Files.newOutputStream(logPath, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            // TODO: Ideally, should change this to UTF-8, but this could cause problems for Windows users when appending to existing logs.
+            PrintStream printStream = new PrintStream(outputStream, false, Charset.defaultCharset());
+            System.setOut(printStream);
+            System.setErr(printStream);
         }
-//        Logger.init(logLevel, logStream, showThrowingLineNo, showThrowingThread);
-        Logger.init(Level.parse(String.valueOf(logLevel)), logStream, logCharset, showThrowingThread);
+        Logger.init(Level.parse(String.valueOf(logLevel)), showThrowingThread);
     }
 
     protected static void printUsage() {

@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -84,11 +85,11 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             // In case the KeyStore password and the KeyPassword are not the same,
             // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
             kmf.init(keystore, keystorePassword.toCharArray());
-            Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
+            Logger.log(Level.FINEST, SSL_RESOURCES,
                        "HttpsListener.KeyCount", keystore.size() + "");
             for ( Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
                 String alias = e.nextElement();
-                Logger.log(Logger.FULL_DEBUG, SSL_RESOURCES,
+                Logger.log(Level.FINEST, SSL_RESOURCES,
                            "HttpsListener.KeyFound", alias,
                            keystore.getCertificate(alias) + "");
             }
@@ -105,7 +106,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                 String[] cipherSuites = excludeCiphers.split(",");
                 ssl.setExcludeCipherSuites(cipherSuites);
             }
-            Logger.log( Logger.INFO, SSL_RESOURCES, //
+            Logger.log(Level.INFO, SSL_RESOURCES, //
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 

@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 
 /**
  * Manages the references to individual webapps within the container. This object handles
@@ -109,7 +110,7 @@ public class HostConfiguration {
         }
 
         server.setHandler(handler);
-        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.InitComplete",
+        Logger.log(Level.FINER, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
     }
 
@@ -141,10 +142,10 @@ public class HostConfiguration {
                 rlh.setRequestLog(loggerConstr.newInstance(webAppName, args));
                 return rlh;
             } else {
-                Logger.log(Logger.DEBUG, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
+                Logger.log(Level.FINER, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
             }
         } catch (Throwable err) {
-            Logger.log(Logger.ERROR, Launcher.RESOURCES,
+            Logger.log(Level.SEVERE, Launcher.RESOURCES,
                     "WebAppConfig.LoggerError", "", err);
         }
         return handler;
@@ -220,7 +221,7 @@ public class HostConfiguration {
     @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, we're not being called from a webapp")
     protected File getWebRoot(File requestedWebroot, File warfile) throws IOException {
         if (warfile != null) {
-            Logger.log(Logger.INFO, Launcher.RESOURCES,
+            Logger.log(Level.INFO, Launcher.RESOURCES,
                     "HostConfig.BeginningWarExtraction");
 
             // open the war file
@@ -243,7 +244,7 @@ public class HostConfiguration {
                 try {
                     Files.delete(tempFile.toPath());
                 } catch (Exception ex) {
-                    Logger.logDirectMessage(Logger.WARNING, null, "Failed To delete dummy file", ex);
+                    Logger.logDirectMessage(Level.WARNING, null, "Failed To delete dummy file", ex);
                 }
             }
             if (unzippedDir.exists()) {
@@ -251,7 +252,7 @@ public class HostConfiguration {
                     throw new WinstoneException(Launcher.RESOURCES.getString(
                             "HostConfig.WebRootNotDirectory", unzippedDir.getPath()));
                 } else {
-                    Logger.log(Logger.DEBUG, Launcher.RESOURCES,
+                    Logger.log(Level.FINER, Launcher.RESOURCES,
                             "HostConfig.WebRootExists", unzippedDir.getCanonicalPath());
                 }
             }
@@ -264,7 +265,7 @@ public class HostConfiguration {
                 try {
                     Files.createDirectories(unzippedDir.toPath());
                 } catch (Exception ex) {
-                    Logger.logDirectMessage(Logger.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
+                    Logger.logDirectMessage(Level.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
                 }
             } else {
                 // files are up to date
@@ -296,12 +297,12 @@ public class HostConfiguration {
                     try {
                         Path parent = outPath.getParent();
                         if (parent == null) {
-                            Logger.logDirectMessage(Logger.WARNING, null, outPath + "has no parent dir ", null);
+                            Logger.logDirectMessage(Level.WARNING, null, outPath + "has no parent dir ", null);
                         } else {
                             Files.createDirectories(parent);
                         }
                     } catch (IOException | InvalidPathException | SecurityException ex) {
-                        Logger.logDirectMessage(Logger.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
+                        Logger.logDirectMessage(Level.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
                     }
 
                     // Copy out the extracted file
@@ -319,7 +320,7 @@ public class HostConfiguration {
             // extraction completed
             new FileOutputStream(timestampFile).close();
             if(!timestampFile.setLastModified(warfile.lastModified())) {
-                Logger.logDirectMessage(Logger.WARNING, null, "Failed to set timestamp " + timestampFile.getAbsolutePath(), null);
+                Logger.logDirectMessage(Level.WARNING, null, "Failed to set timestamp " + timestampFile.getAbsolutePath(), null);
             }
 
             // Return webroot
@@ -339,7 +340,7 @@ public class HostConfiguration {
         try {
             Files.deleteIfExists(dir.toPath());
         } catch (Exception ex) {
-            Logger.logDirectMessage(Logger.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
+            Logger.logDirectMessage(Level.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
         }
     }
 
@@ -364,16 +365,16 @@ public class HostConfiguration {
                     if (aChildren.isDirectory()) {
                         File matchingWarFile = new File(webappsDir, aChildren.getName() + ".war");
                         if (matchingWarFile.exists() && matchingWarFile.isFile()) {
-                            Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
+                            Logger.log(Level.FINER, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
                         } else {
                             String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
                             if (!this.webapps.containsKey(prefix)) {
                                 try {
                                     WebAppContext context = create(aChildren, prefix);
                                     webApps.addHandler(configureAccessLog(context,childName));
-                                    Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
+                                    Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                                 } catch (Throwable err) {
-                                    Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
+                                    Logger.log(Level.SEVERE, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
                                 }
                             }
                         }
@@ -386,15 +387,15 @@ public class HostConfiguration {
                             try {
                                 Files.createDirectories(outputDir.toPath());
                             } catch (Exception ex) {
-                                Logger.logDirectMessage(Logger.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), ex);
+                                Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), ex);
                             }
                             try {
                                 WebAppContext context = create(
                                         getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
                                 webApps.addHandler(configureAccessLog(context,outputName));
-                                Logger.log(Logger.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
+                                Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
                             } catch (Throwable err) {
-                                Logger.log(Logger.ERROR, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
+                                Logger.log(Level.SEVERE, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
                             }
                         }
                     }

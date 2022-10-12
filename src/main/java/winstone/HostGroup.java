@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Manages the references to individual hosts within the container. This object handles
@@ -44,7 +45,7 @@ public class HostGroup {
         initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
                 args);
         this.defaultHostName = DEFAULT_HOSTNAME;
-        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
+        Logger.log(Level.FINER, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                 this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
     }
 
@@ -61,7 +62,7 @@ public class HostGroup {
     protected void initHost(File webappsDir, String hostname,
                             ClassLoader commonLibCL,
                             Map<String, String> args) throws IOException {
-        Logger.log(Logger.DEBUG, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
+        Logger.log(Level.FINER, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
         HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
                 args, webappsDir);
         this.hostConfigs.put(hostname, config);

@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 /**
  * @author rickk
@@ -79,7 +80,7 @@ public class FileRealm extends HashLoginService {
 
                     if ((userName == null) || (password == null)
                             || (roleList == null))
-                        Logger.log(Logger.FULL_DEBUG, REALM_RESOURCES,
+                        Logger.log(Level.FINEST, REALM_RESOURCES,
                                 "FileRealm.SkippingUser", userName);
                     else {
                         // Parse the role list into an array and sort it
@@ -96,7 +97,7 @@ public class FileRealm extends HashLoginService {
                     }
                 }
             }
-            Logger.log(Logger.DEBUG, REALM_RESOURCES, "FileRealm.Initialised",
+            Logger.log(Level.FINER, REALM_RESOURCES, "FileRealm.Initialised",
                     "" + count);
         } catch (java.io.IOException err) {
             throw new WinstoneException(REALM_RESOURCES
