@@ -52,7 +52,7 @@ public class Option<T> {
     /**
      * Number of milliseconds for the HTTP keep-alive to hang around until the next request is sent.
      */
-    private static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",5000);
+    private static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",30000);
 
 
     public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
