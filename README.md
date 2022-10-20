@@ -73,10 +73,10 @@ To run different web applications for diffent virtual hosts:
     
        --httpPort               = set the http listening port. -1 to disable, Default is 8080
        --httpListenAddress      = set the http listening address. Default is all interfaces
-       --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 5000)?
+       --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 30000)?
        --httpsPort              = set the https listening port. -1 to disable, Default is disabled
        --httpsListenAddress     = set the https listening address. Default is all interfaces
-       --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms; default 5000)?
+       --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms; default 30000)?
        --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
        --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
