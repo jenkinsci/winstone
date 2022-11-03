@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.90</version>
+    <version>1.91</version>
     <relativePath />
   </parent>
 
@@ -21,7 +21,6 @@
     <changelist>-SNAPSHOT</changelist>
     <jetty.version>10.0.12</jetty.version>
     <slf4j.version>2.0.3</slf4j.version>
-    <spotbugs.excludeFilterFile>src/spotbugs/spotbugs-excludes.xml</spotbugs.excludeFilterFile>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
   </properties>
 

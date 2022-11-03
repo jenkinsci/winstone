@@ -15,16 +15,6 @@
     <Confidence value="2"/>
     <Or>
       <And>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-        <Or>
-          <Class name="winstone.HostConfiguration"/>
-          <Class name="winstone.HostGroup"/>
-          <Class name="winstone.Launcher"/>
-          <Class name="winstone.ShutdownHook"/>
-          <Class name="winstone.cmdline.CmdLineParser"/>
-        </Or>
-      </And>
-      <And>
         <Bug pattern="SC_START_IN_CTOR"/>
         <Or>
           <Class name="winstone.Launcher"/>

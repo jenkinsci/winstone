@@ -6,7 +6,6 @@
  */
 package winstone;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -106,7 +105,6 @@ public class Logger {
     /**
      * Allocates a stream for redirection to a file etc
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_STATIC_REP2", justification = "False positive, this is intended")
     public static void setStream(String name, Writer stream) {
         if (name == null) {
             name = DEFAULT_STREAM;
