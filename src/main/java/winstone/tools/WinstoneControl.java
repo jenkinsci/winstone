@@ -11,6 +11,7 @@ import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.CmdLineParser;
 import winstone.cmdline.Option;
+import winstone.cmdline.Option.ODebugInt;
 import winstone.cmdline.Option.OInt;
 import winstone.cmdline.Option.OString;
 
@@ -18,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Included so that we can control winstone from the command line a little more
@@ -35,22 +37,7 @@ public class WinstoneControl {
 
     public final static OInt CONTROL_PORT = Option.integer("controlPort");
     public final static OInt PORT = Option.integer("port");
-    public final static OInt DEBUG = new OInt("debug", 5) {
-        @Override
-        public int get(Map<String, String> args) {
-            switch(super.get(args)) {
-                // before switching to java.util.Logging, winstone used a (1:9) range for log levels
-                case 1: return Logger.MIN.intValue();
-                case 2: return Logger.ERROR.intValue();
-                case 3: return Logger.WARNING.intValue();
-                case 4: return Logger.INFO.intValue();
-                case 6: return Logger.SPEED.intValue();
-                case 7: return Logger.DEBUG.intValue();
-                case 8: return Logger.FULL_DEBUG.intValue();
-                case 9: return Logger.MAX.intValue();
-                case 5:
-                default: return Logger.INFO.intValue();
-    }}};
+    public final static OInt DEBUG = new ODebugInt("debug", 5);
     public final static OString HOST = Option.string("host", "localhost");
 
 
@@ -74,7 +61,7 @@ public class WinstoneControl {
         String host = HOST.get(options);
         int port = PORT.get(options, CONTROL_PORT.get(options));
 
-        Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.UsingHostPort",host, port);
+        Logger.log(Level.INFO, TOOLS_RESOURCES, "WinstoneControl.UsingHostPort",host, port);
 
         // Check for shutdown
         if (operation.equalsIgnoreCase(OPERATION_SHUTDOWN)) {
@@ -82,7 +69,7 @@ public class WinstoneControl {
             socket.setSoTimeout(TIMEOUT);
             try(OutputStream out = socket.getOutputStream()){
                 out.write( Launcher.SHUTDOWN_TYPE );
-                Logger.log( Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
+                Logger.log(Level.INFO, TOOLS_RESOURCES, "WinstoneControl.ShutdownOK", host, port );
             }
         }
 
@@ -97,7 +84,7 @@ public class WinstoneControl {
                 objOut.writeUTF( host );
                 objOut.writeUTF( webappName );
             }
-            Logger.log(Logger.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",host, port);
+            Logger.log(Level.INFO, TOOLS_RESOURCES, "WinstoneControl.ReloadOK",host, port);
         }
         else {
             printUsage();

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class LoadTest {
         this.stepPeriod = stepPeriod;
         this.gracePeriod = gracePeriod;
 
-        Logger.log(Logger.INFO, resources, "LoadTest.Config", this.url, this.useKeepAlives + "", this.startThreads + "",
+        Logger.log(Level.INFO, resources, "LoadTest.Config", this.url, this.useKeepAlives + "", this.startThreads + "",
                 this.endThreads + "", this.stepSize + "", this.stepPeriod + "",
                 this.gracePeriod + "");
     }
@@ -84,7 +85,7 @@ public class LoadTest {
             Long averageSuccessTime = this.successCount == 0 ? null : this.successTimeTotal / this.successCount;
 
             // Write out results
-            Logger.log(Logger.INFO, resources, "LoadTest.LineResult",
+            Logger.log(Level.INFO, resources, "LoadTest.LineResult",
                     n + "", this.successCount + "",
                     ((noOfSeconds * n) - this.successCount) + "",
                     averageSuccessTime + "");

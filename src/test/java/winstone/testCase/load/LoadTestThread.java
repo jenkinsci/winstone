@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.logging.Level;
 
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
@@ -79,7 +80,7 @@ public class LoadTestThread implements Runnable {
             this.loadTest.incTimeTotal(System.currentTimeMillis() - startTime);
             this.loadTest.incSuccessCount();
         } catch (IOException | InterruptedException | URISyntaxException err) {
-            Logger.log(Logger.DEBUG, resources, "LoadTestThread.Error", err);
+            Logger.log(Level.FINER, resources, "LoadTestThread.Error", err);
         }
     }
 

@@ -37,6 +37,7 @@ import winstone.cmdline.Option;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * This class add the HTTP/2 Listener This is the class that gets launched
@@ -92,7 +93,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
 
             return http2Connector;
         } catch (IllegalStateException e) {
-            Logger.log( Logger.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
+            Logger.log(Level.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
         }
         return null;
     }

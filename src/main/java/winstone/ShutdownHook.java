@@ -6,6 +6,8 @@
  */
 package winstone;
 
+import java.util.logging.Level;
+
 /**
  * A jvm hook to force the calling of the web-app destroy before the process terminates
  * 
@@ -22,7 +24,7 @@ public class ShutdownHook extends Thread {
     @Override
     public void run() {
         if (this.launcher != null) {
-            Logger.log(Logger.INFO, Launcher.RESOURCES, "ShutdownHook.Initiating");
+            Logger.log(Level.INFO, Launcher.RESOURCES, "ShutdownHook.Initiating");
             this.launcher.shutdown();
         }
     }

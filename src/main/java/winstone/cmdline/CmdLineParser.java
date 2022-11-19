@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * Command line argument parser, Winstone style.
@@ -76,7 +77,7 @@ public class CmdLineParser {
                 loadPropsFromStream( inConfig, args );
                 inConfig.close();
                 Launcher.initLogger( args );
-                Logger.log( Logger.DEBUG, Launcher.RESOURCES, "Launcher.UsingPropertyFile", configFilename );
+                Logger.log(Level.FINER, Launcher.RESOURCES, "Launcher.UsingPropertyFile", configFilename );
             }
         } else {
             Launcher.initLogger(args);
