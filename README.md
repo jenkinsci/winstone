@@ -70,7 +70,7 @@ To run different web applications for diffent virtual hosts:
        --logfile                = redirect log messages to this file
        --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
        --logThrowingThread      = show the thread that logged the message. Default is false
-       --debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)
+       --debug                  = set the level of Winstone debug msgs (1-9). Default is 5 (INFO level)
     
        --httpPort               = set the http listening port. -1 to disable, Default is 8080
        --httpListenAddress      = set the http listening address. Default is all interfaces

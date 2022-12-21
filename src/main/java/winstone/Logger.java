@@ -49,7 +49,7 @@ public class Logger {
             boolean showThrowingThreadArg) {
         synchronized (semaphore) {
             if (!initialised) { // recheck in case we were blocking on another init
-                java.util.logging.Logger.getLogger("").setLevel(level);
+                LOGGER.setLevel(level);
                 showThrowingThread = showThrowingThreadArg;
                 initialised = true;
             }
@@ -60,7 +60,7 @@ public class Logger {
         if (!initialised) {
             init(level);
         } else synchronized (semaphore) {
-            java.util.logging.Logger.getLogger("").setLevel(Level.parse(String.valueOf(level)));
+            LOGGER.setLevel(Level.parse(String.valueOf(level)));
         }
     }
 

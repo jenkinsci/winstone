@@ -365,7 +365,6 @@ public class Launcher implements Runnable {
           for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
               if (h instanceof ConsoleHandler) {
                   ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
-                  h.setLevel(java.util.logging.Logger.getLogger("").getLevel());
               }
           }
         }
