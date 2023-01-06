@@ -91,7 +91,7 @@ public class Launcher implements Runnable {
          * As described in JDK-8161253, there is no way to control the order of execution of
          * shutdown hooks. When LogManager#Cleaner runs before our custom shutdown hook, logging
          * facilities are not available to the application shutdowen process. In the comments to
-         * JDK-8161253, Jason Mehrens suggests a workaround: creat a custom log handler and install
+         * JDK-8161253, Jason Mehrens suggests a workaround: create a custom log handler and install
          * it on the root logger before all other log handlers. Since the first action of
          * LogManager#Cleaner is to close all the installed log handlers on the root logger, it will
          * invoke the custom log handler's close() method. At this point, we have intercepted
