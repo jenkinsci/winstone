@@ -6,6 +6,7 @@
  */
 package winstone;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
 import org.eclipse.jetty.jmx.MBeanContainer;
@@ -42,9 +43,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  * Implements the main launcher daemon thread. This is the class that gets
@@ -65,6 +68,8 @@ public class Launcher implements Runnable {
 
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
 
+    private static int SHUTDOWN_TIMEOUT = 5000; // wait 5s for shutdown
+
     private Thread controlThread;
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
@@ -73,6 +78,8 @@ public class Launcher implements Runnable {
 
     public final Server server;
 
+    private boolean shutdownComplete;
+
     /**
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
@@ -80,6 +87,36 @@ public class Launcher implements Runnable {
     @SuppressFBWarnings(value ="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success=false;
+        /*
+         * As described in JDK-8161253, there is no way to control the order of execution of
+         * shutdown hooks. When LogManager#Cleaner runs before our custom shutdown hook, logging
+         * facilities are not available to the application shutdowen process. In the comments to
+         * JDK-8161253, Jason Mehrens suggests a workaround: creat a custom log handler and install
+         * it on the root logger before all other log handlers. Since the first action of
+         * LogManager#Cleaner is to close all the installed log handlers on the root logger, it will
+         * invoke the custom log handler's close() method. At this point, we have intercepted
+         * control and can delay shutdown of logging facilities until the application has completed
+         * its shutdown process.
+         *
+         * The installLogHandler() method implements the above workaround, which creates an
+         * obligation to notify the custom log handler, via the Launcher#shutdown() method, that the
+         * application shutdown process is complete and logging facilities may be shut down.
+         *
+         * - In the case of successful launch, we execute the finally portion of the try/finally
+         *   block below, which does not call Launcher#shutdown() in the success case, then we
+         *   install the shutdown hook, then when the user terminates the application the shutdown
+         *   hook shuts down the application, then the shutdown hook calls Launcher#shutdown(), then
+         *   finally the custom log handler is notified.
+         *
+         * - In the case of unsuccessful launch, we execute the finally portion of the try/finally
+         *   block below, which calls Launcher#shutdown() in the failure case, which then notifies
+         *   the custom log handler.
+         *
+         * In either case the obligation is fulfilled and the custom log handler is notified of
+         * application shutdown, at which point it proceeds to shut down logging facilities as the
+         * last action prior to process termination.
+         */
+        installLogHandler();
         try {
             Logger.log(Level.ALL, RESOURCES, "Launcher.StartupArgs", args + "");
 
@@ -184,6 +221,67 @@ public class Launcher implements Runnable {
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+    }
+
+    private synchronized boolean isShutdownComplete() {
+        return shutdownComplete;
+    }
+
+    /**
+     * Install our custom log handler that waits for application shutdown to complete before
+     * running.
+     */
+    private void installLogHandler() {
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+        /*
+         * By installing our custom log handler before all others, we ensure that logging facilities
+         * are available during the application shutdown process.
+         */
+        Handler[] handlers = root.getHandlers();
+        for (Handler h : handlers) {
+            root.removeHandler(h);
+        }
+        root.addHandler(new LogHandler(this));
+        for (Handler h : handlers) {
+            root.addHandler(h);
+        }
+    }
+
+    /**
+     * Custom log handler that waits for application shutdown to complete before running.
+     */
+    private static class LogHandler extends Handler {
+        @NonNull
+        private final Launcher launcher;
+
+        LogHandler(@NonNull Launcher launcher) {
+            this.launcher = launcher;
+        }
+
+        @Override
+        public void publish(LogRecord record) {}
+
+        @Override
+        public void flush() {}
+
+        @Override
+        public void close() {
+            try {
+                synchronized (launcher) {
+                    long target = TimeUnit.NANOSECONDS.toMillis(System.nanoTime()) + SHUTDOWN_TIMEOUT;
+                    while (!launcher.isShutdownComplete()) {
+                        long timeoutMillis = target - TimeUnit.NANOSECONDS.toMillis(System.nanoTime());
+                        if (timeoutMillis > 0) {
+                            launcher.wait(timeoutMillis);
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Not applicable, this is called from command line")
@@ -340,6 +438,10 @@ public class Launcher implements Runnable {
             server.stop();
         } catch (Exception e) {
             Logger.log(Level.INFO, RESOURCES, "Launcher.FailedShutdown", e);
+        }
+        synchronized (this) {
+            shutdownComplete = true;
+            notifyAll();
         }
 
         if (this.controlThread != null) {
