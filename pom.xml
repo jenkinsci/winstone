@@ -106,10 +106,25 @@
         <configuration>
           <filters>
             <filter>
-              <artifact>org.eclipse.jetty.orbit:javax.servlet</artifact>
+              <artifact>io.jenkins.lib:support-log-formatter</artifact>
               <excludes>
-                <exclude>META-INF/eclipse.inf</exclude>
-                <exclude>META-INF/ECLIPSEF.*</exclude>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>org.eclipse.jetty*</artifact>
+              <excludes>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+                <exclude>module-info.class</exclude>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>org.slf4j</artifact>
+              <excludes>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+                <exclude>META-INF/versions/9/module-info.class</exclude>
+                <exclude>META-INF/versions/9/module-info.java</exclude>
               </excludes>
             </filter>
           </filters>
