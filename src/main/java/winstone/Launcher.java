@@ -68,7 +68,7 @@ public class Launcher implements Runnable {
 
     private int CONTROL_TIMEOUT = 2000; // wait 2s for control connection
 
-    private static int SHUTDOWN_TIMEOUT = 5000; // wait 5s for shutdown
+    private static int SHUTDOWN_TIMEOUT = 20000; // wait 20s for shutdown
 
     private Thread controlThread;
     public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
