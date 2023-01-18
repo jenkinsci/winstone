@@ -86,6 +86,8 @@ To run different web applications for diffent virtual hosts:
        --httpsSniHostCheck      = if the SNI Host name must match when there is an SNI certificate. Check disabled per default
        --httpsSniRequired       = if a SNI certificate is required. Disabled per default
        --http2ListenAddress     = set the http2 listening address. Default is all interfaces
+       --excludeProtocols       = set protocol versions to exclude. (comma separated list, use blank quote " " to exclude none)
+                                  (default is "SSL", "SSLv2", "SSLv2Hello", "SSLv3")
        --excludeCipherSuites    = set the ciphers to exclude (comma separated, use blank quote " " to exclude none) (default is 
                                // Exclude weak / insecure ciphers 
                                "^.*_(MD5|SHA|SHA1)$", 
