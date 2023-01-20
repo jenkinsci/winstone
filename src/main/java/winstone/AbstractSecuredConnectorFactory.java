@@ -104,9 +104,6 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             if(excludeProtos!=null&&excludeProtos.length()>0) {
                 String[] protos = excludeProtos.split(",");
                 ssl.setExcludeProtocols(protos);
-            } else {
-                String[] default_excluded_protocols = {"SSL", "SSLv2", "SSLv2Hello", "SSLv3"};
-                ssl.setExcludeProtocols(default_excluded_protocols);
             }
             String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
             if(excludeCiphers!=null&&excludeCiphers.length()>0) {
