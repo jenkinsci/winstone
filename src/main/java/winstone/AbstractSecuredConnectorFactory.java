@@ -100,12 +100,19 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             ssl.setKeyManagerPassword(privateKeyPassword);
             ssl.setKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
-            ssl.setExcludeProtocols("SSLv3", "SSLv2", "SSLv2Hello");
+            String excludeProtos = Option.HTTPS_EXCLUDE_PROTOCOLS.get(args);
+            if(excludeProtos!=null&&excludeProtos.length()>0) {
+                String[] protos = excludeProtos.split(",");
+                ssl.setExcludeProtocols(protos);
+            }
             String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
             if(excludeCiphers!=null&&excludeCiphers.length()>0) {
                 String[] cipherSuites = excludeCiphers.split(",");
                 ssl.setExcludeCipherSuites(cipherSuites);
             }
+            Logger.log(Level.INFO, SSL_RESOURCES, //
+                        "HttpsListener.ExcludeProtocols", //
+                        Arrays.asList(ssl.getExcludeProtocols()));
             Logger.log(Level.INFO, SSL_RESOURCES, //
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
