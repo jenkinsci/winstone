@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 /**
  *
@@ -102,7 +103,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             String excludeProtos = Option.HTTPS_EXCLUDE_PROTOCOLS.get(args);
             if(excludeProtos!=null&&excludeProtos.length()>0) {
-                String[] protos = excludeProtos.split(",");
+                String[] protos = Stream.of(excludeProtos.split(",")).map(String::trim).toArray(String[]::new);
                 ssl.setExcludeProtocols(protos);
             }
             String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
