@@ -220,7 +220,11 @@ public class Launcher implements Runnable {
                 shutdown();
         }
 
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+        try {
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(this));
+        } catch (IllegalStateException x) {
+            Logger.logDirectMessage(Level.FINE, null, "Could not add logger shutdown hook", x);
+        }
     }
 
     private synchronized boolean isShutdownComplete() {
