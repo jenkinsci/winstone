@@ -222,6 +222,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>2.2</version>
+      </dependency>
       <!-- TODO SLF4J-437 use BOM -->
       <dependency>
         <groupId>org.slf4j</groupId>
