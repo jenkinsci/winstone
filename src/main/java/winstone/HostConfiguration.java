@@ -19,7 +19,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import winstone.cmdline.Option;
 
-import javax.servlet.SessionTrackingMode;
+import jakarta.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
