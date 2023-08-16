@@ -13,7 +13,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 
 import winstone.cmdline.Option;
@@ -43,14 +42,9 @@ public class HttpsConnectorFactory extends AbstractSecuredConnectorFactory imple
             if(currentHandler == null) {
                 server.setHandler(new SecuredRedirectHandler());
             } else {
-                if(currentHandler instanceof HandlerList) {
-                    ((HandlerList)currentHandler).addHandler(new SecuredRedirectHandler());
-                } else {
-                    HandlerList handlers = new HandlerList();
-                    handlers.addHandler(new SecuredRedirectHandler());
-                    handlers.addHandler(currentHandler);
-                    server.setHandler(handlers);
-                }
+                SecuredRedirectHandler securedRedirectHandler = new SecuredRedirectHandler();
+                securedRedirectHandler.setHandler(currentHandler);
+                server.setHandler(securedRedirectHandler);
             }
         }
         configureSsl(args, server);
