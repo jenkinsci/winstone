@@ -1,5 +1,6 @@
 package winstone;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +39,18 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpUnixDomainPath", "target/jetty.socket");
-        winstone = new Launcher(args);
+        
+        try {
+            winstone = new Launcher(args);
+        }
+        catch (IOException ioe) {
+            if (ioe.getCause() instanceof UnsupportedOperationException) {
+                /* skip JDKs less than 16 */
+                return;
+            }
+            throw ioe;
+        }
+
         String path = ((UnixDomainServerConnector)winstone.server.getConnectors()[0]).getUnixDomainPath().toString();
 
         assertEquals(
