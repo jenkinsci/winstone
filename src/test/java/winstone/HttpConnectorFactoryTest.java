@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -30,6 +31,25 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Rule
     public TemporaryFolder tmp = new TemporaryFolder();
+
+    @Test
+    public void testListenUnixDomainPath() throws Exception {
+        Map<String,String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpUnixDomainPath", "target/jetty.socket");
+        winstone = new Launcher(args);
+        String path = ((UnixDomainServerConnector)winstone.server.getConnectors()[0]).getUnixDomainPath().toString();
+
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                makeRequest(path, "http://127.0.0.1:80/CountRequestsServlet"));
+
+        LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
+        assertNotNull(lowResourceMonitor);
+        assertFalse(lowResourceMonitor.isLowOnResources());
+        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
+    }
 
     @Test
     public void testListenAddress() throws Exception {

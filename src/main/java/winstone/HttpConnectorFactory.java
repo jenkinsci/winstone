@@ -27,8 +27,9 @@ public class HttpConnectorFactory implements ConnectorFactory {
     public Connector start( Map<String, String> args, Server server) throws IOException {
         // Load resources
         int listenPort = Option.HTTP_PORT.get(args);
+        String listenUnixDomainPath = Option.HTTP_UNIX_DOMAIN_PATH.get(args);
 
-        if (listenPort < 0) {
+        if (listenPort < 0 && listenUnixDomainPath == null) {
             return null;
         }
         else {
@@ -36,6 +37,7 @@ public class HttpConnectorFactory implements ConnectorFactory {
                 .withServer(server)
                 .withAcceptors(Option.JETTY_ACCEPTORS.get(args))
                 .withSelectors(Option.JETTY_SELECTORS.get(args))
+                .withListenerUnixDomainPath(listenUnixDomainPath)
                 .withListenerPort(listenPort)
                 .withSecureListenerPort(Option.HTTPS_PORT.get(args, -1))
                 .withListenerAddress(Option.HTTP_LISTEN_ADDRESS.get(args))
