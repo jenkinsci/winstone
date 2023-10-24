@@ -3,17 +3,17 @@ package winstone;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import java.net.ConnectException;
+import java.net.Socket;
+import java.nio.file.Path;
+
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.dynamic.HttpClientTransportDynamic;
+import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.io.ClientConnector;
 import org.junit.After;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -28,12 +28,31 @@ public class AbstractWinstoneTest {
     }
 
     public String makeRequest(String url)
-            throws URISyntaxException, IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder(new URI(url)).GET().build();
-        HttpResponse<String> response =
-                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
-        return response.body();
+            throws Exception {
+        return makeRequest(null, url);
+    }
+
+    public String makeRequest(String path, String url)
+            throws Exception {
+
+        HttpClient httpClient;
+
+        if (path != null) {            
+            Path unixDomainPath = Path.of(path);
+            ClientConnector clientConnector = ClientConnector.forUnixDomain(unixDomainPath);
+            httpClient = new HttpClient(new HttpClientTransportDynamic(clientConnector));
+        }
+        else {
+            httpClient = new HttpClient();
+        }
+        httpClient.start();
+
+        ContentResponse response = httpClient.GET(url);
+
+        httpClient.stop();
+
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        return response.getContentAsString();
     }
 
     protected void assertConnectionRefused(String host, int port) {

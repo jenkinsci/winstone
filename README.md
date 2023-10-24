@@ -74,6 +74,7 @@ To run different web applications for diffent virtual hosts:
     
        --httpPort               = set the http listening port. -1 to disable, Default is 8080
        --httpListenAddress      = set the http listening address. Default is all interfaces
+       --httpUnixDomainPath     = set the http unix domain path. Default is no path
        --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 30000)?
        --httpsPort              = set the https listening port. -1 to disable, Default is disabled
        --httpsListenAddress     = set the https listening address. Default is all interfaces

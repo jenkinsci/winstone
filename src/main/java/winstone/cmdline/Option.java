@@ -51,14 +51,15 @@ public class Option<T> {
     // these are combined with protocol to form options
     private static final OInt _PORT = integer("Port");
     private static final OString _LISTEN_ADDRESS = string("ListenAddress");
+    private static final OString _UNIX_DOMAIN_PATH=string("UnixDomainPath");
     /**
      * Number of milliseconds for the HTTP keep-alive to hang around until the next request is sent.
      */
     private static final OInt _KEEP_ALIVE_TIMEOUT = integer("KeepAliveTimeout",30000);
 
-
     public static final OInt HTTP_PORT=integer("http"+_PORT,8080);
     public static final OString HTTP_LISTEN_ADDRESS=string("http"+ _LISTEN_ADDRESS);
+    public static final OString HTTP_UNIX_DOMAIN_PATH=string("http"+ _UNIX_DOMAIN_PATH);
     public static final OInt HTTP_KEEP_ALIVE_TIMEOUT=integer("http" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
 
     public static final OInt HTTPS_PORT=integer("https"+_PORT,-1);

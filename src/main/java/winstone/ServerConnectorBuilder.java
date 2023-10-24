@@ -1,13 +1,17 @@
 package winstone;
 
+import java.nio.file.Path;
+
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 class ServerConnectorBuilder {
@@ -20,6 +24,7 @@ class ServerConnectorBuilder {
     private int requestHeaderSize;
     private int responseHeaderSize;
     private String listenerAddress;
+    private String listenerUnixDomainPath;
     private Server server;
     private SslContextFactory.Server sslContextFactory;
     private boolean sniHostCheck = true;
@@ -42,6 +47,11 @@ class ServerConnectorBuilder {
 
     public ServerConnectorBuilder withListenerAddress(String listenerAddress) {
         this.listenerAddress = listenerAddress;
+        return this;
+    }
+
+    public ServerConnectorBuilder withListenerUnixDomainPath(String listenerUnixDomainPath) {
+        this.listenerUnixDomainPath = listenerUnixDomainPath;
         return this;
     }
 
@@ -85,21 +95,41 @@ class ServerConnectorBuilder {
         return this;
     }
 
-    public ServerConnector build() {
+    public Connector build() {
 
-        ServerConnector sc;
+        Connector c;
 
-        if (sslContextFactory != null) {
-            sc = new ServerConnector(server, acceptors, selectors, sslContextFactory);
+        if (listenerUnixDomainPath != null) {
+
+            UnixDomainServerConnector usc;
+            
+            usc = new UnixDomainServerConnector(server, acceptors, selectors,
+                    new HttpConnectionFactory());
+
+            usc.setUnixDomainPath(Path.of(listenerUnixDomainPath));
+            usc.setIdleTimeout(keepAliveTimeout);
+
+            c = usc;
+
         } else {
-            sc = new ServerConnector(server, acceptors, selectors);
+
+            ServerConnector sc;
+
+            if (sslContextFactory != null) {
+                sc = new ServerConnector(server, acceptors, selectors, sslContextFactory);
+            } else {
+                sc = new ServerConnector(server, acceptors, selectors);
+            }
+
+            sc.setPort(listenerPort);
+            sc.setHost(listenerAddress);
+            sc.setIdleTimeout(keepAliveTimeout);
+
+            c = sc;
+
         }
 
-        sc.setPort(listenerPort);
-        sc.setHost(listenerAddress);
-        sc.setIdleTimeout(keepAliveTimeout);
-
-        HttpConfiguration hc = sc.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        HttpConfiguration hc = c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
         if(secureListenerPort > 0) {
             hc.setSecurePort(secureListenerPort);
         }
@@ -116,7 +146,8 @@ class ServerConnectorBuilder {
         if(src!=null&&sniRequired){
             src.setSniRequired(true);
         }
-        return sc;
+
+        return c;
 
     }
 
