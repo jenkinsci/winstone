@@ -19,7 +19,7 @@
   <properties>
     <revision>6.16</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>10.0.17</jetty.version>
+    <jetty.version>10.0.18</jetty.version>
     <slf4j.version>2.0.9</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
   </properties>
