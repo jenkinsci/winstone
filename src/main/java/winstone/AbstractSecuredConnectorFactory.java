@@ -118,16 +118,15 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 
-            /*
-             * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
-             * If false, which is the default, don't do so.
-             * Technically speaking, there's the equivalent of "SSLVerifyClient optional", but IE doesn't
-             * recognize it and it always prompt the certificate chooser dialog box, so in practice
-             * it's useless.
-             * <p>
-             * See http://hudson.361315.n4.nabble.com/winstone-container-and-ssl-td383501.html for this failure mode in IE.
-             */
-            ssl.setNeedClientAuth(Option.HTTPS_VERIFY_CLIENT.get(args));
+            String verifyClientArg = Option.HTTPS_VERIFY_CLIENT.get(args);
+            switch (verifyClientArg) {
+                case "true":
+                    ssl.setNeedClientAuth(true);
+                    break;
+                case "optional":
+                    ssl.setWantClientAuth(true);
+                    break;
+            }
             return ssl;
         } catch (Throwable err) {
             throw new WinstoneException(SSL_RESOURCES
