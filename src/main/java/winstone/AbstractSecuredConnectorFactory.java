@@ -118,13 +118,14 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 
-            String verifyClientArg = Option.HTTPS_VERIFY_CLIENT.get(args);
-            switch (verifyClientArg) {
+            switch (Option.HTTPS_VERIFY_CLIENT.get(args)) {
                 case "true":
                     ssl.setNeedClientAuth(true);
                     break;
                 case "optional":
                     ssl.setWantClientAuth(true);
+                    break;
+                default:
                     break;
             }
             return ssl;
