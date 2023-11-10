@@ -7,6 +7,7 @@
 
 package winstone;
 
+import java.util.Locale;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
@@ -118,7 +119,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 
-            switch (Option.HTTPS_VERIFY_CLIENT.get(args)) {
+            switch (Option.HTTPS_VERIFY_CLIENT.get(args).toLowerCase(Locale.ROOT)) {
+                case "yes":
                 case "true":
                     ssl.setNeedClientAuth(true);
                     break;
