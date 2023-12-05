@@ -128,7 +128,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     ssl.setWantClientAuth(true);
                     break;
                 default:
-                    break;
+                   ssl.setNeedClientAuth(false);
+                   break;
             }
             return ssl;
         } catch (Throwable err) {
