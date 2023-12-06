@@ -7,6 +7,7 @@
 
 package winstone;
 
+import java.util.Locale;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
@@ -118,16 +119,18 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                         "HttpsListener.ExcludeCiphers", //
                         Arrays.asList(ssl.getExcludeCipherSuites()));
 
-            /*
-             * If true, request the client certificate ala "SSLVerifyClient require" Apache directive.
-             * If false, which is the default, don't do so.
-             * Technically speaking, there's the equivalent of "SSLVerifyClient optional", but IE doesn't
-             * recognize it and it always prompt the certificate chooser dialog box, so in practice
-             * it's useless.
-             * <p>
-             * See http://hudson.361315.n4.nabble.com/winstone-container-and-ssl-td383501.html for this failure mode in IE.
-             */
-            ssl.setNeedClientAuth(Option.HTTPS_VERIFY_CLIENT.get(args));
+            switch (Option.HTTPS_VERIFY_CLIENT.get(args).toLowerCase(Locale.ROOT)) {
+                case "yes":
+                case "true":
+                    ssl.setNeedClientAuth(true);
+                    break;
+                case "optional":
+                    ssl.setWantClientAuth(true);
+                    break;
+                default:
+                   ssl.setNeedClientAuth(false);
+                   break;
+            }
             return ssl;
         } catch (Throwable err) {
             throw new WinstoneException(SSL_RESOURCES
