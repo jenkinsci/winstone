@@ -22,6 +22,11 @@
     <jetty.version>10.0.18</jetty.version>
     <slf4j.version>2.0.9</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
+    <!-- TODO: Remove when parent pom is using this version or newer -->
+    <!-- https://github.com/jenkinsci/pom/pull/510 -->
+    <spotbugs-maven-plugin.version>4.8.2.0</spotbugs-maven-plugin.version>
+    <spotbugs.effort>Max</spotbugs.effort>
+    <spotbugs.omitVisitors>FindReturnRef,ConstructorThrow</spotbugs.omitVisitors>
   </properties>
 
   <licenses>
