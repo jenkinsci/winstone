@@ -45,17 +45,13 @@ To run locally exploded web archive:
 
     java -jar winstone.jar --webroot=<location of webroot> (+ other options)
 
-To run different web applications for diffent virtual hosts:
-
-    java -jar winstone.jar --hostsDir=<location of hosts directory> (+ other options)
-
 
 ## Command-line options
 
     Winstone Servlet Engine, (c) 2003-2006 Rick Knowles
     Usage: java winstone.jar [--option=value] [--option=value] [etc]
     
-    Required options: either --webroot OR --warfile OR --webappsDir OR --hostsDir
+    Required options: either --webroot OR --warfile OR --webappsDir
        --webroot                = set document root folder.
        --warfile                = set location of warfile to extract from.
        --webappsDir             = set directory for multiple webapps to be deployed from
@@ -163,19 +159,6 @@ sub-directories `ROOT` and `test`, if you executed
 `java -jar winstone.jar --webappsDir=/usr/local/webapps`, you would find that
 the test folder would act as a webroot for requests prefixed with
 `/test`, while other requests would go to the webapp in the `ROOT` folder
-
-If you need multiple hosts (sometimes called name-based virtual hosting),
-there is an option `--hostsDir`. This acts in a similar way to the `--webappsDir` switch,
-but it defines an extra level of sub-directories, the top being a per-host directory
-and the second a per-webapp directory as with `--webappsDir`.
-
-The directory name becomes the host name: that is, a directory named `www.blah.com`
-will only serve requests with the host header www.blah.com, unless it is the default
-host. If a directory named "default" is found, it becomes the default host.
-If no default directory is found, the first directory in the list (alphabetically)
-becomes the default host.
-
-* `java -jar winstone.jar --hostsDir=<dir containing multiple host directories>`
 
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
