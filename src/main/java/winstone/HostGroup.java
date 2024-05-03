@@ -7,9 +7,7 @@
 package winstone;
 
 import org.eclipse.jetty.server.Server;
-import winstone.cmdline.Option;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -38,12 +36,8 @@ public class HostGroup {
         this.server = server;
         this.hostConfigs = new Hashtable<>();
 
-        // Is this the single or multiple configuration ? Check args
-        File webappsDir = Option.WEBAPPS_DIR.get(args);
-
         // If host mode
-        initHost(webappsDir, DEFAULT_HOSTNAME, commonLibCL,
-                args);
+        initHost(DEFAULT_HOSTNAME, commonLibCL, args);
         this.defaultHostName = DEFAULT_HOSTNAME;
         Logger.log(Level.FINER, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
                 this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
@@ -59,12 +53,9 @@ public class HostGroup {
         return this.hostConfigs.get(this.defaultHostName);
     }
 
-    protected void initHost(File webappsDir, String hostname,
-                            ClassLoader commonLibCL,
-                            Map<String, String> args) throws IOException {
+    protected void initHost(String hostname, ClassLoader commonLibCL, Map<String, String> args) throws IOException {
         Logger.log(Level.FINER, Launcher.RESOURCES, "HostGroup.DeployingHost", hostname);
-        HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL,
-                args, webappsDir);
+        HostConfiguration config = new HostConfiguration(server, hostname, commonLibCL, args);
         this.hostConfigs.put(hostname, config);
     }
 }

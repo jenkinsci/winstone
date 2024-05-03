@@ -37,10 +37,6 @@ To run a single war file:
 
     java -jar winstone.jar --warfile=<location of warfile> (+ other options)
 
-To run a directory full of war files:
-
-    java -jar winstone.jar --webappsDir=<location of webapps directory> (+ other options)
-
 To run locally exploded web archive:
 
     java -jar winstone.jar --webroot=<location of webroot> (+ other options)
@@ -51,10 +47,9 @@ To run locally exploded web archive:
     Winstone Servlet Engine, (c) 2003-2006 Rick Knowles
     Usage: java winstone.jar [--option=value] [--option=value] [etc]
     
-    Required options: either --webroot OR --warfile OR --webappsDir
+    Required options: either --webroot OR --warfile
        --webroot                = set document root folder.
        --warfile                = set location of warfile to extract from.
-       --webappsDir             = set directory for multiple webapps to be deployed from
     Other options:
        --javaHome               = Override the JAVA_HOME variable
        --config                 = load configuration properties from here. Default is ./winstone.properties
@@ -145,20 +140,6 @@ just supply the warfile or webroot directory as an argument:
 * `java -jar winstone.jar <webroot or warfile>`, (this method auto-detects the type) or
 * `java -jar winstone.jar --webroot=<webroot>`, or
 * `java -jar winstone.jar --warfile=<warfile>`
-
-If you need to support *multiple webapps*, use the `--webappsDir` switch,
-to which you pass a directory that contains multiple warfiles/webroots.
-
-* `java -jar winstone.jar --webappsDir=<dir containing multiple webroots>`
-
-The directory becomes the prefix name for that webapp (so hello becomes `/hello`, etc).
-The directory named ROOT becomes the no-prefix webapp.
-
-So, for example, if you had a directory `/usr/local/webapps` which contained
-sub-directories `ROOT` and `test`, if you executed
-`java -jar winstone.jar --webappsDir=/usr/local/webapps`, you would find that
-the test folder would act as a webroot for requests prefixed with
-`/test`, while other requests would go to the webapp in the `ROOT` folder
 
 ## Development
 If you have some unit test failures you may add an interface/ip alias such
