@@ -13,7 +13,6 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
@@ -58,8 +57,8 @@ public class HostConfiguration {
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
-    public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL,
-                             @NonNull Map<String, String> args, File webappsDir) throws IOException {
+    public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL, @NonNull Map<String, String> args)
+            throws IOException {
         this.server = server;
         this.hostname = hostname;
         this.args = new HashMap<>(args);
@@ -79,18 +78,12 @@ public class HostConfiguration {
         File warfile = Option.WARFILE.get(this.args);
         File webroot = Option.WEBROOT.get(this.args);
 
-        Handler handler;
-        // If single-webapp mode
-        if (webappsDir == null && ((warfile != null) || (webroot != null))) {
-            String prefix = Option.PREFIX.get(this.args);
-            if (prefix.endsWith("/"))   // trim off the trailing '/' that Jetty doesn't like
-                prefix = prefix.substring(0,prefix.length()-1);
-            handler = configureAccessLog(create(getWebRoot(webroot,warfile), prefix),"webapp");
+        String prefix = Option.PREFIX.get(this.args);
+        if (prefix.endsWith("/")) {
+            // trim off the trailing '/' that Jetty doesn't like
+            prefix = prefix.substring(0, prefix.length() - 1);
         }
-        // Otherwise multi-webapp mode
-        else {
-            handler = initMultiWebappDir(webappsDir);
-        }
+        Handler handler = configureAccessLog(create(getWebRoot(webroot, warfile), prefix), "webapp");
 
         {// load additional mime types
             loadBuiltinMimeTypes();
@@ -342,67 +335,5 @@ public class HostConfiguration {
         } catch (Exception ex) {
             Logger.logDirectMessage(Level.WARNING, null, "Failed to delete dirs " + dir.getAbsolutePath(), ex);
         }
-    }
-
-    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, we're not being called from a webapp")
-    protected ContextHandlerCollection initMultiWebappDir(File webappsDir) {
-        ContextHandlerCollection webApps = new ContextHandlerCollection();
-
-        if (webappsDir == null) {
-            webappsDir = new File("webapps");
-        }
-        if (!webappsDir.exists()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirNotFound", webappsDir.getPath()));
-        } else if (!webappsDir.isDirectory()) {
-            throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WebAppDirIsNotDirectory", webappsDir.getPath()));
-        } else {
-            File[] children = webappsDir.listFiles();
-            if (children != null) {
-                for (File aChildren : children) {
-                    String childName = aChildren.getName();
-
-                    // Check any directories for warfiles that match, and skip: only deploy the war file
-                    if (aChildren.isDirectory()) {
-                        File matchingWarFile = new File(webappsDir, aChildren.getName() + ".war");
-                        if (matchingWarFile.exists() && matchingWarFile.isFile()) {
-                            Logger.log(Level.FINER, Launcher.RESOURCES, "HostConfig.SkippingWarfileDir", childName);
-                        } else {
-                            String prefix = childName.equalsIgnoreCase("ROOT") ? "" : "/" + childName;
-                            if (!this.webapps.containsKey(prefix)) {
-                                try {
-                                    WebAppContext context = create(aChildren, prefix);
-                                    webApps.addHandler(configureAccessLog(context,childName));
-                                    Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
-                                } catch (Throwable err) {
-                                    Logger.log(Level.SEVERE, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
-                                }
-                            }
-                        }
-                    } else if (childName.endsWith(".war")) {
-                        String outputName = childName.substring(0, childName.lastIndexOf(".war"));
-                        String prefix = outputName.equalsIgnoreCase("ROOT") ? "" : "/" + outputName;
-
-                        if (!this.webapps.containsKey(prefix)) {
-                            File outputDir = new File(webappsDir, outputName);
-                            try {
-                                Files.createDirectories(outputDir.toPath());
-                            } catch (Exception ex) {
-                                Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + outputDir.getAbsolutePath(), ex);
-                            }
-                            try {
-                                WebAppContext context = create(
-                                        getWebRoot(new File(webappsDir, outputName), aChildren), prefix);
-                                webApps.addHandler(configureAccessLog(context,outputName));
-                                Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.DeployingWebapp", childName);
-                            } catch (Throwable err) {
-                                Logger.log(Level.SEVERE, Launcher.RESOURCES, "HostConfig.WebappInitError", prefix, err);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return webApps;
     }
 }

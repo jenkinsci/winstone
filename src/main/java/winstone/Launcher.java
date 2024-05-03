@@ -484,8 +484,7 @@ public class Launcher implements Runnable {
         deployEmbeddedWarfile(args);
 
         // Check for embedded warfile
-        if (!Option.WEBROOT.isIn(args) && !Option.WARFILE.isIn(args)
-         && !Option.WEBAPPS_DIR.isIn(args)) {
+        if (!Option.WEBROOT.isIn(args) && !Option.WARFILE.isIn(args)) {
             printUsage();
             return;
         }
@@ -561,7 +560,6 @@ public class Launcher implements Runnable {
 
             Option.WARFILE.put(args, tempWarfile.getAbsolutePath());
             Option.WARFILE.put(args, tempWebroot.getAbsolutePath());
-            Option.WEBAPPS_DIR.remove(args);
         }
     }
 
