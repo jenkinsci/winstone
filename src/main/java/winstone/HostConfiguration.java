@@ -8,14 +8,11 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.eclipse.jetty.http.MimeTypes;
+import org.eclipse.jetty.ee8.webapp.WebAppContext;
+import org.eclipse.jetty.ee8.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import winstone.cmdline.Option;
 
 import javax.servlet.SessionTrackingMode;
@@ -54,7 +51,6 @@ public class HostConfiguration {
     private Map<String, String> args;
     private Map<String,WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL, @NonNull Map<String, String> args)
@@ -83,7 +79,11 @@ public class HostConfiguration {
             // trim off the trailing '/' that Jetty doesn't like
             prefix = prefix.substring(0, prefix.length() - 1);
         }
-        Handler handler = configureAccessLog(create(getWebRoot(webroot, warfile), prefix), "webapp");
+        WebAppContext webAppContext = create(getWebRoot(webroot, warfile), prefix);
+        RequestLog requestLog = configureAccessLog("webapp");
+        if (requestLog != null) {
+            server.setRequestLog(requestLog);
+        }
 
         {// load additional mime types
             loadBuiltinMimeTypes();
@@ -97,12 +97,12 @@ public class HostConfiguration {
                         continue;
                     String extension = mapping.substring(0, delimPos);
                     String mimeType = mapping.substring(delimPos + 1);
-                    this.mimeTypes.addMimeMapping(extension.toLowerCase(), mimeType);
+                    server.getMimeTypes().addMimeMapping(extension.toLowerCase(), mimeType);
                 }
             }
         }
 
-        server.setHandler(handler);
+        server.setHandler(webAppContext);
         Logger.log(Level.FINER, Launcher.RESOURCES, "HostConfig.InitComplete",
                 this.webapps.size() + "", this.webapps.keySet() + "");
     }
@@ -112,7 +112,7 @@ public class HostConfiguration {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
-                mimeTypes.addMimeMapping(e.getKey().toString(),e.getValue().toString());
+                server.getMimeTypes().addMimeMapping(e.getKey().toString(),e.getValue().toString());
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to load the built-in MIME types", e);
@@ -124,16 +124,13 @@ public class HostConfiguration {
      * @param webAppName
      *      Unique name given to the access logger.
      */
-    private Handler configureAccessLog(Handler handler, String webAppName) {
+    private RequestLog configureAccessLog(String webAppName) {
         try {
             Class<? extends RequestLog> loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
             if (loggerClass!=null) {
                 // Build the realm
                 Constructor<? extends RequestLog> loggerConstr = loggerClass.getConstructor(String.class, Map.class);
-                RequestLogHandler rlh = new RequestLogHandler();
-                rlh.setHandler(handler);
-                rlh.setRequestLog(loggerConstr.newInstance(webAppName, args));
-                return rlh;
+                return loggerConstr.newInstance(webAppName, args);
             } else {
                 Logger.log(Level.FINER, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
             }
@@ -141,7 +138,7 @@ public class HostConfiguration {
             Logger.log(Level.SEVERE, Launcher.RESOURCES,
                     "WebAppConfig.LoggerError", "", err);
         }
-        return handler;
+        return null;
     }
 
     private WebAppContext create(File app, String prefix) {
@@ -178,10 +175,10 @@ public class HostConfiguration {
                 getSessionHandler().getSessionCache().setEvictionPolicy( sessionEviction );
             }
         };
+        wac.setServer(server);
         JettyWebSocketServletContainerInitializer.configure(wac, null);
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
-        wac.setMimeTypes(mimeTypes);
         wac.getSessionHandler().setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
         wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
         this.webapps.put(wac.getContextPath(),wac);

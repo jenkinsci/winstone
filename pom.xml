@@ -17,11 +17,12 @@
   <url>https://github.com/jenkinsci/${project.artifactId}</url>
 
   <properties>
-    <revision>6.20</revision>
+    <revision>7.0</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>10.0.20</jetty.version>
+    <jetty.version>12.0.8</jetty.version>
     <slf4j.version>2.0.13</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
+    <maven.compiler.release>17</maven.compiler.release>
   </properties>
 
   <licenses>
@@ -212,6 +213,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee8</groupId>
+        <artifactId>jetty-ee8-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <!-- TODO SLF4J-437 use BOM -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -260,8 +268,8 @@
       <artifactId>jetty-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-servlet</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -272,20 +280,20 @@
       <artifactId>jetty-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-webapp</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-hpack</artifactId>
+      <artifactId>jetty-http2-hpack</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>http2-server</artifactId>
+      <artifactId>jetty-http2-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-jetty-server</artifactId> <!-- or websocket-javax-server -->
+      <groupId>org.eclipse.jetty.ee8.websocket</groupId>
+      <artifactId>jetty-ee8-websocket-jetty-server</artifactId> <!-- or websocket-javax-server -->
       <!-- until Jetty release including https://github.com/eclipse/jetty.project/pull/8199 -->
       <exclusions>
         <exclusion>

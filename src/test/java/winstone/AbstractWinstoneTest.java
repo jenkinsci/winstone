@@ -7,9 +7,9 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.file.Path;
 
+import org.eclipse.jetty.client.ContentResponse;
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.client.dynamic.HttpClientTransportDynamic;
+import org.eclipse.jetty.client.transport.HttpClientTransportDynamic;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.io.ClientConnector;
 import org.junit.After;
