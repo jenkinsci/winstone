@@ -1,7 +1,6 @@
 package winstone;
 
 import java.nio.file.Path;
-
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.Connector;
@@ -81,9 +80,9 @@ class ServerConnectorBuilder {
     }
 
     public ServerConnectorBuilder withResponseHeaderSize(int responseHeaderSize) {
-      this.responseHeaderSize = responseHeaderSize;
-      return this;
-  }
+        this.responseHeaderSize = responseHeaderSize;
+        return this;
+    }
 
     public ServerConnectorBuilder withSniHostCheck(boolean sniHostCheck) {
         this.sniHostCheck = sniHostCheck;
@@ -102,9 +101,8 @@ class ServerConnectorBuilder {
         if (listenerUnixDomainPath != null) {
 
             UnixDomainServerConnector usc;
-            
-            usc = new UnixDomainServerConnector(server, acceptors, selectors,
-                    new HttpConnectionFactory());
+
+            usc = new UnixDomainServerConnector(server, acceptors, selectors, new HttpConnectionFactory());
 
             usc.setUnixDomainPath(Path.of(listenerUnixDomainPath));
             usc.setIdleTimeout(keepAliveTimeout);
@@ -126,11 +124,11 @@ class ServerConnectorBuilder {
             sc.setIdleTimeout(keepAliveTimeout);
 
             c = sc;
-
         }
 
-        HttpConfiguration hc = c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
-        if(secureListenerPort > 0) {
+        HttpConfiguration hc =
+                c.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        if (secureListenerPort > 0) {
             hc.setSecurePort(secureListenerPort);
         }
         hc.setHttpCompliance(HttpCompliance.RFC7230);
@@ -140,15 +138,13 @@ class ServerConnectorBuilder {
         hc.setResponseHeaderSize(responseHeaderSize);
 
         SecureRequestCustomizer src = hc.getCustomizer(SecureRequestCustomizer.class);
-        if(src!=null&&!sniHostCheck){
+        if (src != null && !sniHostCheck) {
             src.setSniHostCheck(false);
         }
-        if(src!=null&&sniRequired){
+        if (src != null && sniRequired) {
             src.setSniRequired(true);
         }
 
         return c;
-
     }
-
 }

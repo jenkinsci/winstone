@@ -3,5 +3,4 @@ package winstone.tools;
 /**
  * @author Kohsuke Kawaguchi
  */
-public class WinstoneControlOption {
-}
+public class WinstoneControlOption {}

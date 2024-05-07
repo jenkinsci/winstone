@@ -7,12 +7,6 @@
 
 package winstone;
 
-import java.util.Locale;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-import winstone.cmdline.Option;
-
-import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,36 +16,39 @@ import java.security.KeyStore;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Stream;
+import javax.net.ssl.KeyManagerFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import winstone.cmdline.Option;
 
 /**
  *
  */
-public abstract class AbstractSecuredConnectorFactory implements ConnectorFactory
-{
+public abstract class AbstractSecuredConnectorFactory implements ConnectorFactory {
     protected static final WinstoneResourceBundle SSL_RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     protected KeyStore keystore;
     protected String keystorePassword;
 
-    protected void configureSsl( Map<String, String> args, Server server ) throws IOException
-    {
+    protected void configureSsl(Map<String, String> args, Server server) throws IOException {
         try {
-            File keyStore =    Option.HTTPS_KEY_STORE.get(args);
-            String pwd =       Option.HTTPS_KEY_STORE_PASSWORD.get(args);
+            File keyStore = Option.HTTPS_KEY_STORE.get(args);
+            String pwd = Option.HTTPS_KEY_STORE_PASSWORD.get(args);
 
-            if (keyStore!=null) {
+            if (keyStore != null) {
                 // load from default Keystore
                 if (!keyStore.exists() || !keyStore.isFile())
-                    throw new WinstoneException(SSL_RESOURCES.getString(
-                        "HttpsListener.KeyStoreNotFound", keyStore.getPath()));
+                    throw new WinstoneException(
+                            SSL_RESOURCES.getString("HttpsListener.KeyStoreNotFound", keyStore.getPath()));
 
                 this.keystorePassword = pwd;
 
                 keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-                try(InputStream inputStream = new FileInputStream(keyStore)){
-                    keystore.load( inputStream, this.keystorePassword.toCharArray());
+                try (InputStream inputStream = new FileInputStream(keyStore)) {
+                    keystore.load(inputStream, this.keystorePassword.toCharArray());
                 }
             } else {
                 throw new WinstoneException(MessageFormat.format("Please set --{0}", Option.HTTPS_KEY_STORE));
@@ -65,7 +62,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
      * Used to get the base ssl context in which to create the server socket.
      * This is basically just so we can have a custom location for key stores.
      */
-    protected SslContextFactory.Server getSSLContext( Map<String, String> args) {
+    protected SslContextFactory.Server getSSLContext(Map<String, String> args) {
         try {
             String privateKeyPassword;
 
@@ -82,18 +79,20 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             // Dump the content of the keystore if log level is FULL_DEBUG
             // Note: The kmf is instantiated here only to access the keystore,
             // the SslContextFactory will instantiate its own KeyManager
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance( Option.HTTPS_KEY_MANAGER_TYPE.get( args));
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
 
             // In case the KeyStore password and the KeyPassword are not the same,
             // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
             kmf.init(keystore, keystorePassword.toCharArray());
-            Logger.log(Level.FINEST, SSL_RESOURCES,
-                       "HttpsListener.KeyCount", keystore.size() + "");
-            for ( Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+            Logger.log(Level.FINEST, SSL_RESOURCES, "HttpsListener.KeyCount", keystore.size() + "");
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = e.nextElement();
-                Logger.log(Level.FINEST, SSL_RESOURCES,
-                           "HttpsListener.KeyFound", alias,
-                           keystore.getCertificate(alias) + "");
+                Logger.log(
+                        Level.FINEST,
+                        SSL_RESOURCES,
+                        "HttpsListener.KeyFound",
+                        alias,
+                        keystore.getCertificate(alias) + "");
             }
 
             SslContextFactory.Server ssl = new SslContextFactory.Server();
@@ -103,21 +102,26 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             ssl.setKeyManagerFactoryAlgorithm(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             String excludeProtos = Option.HTTPS_EXCLUDE_PROTOCOLS.get(args);
-            if(excludeProtos!=null&&excludeProtos.length()>0) {
-                String[] protos = Stream.of(excludeProtos.split(",")).map(String::trim).toArray(String[]::new);
+            if (excludeProtos != null && excludeProtos.length() > 0) {
+                String[] protos =
+                        Stream.of(excludeProtos.split(",")).map(String::trim).toArray(String[]::new);
                 ssl.setExcludeProtocols(protos);
             }
             String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
-            if(excludeCiphers!=null&&excludeCiphers.length()>0) {
+            if (excludeCiphers != null && excludeCiphers.length() > 0) {
                 String[] cipherSuites = excludeCiphers.split(",");
                 ssl.setExcludeCipherSuites(cipherSuites);
             }
-            Logger.log(Level.INFO, SSL_RESOURCES, //
-                        "HttpsListener.ExcludeProtocols", //
-                        Arrays.asList(ssl.getExcludeProtocols()));
-            Logger.log(Level.INFO, SSL_RESOURCES, //
-                        "HttpsListener.ExcludeCiphers", //
-                        Arrays.asList(ssl.getExcludeCipherSuites()));
+            Logger.log(
+                    Level.INFO,
+                    SSL_RESOURCES, //
+                    "HttpsListener.ExcludeProtocols", //
+                    Arrays.asList(ssl.getExcludeProtocols()));
+            Logger.log(
+                    Level.INFO,
+                    SSL_RESOURCES, //
+                    "HttpsListener.ExcludeCiphers", //
+                    Arrays.asList(ssl.getExcludeCipherSuites()));
 
             switch (Option.HTTPS_VERIFY_CLIENT.get(args).toLowerCase(Locale.ROOT)) {
                 case "yes":
@@ -128,14 +132,12 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
                     ssl.setWantClientAuth(true);
                     break;
                 default:
-                   ssl.setNeedClientAuth(false);
-                   break;
+                    ssl.setNeedClientAuth(false);
+                    break;
             }
             return ssl;
         } catch (Throwable err) {
-            throw new WinstoneException(SSL_RESOURCES
-                                            .getString("HttpsListener.ErrorGettingContext"), err);
+            throw new WinstoneException(SSL_RESOURCES.getString("HttpsListener.ErrorGettingContext"), err);
         }
     }
-
 }

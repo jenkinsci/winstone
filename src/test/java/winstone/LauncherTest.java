@@ -4,9 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
-
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,6 +15,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
+import org.eclipse.jetty.server.ServerConnector;
+import org.junit.Test;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -25,17 +24,17 @@ import java.util.logging.LogRecord;
 public class LauncherTest extends AbstractWinstoneTest {
     @Test
     public void mimeType() throws Exception {
-        Map<String,String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");
         args.put("mimeTypes", "xxx=text/xxx");
         winstone = new Launcher(args);
-        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-        HttpRequest request =
-                HttpRequest.newBuilder(new URI("http://127.0.0.2:" + port + "/test.xxx")).GET().build();
-        HttpResponse<String> response =
-                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        HttpRequest request = HttpRequest.newBuilder(new URI("http://127.0.0.2:" + port + "/test.xxx"))
+                .GET()
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
         assertEquals("text/xxx", response.headers().firstValue("Content-Type").get());
         assertEquals("Hello", response.body());
@@ -60,7 +59,8 @@ public class LauncherTest extends AbstractWinstoneTest {
                     makeRequest("http://127.0.0.2:" + port + "/CountRequestsServlet"));
             assertThat(
                     filter.messages,
-                    hasItem("You are using an extra library folder, support for which will end on or after January 1, 2023."));
+                    hasItem(
+                            "You are using an extra library folder, support for which will end on or after January 1, 2023."));
         } finally {
             logger.setFilter(orig);
         }

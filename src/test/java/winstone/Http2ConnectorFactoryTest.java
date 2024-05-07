@@ -5,10 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.jetty.server.LowResourceMonitor;
-import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
-
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,14 +12,15 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
+import org.eclipse.jetty.server.LowResourceMonitor;
+import org.eclipse.jetty.server.ServerConnector;
+import org.junit.Test;
 
 public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
 
-    private static final String DISABLE_HOSTNAME_VERIFICATION =
-            "jdk.internal.httpclient.disableHostnameVerification";
+    private static final String DISABLE_HOSTNAME_VERIFICATION = "jdk.internal.httpclient.disableHostnameVerification";
 
     private String request(X509TrustManager tm, int port) throws Exception {
         String disableHostnameVerification = System.getProperty(DISABLE_HOSTNAME_VERIFICATION);
@@ -36,8 +33,7 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
             SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, new X509TrustManager[] {tm}, null);
             HttpClient client = HttpClient.newBuilder().sslContext(sslContext).build();
-            HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
             return response.body();
         } finally {

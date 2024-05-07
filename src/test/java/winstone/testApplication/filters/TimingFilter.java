@@ -8,7 +8,6 @@ package winstone.testApplication.filters;
 
 import java.io.IOException;
 import java.util.Enumeration;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -30,10 +29,8 @@ public class TimingFilter implements Filter {
 
     @Override
     public void init(FilterConfig config) {
-        String dumpRequestParams = config
-                .getInitParameter("dumpRequestParameters");
-        this.dumpRequestParams = ((dumpRequestParams != null) && dumpRequestParams
-                .equalsIgnoreCase("true"));
+        String dumpRequestParams = config.getInitParameter("dumpRequestParameters");
+        this.dumpRequestParams = ((dumpRequestParams != null) && dumpRequestParams.equalsIgnoreCase("true"));
         this.context = config.getServletContext();
     }
 
@@ -47,19 +44,16 @@ public class TimingFilter implements Filter {
      * the request parameters to the servlet context log
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         if (this.dumpRequestParams)
-            for (Enumeration<String> paramNames = request.getParameterNames(); paramNames
-                    .hasMoreElements();) {
+            for (Enumeration<String> paramNames = request.getParameterNames(); paramNames.hasMoreElements(); ) {
                 String name = paramNames.nextElement();
-                this.context.log("Request parameter: " + name + "="
-                        + request.getParameter(name));
+                this.context.log("Request parameter: " + name + "=" + request.getParameter(name));
             }
 
         long startTime = System.currentTimeMillis();
         chain.doFilter(request, response);
-        this.context.log("Filter chain executed in "
-                + (System.currentTimeMillis() - startTime) + "ms");
+        this.context.log("Filter chain executed in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 }

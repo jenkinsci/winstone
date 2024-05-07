@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 /**
  * A ResourceBundle that includes the ability to do string replacement on the
  * resources it retrieves.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  */
 public class WinstoneResourceBundle {
@@ -48,7 +48,7 @@ public class WinstoneResourceBundle {
     }
 
     private String toString(Object s) {
-        return s!=null?s.toString():null;
+        return s != null ? s.toString() : null;
     }
 
     /**
@@ -74,7 +74,7 @@ public class WinstoneResourceBundle {
         globalReplace(out, fromMarker, toValue);
         return out.toString();
     }
-    
+
     private static void globalReplace(StringBuilder input, String fromMarker, String toValue) {
         if (input == null) {
             return;
@@ -93,7 +93,7 @@ public class WinstoneResourceBundle {
             foundAt = input.indexOf(fromMarker, index);
         }
     }
-    
+
     public static String globalReplace(String input, String[][] parameters) {
         if (parameters != null) {
             StringBuilder out = new StringBuilder(input);

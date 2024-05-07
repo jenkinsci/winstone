@@ -1,5 +1,12 @@
 package winstone;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,13 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
-
 /**
  * @author Kohsuke Kawaguchi
  */
@@ -35,15 +35,14 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
     public void testListenUnixDomainPath() throws Exception {
-        Map<String,String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpUnixDomainPath", "target/jetty.socket");
-        
+
         try {
             winstone = new Launcher(args);
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             if (ioe.getCause() instanceof UnsupportedOperationException) {
                 /* skip JDKs less than 16 */
                 return;
@@ -51,7 +50,9 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
             throw ioe;
         }
 
-        String path = ((UnixDomainServerConnector)winstone.server.getConnectors()[0]).getUnixDomainPath().toString();
+        String path = ((UnixDomainServerConnector) winstone.server.getConnectors()[0])
+                .getUnixDomainPath()
+                .toString();
 
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
@@ -65,15 +66,15 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
     public void testListenAddress() throws Exception {
-        Map<String,String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
         args.put("httpPort", "0");
         // see README development section for getting this to work on macOS
         args.put("httpListenAddress", "127.0.0.2");
         winstone = new Launcher(args);
-        int port = ((ServerConnector)winstone.server.getConnectors()[0]).getLocalPort();
-        assertConnectionRefused("127.0.0.1",port);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        assertConnectionRefused("127.0.0.1", port);
 
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
