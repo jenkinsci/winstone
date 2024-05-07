@@ -22,5 +22,4 @@ public class AcceptFormServlet extends HttpServlet {
             pw.print("received " + req.getContentLength() + " bytes");
         }
     }
-
 }

@@ -6,12 +6,11 @@
  */
 package winstone;
 
-import org.eclipse.jetty.server.Server;
-
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Level;
+import org.eclipse.jetty.server.Server;
 
 /**
  * Manages the references to individual hosts within the container. This object handles
@@ -23,24 +22,26 @@ import java.util.logging.Level;
  */
 public class HostGroup {
 
-    private final static String DEFAULT_HOSTNAME = "default";
+    private static final String DEFAULT_HOSTNAME = "default";
     private final Server server;
 
     //    private Map args;
     private Map<String, HostConfiguration> hostConfigs;
     private String defaultHostName;
 
-    public HostGroup(
-            Server server, ClassLoader commonLibCL,
-            Map<String, String> args) throws IOException {
+    public HostGroup(Server server, ClassLoader commonLibCL, Map<String, String> args) throws IOException {
         this.server = server;
         this.hostConfigs = new Hashtable<>();
 
         // If host mode
         initHost(DEFAULT_HOSTNAME, commonLibCL, args);
         this.defaultHostName = DEFAULT_HOSTNAME;
-        Logger.log(Level.FINER, Launcher.RESOURCES, "HostGroup.InitSingleComplete",
-                this.hostConfigs.size() + "", this.hostConfigs.keySet() + "");
+        Logger.log(
+                Level.FINER,
+                Launcher.RESOURCES,
+                "HostGroup.InitSingleComplete",
+                this.hostConfigs.size() + "",
+                this.hostConfigs.keySet() + "");
     }
 
     public HostConfiguration getHostByName(String hostname) {

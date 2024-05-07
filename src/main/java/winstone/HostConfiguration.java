@@ -8,17 +8,6 @@ package winstone;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.eclipse.jetty.http.MimeTypes;
-import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.RequestLog;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
-import winstone.cmdline.Option;
-
-import javax.servlet.SessionTrackingMode;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +29,16 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import javax.servlet.SessionTrackingMode;
+import org.eclipse.jetty.http.MimeTypes;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import winstone.cmdline.Option;
 
 /**
  * Manages the references to individual webapps within the container. This object handles
@@ -52,7 +51,7 @@ public class HostConfiguration {
     private final Server server;
     private String hostname;
     private Map<String, String> args;
-    private Map<String,WebAppContext> webapps;
+    private Map<String, WebAppContext> webapps;
     private ClassLoader commonLibCL;
     private MimeTypes mimeTypes = new MimeTypes();
     private final LoginService loginService;
@@ -67,7 +66,8 @@ public class HostConfiguration {
 
         try {
             // Build the realm
-            Class<? extends LoginService> realmClass = Option.REALM_CLASS_NAME.get(this.args, LoginService.class, commonLibCL);
+            Class<? extends LoginService> realmClass =
+                    Option.REALM_CLASS_NAME.get(this.args, LoginService.class, commonLibCL);
             Constructor<? extends LoginService> realmConstr = realmClass.getConstructor(Map.class);
             loginService = realmConstr.newInstance(this.args);
         } catch (Throwable err) {
@@ -85,16 +85,15 @@ public class HostConfiguration {
         }
         Handler handler = configureAccessLog(create(getWebRoot(webroot, warfile), prefix), "webapp");
 
-        {// load additional mime types
+        { // load additional mime types
             loadBuiltinMimeTypes();
             String types = Option.MIME_TYPES.get(this.args);
-            if (types!=null) {
+            if (types != null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
                 while (mappingST.hasMoreTokens()) {
                     String mapping = mappingST.nextToken();
                     int delimPos = mapping.indexOf('=');
-                    if (delimPos == -1)
-                        continue;
+                    if (delimPos == -1) continue;
                     String extension = mapping.substring(0, delimPos);
                     String mimeType = mapping.substring(delimPos + 1);
                     this.mimeTypes.addMimeMapping(extension.toLowerCase(), mimeType);
@@ -103,8 +102,12 @@ public class HostConfiguration {
         }
 
         server.setHandler(handler);
-        Logger.log(Level.FINER, Launcher.RESOURCES, "HostConfig.InitComplete",
-                this.webapps.size() + "", this.webapps.keySet() + "");
+        Logger.log(
+                Level.FINER,
+                Launcher.RESOURCES,
+                "HostConfig.InitComplete",
+                this.webapps.size() + "",
+                this.webapps.keySet() + "");
     }
 
     private void loadBuiltinMimeTypes() {
@@ -112,13 +115,12 @@ public class HostConfiguration {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
-                mimeTypes.addMimeMapping(e.getKey().toString(),e.getValue().toString());
+                mimeTypes.addMimeMapping(e.getKey().toString(), e.getValue().toString());
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to load the built-in MIME types", e);
         }
     }
-
 
     /**
      * @param webAppName
@@ -126,8 +128,9 @@ public class HostConfiguration {
      */
     private Handler configureAccessLog(Handler handler, String webAppName) {
         try {
-            Class<? extends RequestLog> loggerClass = Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
-            if (loggerClass!=null) {
+            Class<? extends RequestLog> loggerClass =
+                    Option.ACCESS_LOGGER_CLASSNAME.get(args, RequestLog.class, commonLibCL);
+            if (loggerClass != null) {
                 // Build the realm
                 Constructor<? extends RequestLog> loggerConstr = loggerClass.getConstructor(String.class, Map.class);
                 RequestLogHandler rlh = new RequestLogHandler();
@@ -138,14 +141,13 @@ public class HostConfiguration {
                 Logger.log(Level.FINER, Launcher.RESOURCES, "WebAppConfig.LoggerDisabled");
             }
         } catch (Throwable err) {
-            Logger.log(Level.SEVERE, Launcher.RESOURCES,
-                    "WebAppConfig.LoggerError", "", err);
+            Logger.log(Level.SEVERE, Launcher.RESOURCES, "WebAppConfig.LoggerError", "", err);
         }
         return handler;
     }
 
     private WebAppContext create(File app, String prefix) {
-        WebAppContext wac = new WebAppContext(app.getAbsolutePath(),prefix) {
+        WebAppContext wac = new WebAppContext(app.getAbsolutePath(), prefix) {
             @Override
             public void preConfigure() throws Exception {
                 // to have WebAppClassLoader inherit from commonLibCL,
@@ -171,20 +173,21 @@ public class HostConfiguration {
 
                 // if specified, override the value in web.xml
                 int sessionTimeout = Option.SESSION_TIMEOUT.get(args);
-                if (sessionTimeout>0) {
+                if (sessionTimeout > 0) {
                     getSessionHandler().setMaxInactiveInterval(sessionTimeout * 60);
                 }
                 int sessionEviction = Option.SESSION_EVICTION.get(args);
-                getSessionHandler().getSessionCache().setEvictionPolicy( sessionEviction );
+                getSessionHandler().getSessionCache().setEvictionPolicy(sessionEviction);
             }
         };
         JettyWebSocketServletContainerInitializer.configure(wac, null);
         wac.getSecurityHandler().setLoginService(loginService);
-        wac.setThrowUnavailableOnStartupException(true);    // if boot fails, abort the process instead of letting empty Jetty run
+        wac.setThrowUnavailableOnStartupException(
+                true); // if boot fails, abort the process instead of letting empty Jetty run
         wac.setMimeTypes(mimeTypes);
         wac.getSessionHandler().setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
         wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
-        this.webapps.put(wac.getContextPath(),wac);
+        this.webapps.put(wac.getContextPath(), wac);
         return wac;
     }
 
@@ -199,7 +202,7 @@ public class HostConfiguration {
                 webApp.stop();
                 webApp.start();
             } catch (Exception e) {
-                throw new WinstoneException("Failed to redeploy "+prefix,e);
+                throw new WinstoneException("Failed to redeploy " + prefix, e);
             }
         } else {
             throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.PrefixUnknown", prefix));
@@ -211,16 +214,16 @@ public class HostConfiguration {
      * war file is newer than. If none is supplied, use the default temp
      * directory.
      */
-    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, we're not being called from a webapp")
+    @SuppressFBWarnings(
+            value = "PATH_TRAVERSAL_IN",
+            justification = "false positive, we're not being called from a webapp")
     protected File getWebRoot(File requestedWebroot, File warfile) throws IOException {
         if (warfile != null) {
-            Logger.log(Level.INFO, Launcher.RESOURCES,
-                    "HostConfig.BeginningWarExtraction");
+            Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.BeginningWarExtraction");
 
             // open the war file
             if (!warfile.exists() || !warfile.isFile())
-                throw new WinstoneException(Launcher.RESOURCES.getString(
-                        "HostConfig.WarFileInvalid", warfile));
+                throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WarFileInvalid", warfile));
 
             // Get the webroot folder (or a temp dir if none supplied)
             File unzippedDir;
@@ -229,10 +232,15 @@ public class HostConfiguration {
             } else {
                 File tempFile = File.createTempFile("dummy", "dummy");
                 String userName = System.getProperty("user.name");
-                unzippedDir = new File(tempFile.getParent(),
-                        (userName != null ? WinstoneResourceBundle.globalReplace(userName,
-                                new String[][] {{"/", ""}, {"\\", ""}, {",", ""}}) + "/" : "") +
-                        "winstone/" + warfile.getName());
+                unzippedDir = new File(
+                        tempFile.getParent(),
+                        (userName != null
+                                        ? WinstoneResourceBundle.globalReplace(
+                                                        userName, new String[][] {{"/", ""}, {"\\", ""}, {",", ""}})
+                                                + "/"
+                                        : "")
+                                + "winstone/"
+                                + warfile.getName());
 
                 try {
                     Files.delete(tempFile.toPath());
@@ -242,23 +250,27 @@ public class HostConfiguration {
             }
             if (unzippedDir.exists()) {
                 if (!unzippedDir.isDirectory()) {
-                    throw new WinstoneException(Launcher.RESOURCES.getString(
-                            "HostConfig.WebRootNotDirectory", unzippedDir.getPath()));
+                    throw new WinstoneException(
+                            Launcher.RESOURCES.getString("HostConfig.WebRootNotDirectory", unzippedDir.getPath()));
                 } else {
-                    Logger.log(Level.FINER, Launcher.RESOURCES,
-                            "HostConfig.WebRootExists", unzippedDir.getCanonicalPath());
+                    Logger.log(
+                            Level.FINER,
+                            Launcher.RESOURCES,
+                            "HostConfig.WebRootExists",
+                            unzippedDir.getCanonicalPath());
                 }
             }
 
             // check consistency and if out-of-sync, recreate
-            File timestampFile = new File(unzippedDir,".timestamp");
-            if(!timestampFile.exists() || Math.abs(timestampFile.lastModified()- warfile.lastModified())>1000) {
+            File timestampFile = new File(unzippedDir, ".timestamp");
+            if (!timestampFile.exists() || Math.abs(timestampFile.lastModified() - warfile.lastModified()) > 1000) {
                 // contents of the target directory is inconsistent from the war.
                 deleteRecursive(unzippedDir);
                 try {
                     Files.createDirectories(unzippedDir.toPath());
                 } catch (Exception ex) {
-                    Logger.logDirectMessage(Level.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
+                    Logger.logDirectMessage(
+                            Level.WARNING, null, "Failed to recreate dirs " + unzippedDir.getAbsolutePath(), ex);
                 }
             } else {
                 // files are up to date
@@ -268,7 +280,7 @@ public class HostConfiguration {
             // Iterate through the files
             byte[] buffer = new byte[8192];
             try (JarFile warArchive = new JarFile(warfile)) {
-                for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements();) {
+                for (Enumeration<JarEntry> e = warArchive.entries(); e.hasMoreElements(); ) {
                     JarEntry element = e.nextElement();
                     if (element.isDirectory()) {
                         continue;
@@ -295,16 +307,21 @@ public class HostConfiguration {
                             Files.createDirectories(parent);
                         }
                     } catch (IOException | InvalidPathException | SecurityException ex) {
-                        Logger.logDirectMessage(Level.WARNING, null, "Failed to create dirs " + outFile.getParentFile().getAbsolutePath(), null);
+                        Logger.logDirectMessage(
+                                Level.WARNING,
+                                null,
+                                "Failed to create dirs "
+                                        + outFile.getParentFile().getAbsolutePath(),
+                                null);
                     }
 
                     // Copy out the extracted file
                     try (InputStream inContent = warArchive.getInputStream(element);
                             OutputStream outStream = new FileOutputStream(outFile)) {
-                        int readBytes = inContent.read( buffer );
-                        while ( readBytes != -1 ) {
-                            outStream.write( buffer, 0, readBytes );
-                            readBytes = inContent.read( buffer );
+                        int readBytes = inContent.read(buffer);
+                        while (readBytes != -1) {
+                            outStream.write(buffer, 0, readBytes);
+                            readBytes = inContent.read(buffer);
                         }
                     }
                 }
@@ -312,8 +329,9 @@ public class HostConfiguration {
 
             // extraction completed
             new FileOutputStream(timestampFile).close();
-            if(!timestampFile.setLastModified(warfile.lastModified())) {
-                Logger.logDirectMessage(Level.WARNING, null, "Failed to set timestamp " + timestampFile.getAbsolutePath(), null);
+            if (!timestampFile.setLastModified(warfile.lastModified())) {
+                Logger.logDirectMessage(
+                        Level.WARNING, null, "Failed to set timestamp " + timestampFile.getAbsolutePath(), null);
             }
 
             // Return webroot
@@ -325,7 +343,7 @@ public class HostConfiguration {
 
     private void deleteRecursive(File dir) {
         File[] children = dir.listFiles();
-        if(children!=null) {
+        if (children != null) {
             for (File child : children) {
                 deleteRecursive(child);
             }

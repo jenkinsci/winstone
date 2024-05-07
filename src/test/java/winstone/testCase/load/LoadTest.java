@@ -12,12 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
-
 import winstone.cmdline.Option;
 
 /**
@@ -45,9 +43,15 @@ public class LoadTest {
 
     private static String LOCAL_RESOURCE_FILE = "winstone.testCase.load.LocalStrings";
 
-    public LoadTest(WinstoneResourceBundle resources, String url,
-            boolean useKeepAlives, int startThreads, int endThreads,
-            int stepSize, long stepPeriod, long gracePeriod) {
+    public LoadTest(
+            WinstoneResourceBundle resources,
+            String url,
+            boolean useKeepAlives,
+            int startThreads,
+            int endThreads,
+            int stepSize,
+            long stepPeriod,
+            long gracePeriod) {
         this.resources = resources;
         this.url = url;
         this.useKeepAlives = useKeepAlives;
@@ -57,8 +61,16 @@ public class LoadTest {
         this.stepPeriod = stepPeriod;
         this.gracePeriod = gracePeriod;
 
-        Logger.log(Level.INFO, resources, "LoadTest.Config", this.url, this.useKeepAlives + "", this.startThreads + "",
-                this.endThreads + "", this.stepSize + "", this.stepPeriod + "",
+        Logger.log(
+                Level.INFO,
+                resources,
+                "LoadTest.Config",
+                this.url,
+                this.useKeepAlives + "",
+                this.startThreads + "",
+                this.endThreads + "",
+                this.stepSize + "",
+                this.stepPeriod + "",
                 this.gracePeriod + "");
     }
 
@@ -68,15 +80,13 @@ public class LoadTest {
 
         // Loop through in steps
         for (int n = this.startThreads; n <= this.endThreads; n += this.stepSize) {
-            if (this.useKeepAlives)
-                client = HttpClient.newHttpClient();
+            if (this.useKeepAlives) client = HttpClient.newHttpClient();
 
             // Spawn the threads
             int noOfSeconds = (int) this.stepPeriod / 1000;
             List<LoadTestThread> threads = new ArrayList<>();
             for (int m = 0; m < n; m++)
-                threads.add(new LoadTestThread(this.url, this, this.resources,
-                        client, noOfSeconds - 1));
+                threads.add(new LoadTestThread(this.url, this, this.resources, client, noOfSeconds - 1));
 
             // Sleep for step period
             Thread.sleep(this.stepPeriod + gracePeriod);
@@ -85,8 +95,12 @@ public class LoadTest {
             Long averageSuccessTime = this.successCount == 0 ? null : this.successTimeTotal / this.successCount;
 
             // Write out results
-            Logger.log(Level.INFO, resources, "LoadTest.LineResult",
-                    n + "", this.successCount + "",
+            Logger.log(
+                    Level.INFO,
+                    resources,
+                    "LoadTest.LineResult",
+                    n + "",
+                    this.successCount + "",
                     ((noOfSeconds * n) - this.successCount) + "",
                     averageSuccessTime + "");
 
@@ -95,7 +109,6 @@ public class LoadTest {
 
             this.successTimeTotal = 0;
             this.successCount = 0;
-
         }
     }
 
@@ -108,19 +121,16 @@ public class LoadTest {
     }
 
     public static void main(String[] args) throws Exception {
-        WinstoneResourceBundle resources = new WinstoneResourceBundle(
-                LOCAL_RESOURCE_FILE);
+        WinstoneResourceBundle resources = new WinstoneResourceBundle(LOCAL_RESOURCE_FILE);
 
         // Loop for args
-        Map<String,String> options = new HashMap<>();
+        Map<String, String> options = new HashMap<>();
         // String operation = "";
         for (String option : args) {
             if (option.startsWith("--")) {
                 int equalPos = option.indexOf('=');
-                String paramName = option.substring(2, equalPos == -1 ? option
-                        .length() : equalPos);
-                String paramValue = (equalPos == -1 ? "true" : option
-                        .substring(equalPos + 1));
+                String paramName = option.substring(2, equalPos == -1 ? option.length() : equalPos);
+                String paramValue = (equalPos == -1 ? "true" : option.substring(equalPos + 1));
                 options.put(paramName, paramValue);
             }
         }
@@ -139,10 +149,15 @@ public class LoadTest {
         String stepPeriod = Option.stringArg(options, "stepPeriod", "5000");
         String gracePeriod = Option.stringArg(options, "gracePeriod", "5000");
 
-        LoadTest lt = new LoadTest(resources, url, keepAlive, Integer
-                .parseInt(startThreads), Integer.parseInt(endThreads), Integer
-                .parseInt(stepSize), Integer.parseInt(stepPeriod), Integer
-                .parseInt(gracePeriod));
+        LoadTest lt = new LoadTest(
+                resources,
+                url,
+                keepAlive,
+                Integer.parseInt(startThreads),
+                Integer.parseInt(endThreads),
+                Integer.parseInt(stepSize),
+                Integer.parseInt(stepPeriod),
+                Integer.parseInt(gracePeriod));
 
         lt.test();
     }
@@ -153,5 +168,4 @@ public class LoadTest {
     private static void printUsage(WinstoneResourceBundle resources) {
         System.out.println(resources.getString("LoadTest.Usage"));
     }
-
 }

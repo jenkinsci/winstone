@@ -26,7 +26,7 @@ import java.util.logging.Level;
  */
 public class Logger {
 
-    private final static Object semaphore = new Object();
+    private static final Object semaphore = new Object();
     static boolean initialised = false;
     static boolean showThrowingThread;
 
@@ -44,9 +44,7 @@ public class Logger {
     /**
      * Initialize default streams
      */
-    public static void init(
-            Level level,
-            boolean showThrowingThreadArg) {
+    public static void init(Level level, boolean showThrowingThreadArg) {
         synchronized (semaphore) {
             if (!initialised) { // recheck in case we were blocking on another init
                 LOGGER.setLevel(level);
@@ -59,9 +57,10 @@ public class Logger {
     public static void setCurrentDebugLevel(int level) {
         if (!initialised) {
             init(level);
-        } else synchronized (semaphore) {
-            LOGGER.setLevel(Level.parse(String.valueOf(level)));
-        }
+        } else
+            synchronized (semaphore) {
+                LOGGER.setLevel(Level.parse(String.valueOf(level)));
+            }
     }
 
     /**
@@ -75,15 +74,14 @@ public class Logger {
 
         String msg = "";
         if (showThrowingThread) {
-            msg = "["+Thread.currentThread().getName()+"] - ";
+            msg = "[" + Thread.currentThread().getName() + "] - ";
         }
         msg += message;
 
-        LOGGER.log(level,msg,error);
+        LOGGER.log(level, msg, error);
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey) {
+    public static void log(Level level, WinstoneResourceBundle resources, String messageKey) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -91,8 +89,7 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Throwable error) {
+    public static void log(Level level, WinstoneResourceBundle resources, String messageKey, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -100,8 +97,7 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object param) {
+    public static void log(Level level, WinstoneResourceBundle resources, String messageKey, Object param) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -109,8 +105,7 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object... params) {
+    public static void log(Level level, WinstoneResourceBundle resources, String messageKey, Object... params) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -118,8 +113,8 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object param, Throwable error) {
+    public static void log(
+            Level level, WinstoneResourceBundle resources, String messageKey, Object param, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -127,8 +122,8 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String messageKey, Object[] params, Throwable error) {
+    public static void log(
+            Level level, WinstoneResourceBundle resources, String messageKey, Object[] params, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {
@@ -136,17 +131,21 @@ public class Logger {
         }
     }
 
-    public static void log(Level level, WinstoneResourceBundle resources,
-            String streamName, String messageKey, Object[] params, Throwable error) {
-        if (!LOGGER.isLoggable(level)) {
-            return;
-        } else {
-            logInternal(level, resources.getString(messageKey, params), error);
-        }
-    }
-
-    public static void logDirectMessage(Level level, String streamName, String message,
+    public static void log(
+            Level level,
+            WinstoneResourceBundle resources,
+            String streamName,
+            String messageKey,
+            Object[] params,
             Throwable error) {
+        if (!LOGGER.isLoggable(level)) {
+            return;
+        } else {
+            logInternal(level, resources.getString(messageKey, params), error);
+        }
+    }
+
+    public static void logDirectMessage(Level level, String streamName, String message, Throwable error) {
         if (!LOGGER.isLoggable(level)) {
             return;
         } else {

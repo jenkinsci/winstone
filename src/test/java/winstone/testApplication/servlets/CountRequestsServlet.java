@@ -7,7 +7,6 @@
 package winstone.testApplication.servlets;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -17,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Simple test servlet that counts the number of times it has been requested,
  * and returns that number in the response.
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: CountRequestsServlet.java,v 1.3 2006/02/28 07:32:49 rickknowles Exp $
  */
@@ -34,12 +33,11 @@ public class CountRequestsServlet extends HttpServlet {
      * Get implementation - increments and shows the access count
      */
     @Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         numberOfGets++;
         ServletOutputStream out = response.getOutputStream();
-        out.println("<html><body>This servlet has been accessed via GET "
-                + numberOfGets + " times</body></html>");
+        out.println("<html><body>This servlet has been accessed via GET " + numberOfGets + " times</body></html>");
         out.flush();
     }
 }
