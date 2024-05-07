@@ -135,13 +135,15 @@ public class Launcher implements Runnable {
             if (libFolder.exists() && libFolder.isDirectory()) {
                 Logger.log(Level.FINER, RESOURCES, "Launcher.UsingCommonLib", libFolder.getCanonicalPath());
                 File[] children = libFolder.listFiles();
-                if (children != null)
-                    for (File aChildren : children)
+                if (children != null) {
+                    for (File aChildren : children) {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             jars.add(aChildren.toURI().toURL());
                             Logger.log(Level.FINER, RESOURCES, "Launcher.AddedCommonLibJar", aChildren.getName());
                         }
+                    }
+                }
             } else {
                 Logger.log(Level.FINER, RESOURCES, "Launcher.NoCommonLib");
             }
@@ -151,12 +153,14 @@ public class Launcher implements Runnable {
             if (extraLibFolder != null && extraLibFolder.exists()) {
                 Logger.log(Level.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
                 File[] children = extraLibFolder.listFiles();
-                if (children != null)
-                    for (File aChildren : children)
+                if (children != null) {
+                    for (File aChildren : children) {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             extraJars.add(aChildren.toURI().toURL());
                         }
+                    }
+                }
             }
 
             ClassLoader commonLibCL =
@@ -212,7 +216,9 @@ public class Launcher implements Runnable {
 
             success = true;
         } finally {
-            if (!success) shutdown();
+            if (!success) {
+                shutdown();
+            }
         }
 
         try {

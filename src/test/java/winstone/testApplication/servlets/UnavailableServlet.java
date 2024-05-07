@@ -27,13 +27,17 @@ public class UnavailableServlet extends HttpServlet {
     public void init() throws ServletException {
         String errorTime = getServletConfig().getInitParameter("errorTime");
         this.errorAtInit = ((errorTime == null) || errorTime.equals("init"));
-        if (this.errorAtInit) throw new UnavailableException("Error thrown deliberately during init");
+        if (this.errorAtInit) {
+            throw new UnavailableException("Error thrown deliberately during init");
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!this.errorAtInit) throw new UnavailableException("Error thrown deliberately during get");
+        if (!this.errorAtInit) {
+            throw new UnavailableException("Error thrown deliberately during get");
+        }
 
         try (Writer out = response.getWriter()) {
             out.write("This should not be shown, because we've thrown unavailable exceptions");

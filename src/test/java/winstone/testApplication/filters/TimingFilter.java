@@ -46,11 +46,12 @@ public class TimingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        if (this.dumpRequestParams)
+        if (this.dumpRequestParams) {
             for (Enumeration<String> paramNames = request.getParameterNames(); paramNames.hasMoreElements(); ) {
                 String name = paramNames.nextElement();
                 this.context.log("Request parameter: " + name + "=" + request.getParameter(name));
             }
+        }
 
         long startTime = System.currentTimeMillis();
         chain.doFilter(request, response);

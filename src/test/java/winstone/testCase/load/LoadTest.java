@@ -80,13 +80,16 @@ public class LoadTest {
 
         // Loop through in steps
         for (int n = this.startThreads; n <= this.endThreads; n += this.stepSize) {
-            if (this.useKeepAlives) client = HttpClient.newHttpClient();
+            if (this.useKeepAlives) {
+                client = HttpClient.newHttpClient();
+            }
 
             // Spawn the threads
             int noOfSeconds = (int) this.stepPeriod / 1000;
             List<LoadTestThread> threads = new ArrayList<>();
-            for (int m = 0; m < n; m++)
+            for (int m = 0; m < n; m++) {
                 threads.add(new LoadTestThread(this.url, this, this.resources, client, noOfSeconds - 1));
+            }
 
             // Sleep for step period
             Thread.sleep(this.stepPeriod + gracePeriod);
@@ -105,7 +108,9 @@ public class LoadTest {
                     averageSuccessTime + "");
 
             // Close threads
-            for (LoadTestThread thread : threads) thread.destroy();
+            for (LoadTestThread thread : threads) {
+                thread.destroy();
+            }
 
             this.successTimeTotal = 0;
             this.successCount = 0;

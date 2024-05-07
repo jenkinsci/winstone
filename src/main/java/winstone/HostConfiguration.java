@@ -93,7 +93,9 @@ public class HostConfiguration {
                 while (mappingST.hasMoreTokens()) {
                     String mapping = mappingST.nextToken();
                     int delimPos = mapping.indexOf('=');
-                    if (delimPos == -1) continue;
+                    if (delimPos == -1) {
+                        continue;
+                    }
                     String extension = mapping.substring(0, delimPos);
                     String mimeType = mapping.substring(delimPos + 1);
                     this.mimeTypes.addMimeMapping(extension.toLowerCase(), mimeType);
@@ -222,8 +224,9 @@ public class HostConfiguration {
             Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.BeginningWarExtraction");
 
             // open the war file
-            if (!warfile.exists() || !warfile.isFile())
+            if (!warfile.exists() || !warfile.isFile()) {
                 throw new WinstoneException(Launcher.RESOURCES.getString("HostConfig.WarFileInvalid", warfile));
+            }
 
             // Get the webroot folder (or a temp dir if none supplied)
             File unzippedDir;

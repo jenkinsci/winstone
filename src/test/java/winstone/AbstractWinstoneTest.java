@@ -21,7 +21,9 @@ public class AbstractWinstoneTest {
 
     @After
     public void tearDown() {
-        if (winstone != null) winstone.shutdown();
+        if (winstone != null) {
+            winstone.shutdown();
+        }
     }
 
     public String makeRequest(String url) throws Exception {

@@ -29,7 +29,9 @@ public class TrustManagerImpl implements X509TrustManager {
         for (X509Certificate x509Certificate : xcs) {
             System.out.println(
                     "certificate: " + x509Certificate.getIssuerX500Principal().getName());
-            if (cert.getSubjectX500Principal().equals(x509Certificate.getIssuerX500Principal())) return;
+            if (cert.getSubjectX500Principal().equals(x509Certificate.getIssuerX500Principal())) {
+                return;
+            }
         }
 
         throw new CertificateException("Untrusted certificate?");

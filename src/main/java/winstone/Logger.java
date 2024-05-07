@@ -57,10 +57,11 @@ public class Logger {
     public static void setCurrentDebugLevel(int level) {
         if (!initialised) {
             init(level);
-        } else
+        } else {
             synchronized (semaphore) {
                 LOGGER.setLevel(Level.parse(String.valueOf(level)));
             }
+        }
     }
 
     /**
