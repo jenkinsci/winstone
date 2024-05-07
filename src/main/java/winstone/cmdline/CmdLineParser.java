@@ -45,25 +45,29 @@ public class CmdLineParser {
                 int equalPos = option.indexOf('=');
                 String paramName = option.substring(2, equalPos == -1 ? option.length() : equalPos);
                 Option<?> opt = toOption(paramName);
-                if (opt == null)
+                if (opt == null) {
                     throw new IllegalArgumentException(
                             Launcher.RESOURCES.getString("CmdLineParser.UnrecognizedOption", option));
+                }
 
                 if (equalPos != -1) {
                     args.put(paramName, option.substring(equalPos + 1));
                 } else {
-                    if (opt.type == Boolean.class) args.put(paramName, "true");
-                    else
+                    if (opt.type == Boolean.class) {
+                        args.put(paramName, "true");
+                    } else {
                         throw new IllegalArgumentException(
                                 Launcher.RESOURCES.getString("CmdLineParser.OperandExpected", option));
+                    }
                 }
                 if (paramName.equals(Option.CONFIG.name)) {
                     configFilename = args.get(paramName);
                 }
             } else {
-                if (args.containsKey(nonSwitchArgName))
+                if (args.containsKey(nonSwitchArgName)) {
                     throw new IllegalArgumentException(
                             Launcher.RESOURCES.getString("CmdLineParser.MultipleArgs", option));
+                }
                 args.put(nonSwitchArgName, option);
             }
         }
@@ -97,8 +101,12 @@ public class CmdLineParser {
 
     private Option<?> toOption(String paramName) {
         for (Option<?> o : options) {
-            if (o.isWildcard() && paramName.startsWith(o.name)) return o;
-            if (!o.isWildcard() && paramName.equals(o.name)) return o;
+            if (o.isWildcard() && paramName.startsWith(o.name)) {
+                return o;
+            }
+            if (!o.isWildcard() && paramName.equals(o.name)) {
+                return o;
+            }
         }
         return null;
     }

@@ -290,14 +290,19 @@ public class Option<T> {
         public <T> Class<? extends T> get(Map<String, String> args, Class<T> expectedType, ClassLoader cl)
                 throws ClassNotFoundException {
             String v = args.get(name);
-            if (v == null) return defaultValue;
+            if (v == null) {
+                return defaultValue;
+            }
 
             v = v.trim();
-            if (v.length() == 0) return defaultValue;
+            if (v.length() == 0) {
+                return defaultValue;
+            }
 
             Class<?> c = Class.forName(v, true, cl);
-            if (!expectedType.isAssignableFrom(c))
+            if (!expectedType.isAssignableFrom(c)) {
                 throw new ClassNotFoundException("Expected a subype of " + expectedType + " but got " + c + " instead");
+            }
 
             return c.asSubclass(expectedType);
         }
@@ -313,8 +318,11 @@ public class Option<T> {
 
     public static boolean booleanArg(Map<String, String> args, String name, boolean defaultTrue) {
         String value = args.get(name);
-        if (defaultTrue) return (value == null) || (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
-        else return (value != null) && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
+        if (defaultTrue) {
+            return (value == null) || (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
+        } else {
+            return (value != null) && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes"));
+        }
     }
 
     public static String stringArg(Map<String, String> args, String name, String defaultValue) {

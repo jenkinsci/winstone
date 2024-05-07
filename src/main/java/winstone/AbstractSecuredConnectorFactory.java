@@ -40,9 +40,10 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
 
             if (keyStore != null) {
                 // load from default Keystore
-                if (!keyStore.exists() || !keyStore.isFile())
+                if (!keyStore.exists() || !keyStore.isFile()) {
                     throw new WinstoneException(
                             SSL_RESOURCES.getString("HttpsListener.KeyStoreNotFound", keyStore.getPath()));
+                }
 
                 this.keystorePassword = pwd;
 

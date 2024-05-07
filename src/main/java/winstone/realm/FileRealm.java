@@ -51,9 +51,12 @@ public class FileRealm extends HashLoginService {
         setUserStore(userStore);
         // Get the filename and parse the xml doc
         File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
-        if (realmFile == null) realmFile = new File(DEFAULT_FILE_NAME);
-        if (!realmFile.exists())
+        if (realmFile == null) {
+            realmFile = new File(DEFAULT_FILE_NAME);
+        }
+        if (!realmFile.exists()) {
             throw new WinstoneException(REALM_RESOURCES.getString("FileRealm.FileNotFound", realmFile.getPath()));
+        }
         try (InputStream inFile = new FileInputStream(realmFile)) {
             int count = 0;
             Document doc = this.parseStreamToXML(inFile);
@@ -69,14 +72,18 @@ public class FileRealm extends HashLoginService {
                     // Loop through for attributes
                     for (int j = 0; j < child.getAttributes().getLength(); j++) {
                         Node thisAtt = child.getAttributes().item(j);
-                        if (thisAtt.getNodeName().equals(ATT_USERNAME)) userName = thisAtt.getNodeValue();
-                        else if (thisAtt.getNodeName().equals(ATT_PASSWORD)) password = thisAtt.getNodeValue();
-                        else if (thisAtt.getNodeName().equals(ATT_ROLELIST)) roleList = thisAtt.getNodeValue();
+                        if (thisAtt.getNodeName().equals(ATT_USERNAME)) {
+                            userName = thisAtt.getNodeValue();
+                        } else if (thisAtt.getNodeName().equals(ATT_PASSWORD)) {
+                            password = thisAtt.getNodeValue();
+                        } else if (thisAtt.getNodeName().equals(ATT_ROLELIST)) {
+                            roleList = thisAtt.getNodeValue();
+                        }
                     }
 
-                    if ((userName == null) || (password == null) || (roleList == null))
+                    if ((userName == null) || (password == null) || (roleList == null)) {
                         Logger.log(Level.FINEST, REALM_RESOURCES, "FileRealm.SkippingUser", userName);
-                    else {
+                    } else {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
                         List<String> rl = new ArrayList<>();

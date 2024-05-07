@@ -45,16 +45,19 @@ public class LoadTestThread implements Runnable {
         this.thread.start();
 
         // Launch the next second's getter
-        if (delayedThreads > 0) this.next = new LoadTestThread(url, loadTest, resources, client, delayedThreads - 1);
+        if (delayedThreads > 0) {
+            this.next = new LoadTestThread(url, loadTest, resources, client, delayedThreads - 1);
+        }
     }
 
     @Override
     public void run() {
-        if (this.delayBeforeStarting > 0)
+        if (this.delayBeforeStarting > 0) {
             try {
                 Thread.sleep(this.delayBeforeStarting);
             } catch (InterruptedException err) {
             }
+        }
 
         long startTime = System.currentTimeMillis();
 
@@ -68,7 +71,9 @@ public class LoadTestThread implements Runnable {
                     HttpRequest.newBuilder(new URI(this.url)).GET().build();
             HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             int responseCode = response.statusCode();
-            if (responseCode >= 400) throw new IOException("Failed with status " + responseCode);
+            if (responseCode >= 400) {
+                throw new IOException("Failed with status " + responseCode);
+            }
             if (this.interrupted) {
                 return;
             }
@@ -82,6 +87,8 @@ public class LoadTestThread implements Runnable {
     public void destroy() {
         this.interrupted = true;
         this.thread.interrupt();
-        if (this.next != null) this.next.destroy();
+        if (this.next != null) {
+            this.next.destroy();
+        }
     }
 }
