@@ -36,8 +36,6 @@ import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import winstone.cmdline.Option;
 
 /**
