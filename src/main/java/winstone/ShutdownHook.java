@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 /**
  * A jvm hook to force the calling of the web-app destroy before the process terminates
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: ShutdownHook.java,v 1.3 2006/02/28 07:32:47 rickknowles Exp $
  */

@@ -1,10 +1,10 @@
 package winstone;
 
-import javax.net.ssl.X509TrustManager;
 import java.io.FileInputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * {@link X509TrustManager} that only recognizes our self-signed certificate.
@@ -27,9 +27,11 @@ public class TrustManagerImpl implements X509TrustManager {
     @Override
     public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
         for (X509Certificate x509Certificate : xcs) {
-            System.out.println("certificate: " + x509Certificate.getIssuerX500Principal().getName());
-            if (cert.getSubjectX500Principal().equals(x509Certificate.getIssuerX500Principal()))
+            System.out.println(
+                    "certificate: " + x509Certificate.getIssuerX500Principal().getName());
+            if (cert.getSubjectX500Principal().equals(x509Certificate.getIssuerX500Principal())) {
                 return;
+            }
         }
 
         throw new CertificateException("Untrusted certificate?");
@@ -37,6 +39,6 @@ public class TrustManagerImpl implements X509TrustManager {
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[]{cert};
+        return new X509Certificate[] {cert};
     }
 }

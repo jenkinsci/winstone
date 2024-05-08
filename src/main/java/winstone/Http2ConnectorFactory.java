@@ -20,6 +20,9 @@
 
 package winstone;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
@@ -35,10 +38,6 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import winstone.cmdline.Option;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-
 /**
  * This class add the HTTP/2 Listener This is the class that gets launched
  * by the command line, and owns the server socket, etc.
@@ -46,20 +45,18 @@ import java.util.logging.Level;
  */
 public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory implements ConnectorFactory {
     @Override
-    public Connector start( Map<String, String> args, Server server ) throws IOException
-    {
-        int listenPort = Option.HTTP2_PORT.get( args );
+    public Connector start(Map<String, String> args, Server server) throws IOException {
+        int listenPort = Option.HTTP2_PORT.get(args);
         String listenAddress = Option.HTTP2_LISTEN_ADDRESS.get(args);
 
-        if ( listenPort < 0 ) {
+        if (listenPort < 0) {
             // not running HTTP2 listener
             return null;
         }
 
-
         try {
-            configureSsl( args, server );
-            SslContextFactory.Server sslContextFactory = getSSLContext( args );
+            configureSsl(args, server);
+            SslContextFactory.Server sslContextFactory = getSSLContext(args);
             sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
 
             // HTTPS Configuration
@@ -80,20 +77,25 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             alpn.setDefaultProtocol("http/1.1");
 
             // SSL Connection Factory
-            SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory,alpn.getProtocol());
+            SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory, alpn.getProtocol());
 
             // HTTP/2 Connector
-            ServerConnector http2Connector =
-                new ServerConnector(server,Option.JETTY_ACCEPTORS.get( args ), Option.JETTY_SELECTORS.get( args )
-                    ,ssl,alpn,h2,new HttpConnectionFactory(https_config));
+            ServerConnector http2Connector = new ServerConnector(
+                    server,
+                    Option.JETTY_ACCEPTORS.get(args),
+                    Option.JETTY_SELECTORS.get(args),
+                    ssl,
+                    alpn,
+                    h2,
+                    new HttpConnectionFactory(https_config));
             http2Connector.setPort(listenPort);
-            http2Connector.setHost( listenAddress );
+            http2Connector.setHost(listenAddress);
             server.addConnector(http2Connector);
-            server.setDumpAfterStart( Boolean.getBoolean( "dumpAfterStart" ) );
+            server.setDumpAfterStart(Boolean.getBoolean("dumpAfterStart"));
 
             return http2Connector;
         } catch (IllegalStateException e) {
-            Logger.log(Level.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e );
+            Logger.log(Level.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e);
         }
         return null;
     }

@@ -7,15 +7,6 @@
 package winstone.accesslog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.eclipse.jetty.http.HttpFields;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.RequestLog;
-import org.eclipse.jetty.server.Response;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import winstone.Logger;
-import winstone.WinstoneResourceBundle;
-import winstone.cmdline.Option;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,6 +22,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
+import org.eclipse.jetty.http.HttpFields;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.RequestLog;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import winstone.Logger;
+import winstone.WinstoneResourceBundle;
+import winstone.cmdline.Option;
 
 /**
  * Simulates an apache "combined" style logger, which logs User-Agent, Referer, etc
@@ -54,9 +53,10 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
     private String pattern;
     private String fileName;
 
-    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "false positive, webAppName come from command line")
-    public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs)
-            throws IOException {
+    @SuppressFBWarnings(
+            value = "PATH_TRAVERSAL_IN",
+            justification = "false positive, webAppName come from command line")
+    public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs) throws IOException {
 
         // Get pattern
         String patternType = Option.SIMPLE_ACCESS_LOGGER_FORMAT.get(startupArgs);
@@ -73,10 +73,9 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         }
 
         // Get filename
-        String filePattern =  Option.SIMPLE_ACCESS_LOGGER_FILE.get(startupArgs);
-        this.fileName = WinstoneResourceBundle.globalReplace(filePattern,
-                new String [][] {
-                    {"###webapp###", webAppName}});
+        String filePattern = Option.SIMPLE_ACCESS_LOGGER_FILE.get(startupArgs);
+        this.fileName =
+                WinstoneResourceBundle.globalReplace(filePattern, new String[][] {{"###webapp###", webAppName}});
 
         File file = new File(this.fileName);
         File parentFile = file.getParentFile();
@@ -92,13 +91,13 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         }
         this.outWriter = new PrintWriter(new OutputStreamWriter(this.outStream, StandardCharsets.UTF_8), true);
 
-        Logger.log(Level.FINER, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init",
-                this.fileName, patternType);
+        Logger.log(Level.FINER, ACCESSLOG_RESOURCES, "SimpleAccessLogger.Init", this.fileName, patternType);
     }
 
     @Override
     public void log(Request request, Response response) {
-        String uriLine = request.getMethod() + " " + request.getHttpURI().getPath() + " " + request.getConnectionMetaData().getProtocol();
+        String uriLine = request.getMethod() + " " + request.getHttpURI().getPath() + " "
+                + request.getConnectionMetaData().getProtocol();
         int status = response.getStatus();
         long size = Response.getContentBytesWritten(response);
         String date;
@@ -111,24 +110,24 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
 
         HttpFields httpFields = request.getHeaders();
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
-                {"###x-forwarded-for###", nvl(httpFields.get("X-Forwarded-For"))},
-                {"###x-forwarded-host###", nvl(httpFields.get("X-Forwarded-Host"))},
-                {"###x-forwarded-proto###", nvl(httpFields.get("X-Forwarded-Proto"))},
-                {"###x-forwarded-protocol###", nvl(httpFields.get("X-Forwarded-Protocol"))},
-                {"###x-forwarded-server###", nvl(httpFields.get("X-Forwarded-Server"))},
-                {"###x-forwarded-ssl###", nvl(httpFields.get("X-Forwarded-Ssl"))},
-                {"###x-requested-with###", nvl(httpFields.get("X-Requested-With"))},
-                {"###x-do-not-track###", nvl(httpFields.get("X-Do-Not-Track"))},
-                {"###dnt###", nvl(httpFields.get("DNT"))},
-                {"###via###", nvl(httpFields.get("Via"))},
-                {"###ip###", Request.getRemoteAddr(request)},
-                {"###user###", nvl(remoteUser)},
-                {"###time###", "[" + date + "]"},
-                {"###uriLine###", uriLine},
-                {"###status###", "" + status},
-                {"###size###", "" + size},
-                {"###referer###", nvl(httpFields.get("Referer"))},
-                {"###userAgent###", nvl(httpFields.get("User-Agent"))}
+            {"###x-forwarded-for###", nvl(httpFields.get("X-Forwarded-For"))},
+            {"###x-forwarded-host###", nvl(httpFields.get("X-Forwarded-Host"))},
+            {"###x-forwarded-proto###", nvl(httpFields.get("X-Forwarded-Proto"))},
+            {"###x-forwarded-protocol###", nvl(httpFields.get("X-Forwarded-Protocol"))},
+            {"###x-forwarded-server###", nvl(httpFields.get("X-Forwarded-Server"))},
+            {"###x-forwarded-ssl###", nvl(httpFields.get("X-Forwarded-Ssl"))},
+            {"###x-requested-with###", nvl(httpFields.get("X-Requested-With"))},
+            {"###x-do-not-track###", nvl(httpFields.get("X-Do-Not-Track"))},
+            {"###dnt###", nvl(httpFields.get("DNT"))},
+            {"###via###", nvl(httpFields.get("Via"))},
+            {"###ip###", Request.getRemoteAddr(request)},
+            {"###user###", nvl(remoteUser)},
+            {"###time###", "[" + date + "]"},
+            {"###uriLine###", uriLine},
+            {"###status###", "" + status},
+            {"###size###", "" + size},
+            {"###referer###", nvl(httpFields.get("Referer"))},
+            {"###userAgent###", nvl(httpFields.get("User-Agent"))}
         });
         this.outWriter.println(logLine);
     }

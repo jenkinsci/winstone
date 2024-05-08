@@ -6,6 +6,18 @@
  */
 package winstone.realm;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.util.security.Credential;
@@ -16,25 +28,13 @@ import winstone.WinstoneException;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-
 /**
  * @author rickk
  * @version $Id: FileRealm.java,v 1.4 2006/08/30 04:07:52 rickknowles Exp $
  */
 public class FileRealm extends HashLoginService {
-    private static final WinstoneResourceBundle REALM_RESOURCES = new WinstoneResourceBundle("winstone.realm.LocalStrings");
+    private static final WinstoneResourceBundle REALM_RESOURCES =
+            new WinstoneResourceBundle("winstone.realm.LocalStrings");
 
     static final String DEFAULT_FILE_NAME = "users.xml";
     static final String ELEM_USER = "user";
@@ -48,15 +48,17 @@ public class FileRealm extends HashLoginService {
      */
     public FileRealm(Map<String, String> args) {
         UserStore userStore = new UserStore();
-        setUserStore( userStore );
+        setUserStore(userStore);
         // Get the filename and parse the xml doc
         File realmFile = Option.FILEREALM_CONFIGFILE.get(args);
-        if (realmFile==null)    realmFile = new File(DEFAULT_FILE_NAME);
-        if (!realmFile.exists())
-            throw new WinstoneException(REALM_RESOURCES.getString(
-                    "FileRealm.FileNotFound", realmFile.getPath()));
-        try (InputStream inFile = new FileInputStream(realmFile)){
-            int count=0;
+        if (realmFile == null) {
+            realmFile = new File(DEFAULT_FILE_NAME);
+        }
+        if (!realmFile.exists()) {
+            throw new WinstoneException(REALM_RESOURCES.getString("FileRealm.FileNotFound", realmFile.getPath()));
+        }
+        try (InputStream inFile = new FileInputStream(realmFile)) {
+            int count = 0;
             Document doc = this.parseStreamToXML(inFile);
             Node rootElm = doc.getDocumentElement();
             for (int n = 0; n < rootElm.getChildNodes().getLength(); n++) {
@@ -70,19 +72,18 @@ public class FileRealm extends HashLoginService {
                     // Loop through for attributes
                     for (int j = 0; j < child.getAttributes().getLength(); j++) {
                         Node thisAtt = child.getAttributes().item(j);
-                        if (thisAtt.getNodeName().equals(ATT_USERNAME))
+                        if (thisAtt.getNodeName().equals(ATT_USERNAME)) {
                             userName = thisAtt.getNodeValue();
-                        else if (thisAtt.getNodeName().equals(ATT_PASSWORD))
+                        } else if (thisAtt.getNodeName().equals(ATT_PASSWORD)) {
                             password = thisAtt.getNodeValue();
-                        else if (thisAtt.getNodeName().equals(ATT_ROLELIST))
+                        } else if (thisAtt.getNodeName().equals(ATT_ROLELIST)) {
                             roleList = thisAtt.getNodeValue();
+                        }
                     }
 
-                    if ((userName == null) || (password == null)
-                            || (roleList == null))
-                        Logger.log(Level.FINEST, REALM_RESOURCES,
-                                "FileRealm.SkippingUser", userName);
-                    else {
+                    if ((userName == null) || (password == null) || (roleList == null)) {
+                        Logger.log(Level.FINEST, REALM_RESOURCES, "FileRealm.SkippingUser", userName);
+                    } else {
                         // Parse the role list into an array and sort it
                         StringTokenizer st = new StringTokenizer(roleList, ",");
                         List<String> rl = new ArrayList<>();
@@ -97,11 +98,9 @@ public class FileRealm extends HashLoginService {
                     }
                 }
             }
-            Logger.log(Level.FINER, REALM_RESOURCES, "FileRealm.Initialised",
-                    "" + count);
+            Logger.log(Level.FINER, REALM_RESOURCES, "FileRealm.Initialised", "" + count);
         } catch (java.io.IOException err) {
-            throw new WinstoneException(REALM_RESOURCES
-                    .getString("FileRealm.ErrorLoading"), err);
+            throw new WinstoneException(REALM_RESOURCES.getString("FileRealm.ErrorLoading"), err);
         }
     }
 
@@ -125,8 +124,7 @@ public class FileRealm extends HashLoginService {
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(in);
         } catch (Throwable errParser) {
-            throw new WinstoneException(REALM_RESOURCES
-                    .getString("FileRealm.XMLParseError"), errParser);
+            throw new WinstoneException(REALM_RESOURCES.getString("FileRealm.XMLParseError"), errParser);
         }
     }
 }

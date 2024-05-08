@@ -18,11 +18,9 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import winstone.Launcher;
 import winstone.Logger;
 
@@ -48,10 +46,9 @@ public class HttpConnectorTest extends TestCase {
     /**
      * Test the simple case of connecting, retrieving and disconnecting
      */
-    public void testSimpleConnection()
-            throws URISyntaxException, IOException, InterruptedException {
+    public void testSimpleConnection() throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
-        Map<String,String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10003");
@@ -62,14 +59,13 @@ public class HttpConnectorTest extends TestCase {
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
-        HttpRequest request =
-                HttpRequest.newBuilder(new URI("http://localhost:10003/examples/CountRequestsServlet")).GET().build();
-        HttpResponse<String> response =
-                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder(new URI("http://localhost:10003/examples/CountRequestsServlet"))
+                .GET()
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
         assertEquals(
-                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                response.body());
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n", response.body());
         winstone.shutdown();
         Thread.sleep(500);
     }
@@ -77,10 +73,9 @@ public class HttpConnectorTest extends TestCase {
     /**
      * Test the keep alive case
      */
-    public void testWriteAfterServlet()
-            throws URISyntaxException, IOException, InterruptedException {
+    public void testWriteAfterServlet() throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
-        Map<String,String> args = new HashMap<>();
+        Map<String, String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
         args.put("prefix", "/examples");
         args.put("httpPort", "10005");
@@ -91,10 +86,10 @@ public class HttpConnectorTest extends TestCase {
         Launcher winstone = new Launcher(args);
 
         // Check for a simple connection
-        HttpRequest request =
-                HttpRequest.newBuilder(new URI("http://localhost:10005/examples/TestWriteAfterServlet")).GET().build();
-        HttpResponse<String> response =
-                HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder(new URI("http://localhost:10005/examples/TestWriteAfterServlet"))
+                .GET()
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\nHello",

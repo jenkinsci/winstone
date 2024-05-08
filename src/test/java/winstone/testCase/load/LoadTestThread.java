@@ -13,13 +13,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.logging.Level;
-
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 
 /**
  * A single worked thread in the load testing program
- * 
+ *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
  * @version $Id: LoadTestThread.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
  */
@@ -33,9 +32,8 @@ public class LoadTestThread implements Runnable {
     private boolean interrupted;
     private LoadTestThread next;
 
-    public LoadTestThread(String url, LoadTest loadTest,
-            WinstoneResourceBundle resources, HttpClient client,
-            int delayedThreads) {
+    public LoadTestThread(
+            String url, LoadTest loadTest, WinstoneResourceBundle resources, HttpClient client, int delayedThreads) {
         this.resources = resources;
         this.url = url;
         this.loadTest = loadTest;
@@ -47,18 +45,19 @@ public class LoadTestThread implements Runnable {
         this.thread.start();
 
         // Launch the next second's getter
-        if (delayedThreads > 0)
-            this.next = new LoadTestThread(url, loadTest, resources, client,
-                    delayedThreads - 1);
+        if (delayedThreads > 0) {
+            this.next = new LoadTestThread(url, loadTest, resources, client, delayedThreads - 1);
+        }
     }
 
     @Override
     public void run() {
-        if (this.delayBeforeStarting > 0)
+        if (this.delayBeforeStarting > 0) {
             try {
                 Thread.sleep(this.delayBeforeStarting);
             } catch (InterruptedException err) {
             }
+        }
 
         long startTime = System.currentTimeMillis();
 
@@ -68,12 +67,13 @@ public class LoadTestThread implements Runnable {
             }
 
             // Access the URL
-            HttpRequest request = HttpRequest.newBuilder(new URI(this.url)).GET().build();
-            HttpResponse<String> response =
-                    this.client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpRequest request =
+                    HttpRequest.newBuilder(new URI(this.url)).GET().build();
+            HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             int responseCode = response.statusCode();
-            if (responseCode >= 400)
+            if (responseCode >= 400) {
                 throw new IOException("Failed with status " + responseCode);
+            }
             if (this.interrupted) {
                 return;
             }
@@ -87,7 +87,8 @@ public class LoadTestThread implements Runnable {
     public void destroy() {
         this.interrupted = true;
         this.thread.interrupt();
-        if (this.next != null)
+        if (this.next != null) {
             this.next.destroy();
+        }
     }
 }

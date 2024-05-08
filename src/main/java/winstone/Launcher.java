@@ -9,15 +9,6 @@ package winstone;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.lib.support_log_formatter.SupportLogFormatter;
-import org.eclipse.jetty.jmx.MBeanContainer;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.LowResourceMonitor;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import winstone.cmdline.CmdLineParser;
-import winstone.cmdline.Option;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,6 +39,14 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.LowResourceMonitor;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import winstone.cmdline.CmdLineParser;
+import winstone.cmdline.Option;
 
 /**
  * Implements the main launcher daemon thread. This is the class that gets
@@ -71,7 +70,7 @@ public class Launcher implements Runnable {
     private static int SHUTDOWN_TIMEOUT = 20000; // wait 20s for shutdown
 
     private Thread controlThread;
-    public final static WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
+    public static final WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
     private int controlPort;
     private HostGroup hostGroup;
     private Map<String, String> args;
@@ -84,9 +83,11 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
-    @SuppressFBWarnings(value ="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
+    @SuppressFBWarnings(
+            value = "DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED",
+            justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
     public Launcher(Map<String, String> args) throws IOException {
-        boolean success=false;
+        boolean success = false;
         /*
          * As described in JDK-8161253, there is no way to control the order of execution of
          * shutdown hooks. When LogManager#Cleaner runs before our custom shutdown hook, logging
@@ -121,60 +122,61 @@ public class Launcher implements Runnable {
             Logger.log(Level.ALL, RESOURCES, "Launcher.StartupArgs", args + "");
 
             this.args = args;
-            this.controlPort =Option.CONTROL_PORT.get(args);
+            this.controlPort = Option.CONTROL_PORT.get(args);
 
             // Check for java home
             List<URL> jars = new ArrayList<>();
             String defaultJavaHome = System.getProperty("java.home");
-            File javaHome = Option.JAVA_HOME.get(args,new File(defaultJavaHome));
+            File javaHome = Option.JAVA_HOME.get(args, new File(defaultJavaHome));
             Logger.log(Level.FINER, RESOURCES, "Launcher.UsingJavaHome", javaHome.getPath());
 
             // Set up common lib class loader
-            File libFolder = Option.COMMON_LIB_FOLDER.get(args,new File("lib"));
+            File libFolder = Option.COMMON_LIB_FOLDER.get(args, new File("lib"));
             if (libFolder.exists() && libFolder.isDirectory()) {
-                Logger.log(Level.FINER, RESOURCES, "Launcher.UsingCommonLib",
-                        libFolder.getCanonicalPath());
+                Logger.log(Level.FINER, RESOURCES, "Launcher.UsingCommonLib", libFolder.getCanonicalPath());
                 File[] children = libFolder.listFiles();
-                if (children != null)
-                    for (File aChildren : children)
+                if (children != null) {
+                    for (File aChildren : children) {
                         if (aChildren.getName().endsWith(".jar")
                                 || aChildren.getName().endsWith(".zip")) {
                             jars.add(aChildren.toURI().toURL());
-                            Logger.log(Level.FINER, RESOURCES, "Launcher.AddedCommonLibJar",
-                                    aChildren.getName());
+                            Logger.log(Level.FINER, RESOURCES, "Launcher.AddedCommonLibJar", aChildren.getName());
                         }
+                    }
+                }
             } else {
                 Logger.log(Level.FINER, RESOURCES, "Launcher.NoCommonLib");
             }
 
             File extraLibFolder = Option.EXTRA_LIB_FOLDER.get(args);
             List<URL> extraJars = new ArrayList<>();
-            if(extraLibFolder != null && extraLibFolder.exists()){
+            if (extraLibFolder != null && extraLibFolder.exists()) {
                 Logger.log(Level.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
                 File[] children = extraLibFolder.listFiles();
-                if (children != null)
-                    for (File aChildren : children)
+                if (children != null) {
+                    for (File aChildren : children) {
                         if (aChildren.getName().endsWith(".jar")
-                            || aChildren.getName().endsWith(".zip")) {
+                                || aChildren.getName().endsWith(".zip")) {
                             extraJars.add(aChildren.toURI().toURL());
                         }
+                    }
+                }
             }
 
-            ClassLoader commonLibCL = new URLClassLoader(jars.toArray(new URL[0]),
-                    getClass().getClassLoader());
+            ClassLoader commonLibCL =
+                    new URLClassLoader(jars.toArray(new URL[0]), getClass().getClassLoader());
 
-            Logger.log(Level.ALL, RESOURCES, "Launcher.CLClassLoader",
-                    commonLibCL.toString());
+            Logger.log(Level.ALL, RESOURCES, "Launcher.CLClassLoader", commonLibCL.toString());
 
-
-            if(!extraJars.isEmpty()){
-                ClassLoader extraClassLoader = new URLClassLoader(extraJars.toArray(new URL[0]),
-                                                             getClass().getClassLoader());
-                Thread.currentThread().setContextClassLoader( extraClassLoader );
+            if (!extraJars.isEmpty()) {
+                ClassLoader extraClassLoader = new URLClassLoader(
+                        extraJars.toArray(new URL[0]), getClass().getClassLoader());
+                Thread.currentThread().setContextClassLoader(extraClassLoader);
             }
 
             int qtpMaxThread = Option.QTP_MAXTHREADS.get(args);
-            QueuedThreadPool queuedThreadPool = qtpMaxThread>0?new QueuedThreadPool(qtpMaxThread):new QueuedThreadPool();
+            QueuedThreadPool queuedThreadPool =
+                    qtpMaxThread > 0 ? new QueuedThreadPool(qtpMaxThread) : new QueuedThreadPool();
             queuedThreadPool.setName("Jetty (winstone)");
             this.server = new Server(queuedThreadPool);
 
@@ -182,7 +184,6 @@ public class Launcher implements Runnable {
             LowResourceMonitor lowResourceMonitor = new LowResourceMonitor(this.server);
             lowResourceMonitor.setMonitorThreads(true);
             this.server.addBean(lowResourceMonitor);
-
 
             // Open the web apps
             this.hostGroup = new HostGroup(server, commonLibCL, args);
@@ -195,9 +196,9 @@ public class Launcher implements Runnable {
 
             lowResourceMonitor.setMonitoredConnectors(connectors);
 
-            if(Option.USE_JMX.get(args)) {
+            if (Option.USE_JMX.get(args)) {
                 // Setup JMX if needed
-                MBeanContainer mbeanContainer = new MBeanContainer( ManagementFactory.getPlatformMBeanServer());
+                MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
                 server.addBean(mbeanContainer);
             }
 
@@ -206,18 +207,18 @@ public class Launcher implements Runnable {
                 writePortToFileIfNeeded();
 
             } catch (Exception e) {
-                throw new IOException("Failed to start Jetty",e);
+                throw new IOException("Failed to start Jetty", e);
             }
 
-            this.controlThread = new Thread(this, RESOURCES.getString(
-                    "Launcher.ThreadName", "" + this.controlPort));
+            this.controlThread = new Thread(this, RESOURCES.getString("Launcher.ThreadName", "" + this.controlPort));
             this.controlThread.setDaemon(false);
             this.controlThread.start();
 
             success = true;
         } finally {
-            if (!success)
+            if (!success) {
                 shutdown();
+            }
         }
 
         try {
@@ -300,7 +301,8 @@ public class Launcher implements Runnable {
                     Path portFile = Paths.get(portFileName);
                     Path portDir = portFile.getParent();
                     if (portDir == null) {
-                        throw new IllegalArgumentException("Given port file name doesn't have a parent: " + portFileName);
+                        throw new IllegalArgumentException(
+                                "Given port file name doesn't have a parent: " + portFileName);
                     }
                     Files.createDirectories(portDir);
                     Path fileName = portFile.getFileName();
@@ -313,7 +315,8 @@ public class Launcher implements Runnable {
                     try {
                         Files.move(tmpPath, portFile, StandardCopyOption.ATOMIC_MOVE);
                     } catch (AtomicMoveNotSupportedException e) {
-                        Logger.logDirectMessage(Level.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
+                        Logger.logDirectMessage(
+                                Level.WARNING, null, "Atomic move not supported. Falling back to non-atomic move.", e);
                         try {
                             Files.move(tmpPath, portFile, StandardCopyOption.REPLACE_EXISTING);
                         } catch (IOException e2) {
@@ -338,15 +341,15 @@ public class Launcher implements Runnable {
      */
     protected Connector spawnListener(String listenerClassName, List<Connector> connectors) throws IOException {
         try {
-            ConnectorFactory connectorFactory = (ConnectorFactory) Class.forName(listenerClassName)
-                    .getDeclaredConstructor().newInstance();
+            ConnectorFactory connectorFactory = (ConnectorFactory)
+                    Class.forName(listenerClassName).getDeclaredConstructor().newInstance();
             Connector connector = connectorFactory.start(args, server);
-            if(connector!=null){
+            if (connector != null) {
                 connectors.add(connector);
             }
             return connector;
         } catch (Throwable err) {
-            throw new IOException("Failed to start a listener: "+listenerClassName, err);
+            throw new IOException("Failed to start a listener: " + listenerClassName, err);
         }
     }
 
@@ -364,10 +367,12 @@ public class Launcher implements Runnable {
                 controlSocket.setSoTimeout(CONTROL_TIMEOUT);
             }
 
-            Logger.log(Level.INFO, RESOURCES, "Launcher.StartupOK",
+            Logger.log(
+                    Level.INFO,
+                    RESOURCES,
+                    "Launcher.StartupOK",
                     RESOURCES.getString("ServerVersion"),
-                    (this.controlPort > 0 ? "" + this.controlPort
-                            : RESOURCES.getString("Launcher.ControlDisabled")));
+                    (this.controlPort > 0 ? "" + this.controlPort : RESOURCES.getString("Launcher.ControlDisabled")));
 
             // Enter the main loop
             while (!interrupted) {
@@ -387,11 +392,13 @@ public class Launcher implements Runnable {
                 } catch (InterruptedException err) {
                     interrupted = true;
                 } catch (Throwable err) {
-                    Logger.log(Level.SEVERE, RESOURCES,
-                            "Launcher.ShutdownError", err);
+                    Logger.log(Level.SEVERE, RESOURCES, "Launcher.ShutdownError", err);
                 } finally {
                     if (accepted != null) {
-                        try {accepted.close();} catch (IOException err) {}
+                        try {
+                            accepted.close();
+                        } catch (IOException err) {
+                        }
                     }
                     if (Thread.interrupted()) {
                         interrupted = true;
@@ -416,8 +423,7 @@ public class Launcher implements Runnable {
             inSocket = csAccepted.getInputStream();
             int reqType = inSocket.read();
             if ((byte) reqType == SHUTDOWN_TYPE) {
-                Logger.log(Level.INFO, RESOURCES,
-                        "Launcher.ShutdownRequestReceived");
+                Logger.log(Level.INFO, RESOURCES, "Launcher.ShutdownRequestReceived");
                 shutdown();
             } else if ((byte) reqType == RELOAD_TYPE) {
                 inControl = new ObjectInputStream(inSocket);
@@ -429,10 +435,16 @@ public class Launcher implements Runnable {
             }
         } finally {
             if (inControl != null) {
-                try {inControl.close();} catch (IOException err) {}
+                try {
+                    inControl.close();
+                } catch (IOException err) {
+                }
             }
             if (inSocket != null) {
-                try {inSocket.close();} catch (IOException err) {}
+                try {
+                    inSocket.close();
+                } catch (IOException err) {
+                }
             }
         }
     }
@@ -468,11 +480,11 @@ public class Launcher implements Runnable {
         Map<String, String> args = getArgsFromCommandLine(argv);
 
         if (System.getProperty("java.util.logging.config.file") == null) {
-          for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
-              if (h instanceof ConsoleHandler) {
-                  ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
-              }
-          }
+            for (Handler h : java.util.logging.Logger.getLogger("").getHandlers()) {
+                if (h instanceof ConsoleHandler) {
+                    ((ConsoleHandler) h).setFormatter(new SupportLogFormatter());
+                }
+            }
         }
 
         if (Option.USAGE.isIn(args) || Option.HELP.isIn(args)) {
@@ -489,7 +501,6 @@ public class Launcher implements Runnable {
             return;
         }
 
-
         // Launch
         try {
             new Launcher(args);
@@ -502,7 +513,7 @@ public class Launcher implements Runnable {
 
     @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "TODO needs triage")
     public static Map<String, String> getArgsFromCommandLine(String[] argv) throws IOException {
-        Map<String, String> args = new CmdLineParser(Option.all(Option.class)).parse(argv,"nonSwitch");
+        Map<String, String> args = new CmdLineParser(Option.all(Option.class)).parse(argv, "nonSwitch");
 
         // Small hack to allow re-use of the command line parsing inside the control tool
         String firstNonSwitchArgument = args.get("nonSwitch");
@@ -522,11 +533,12 @@ public class Launcher implements Runnable {
         return args;
     }
 
-    @SuppressFBWarnings(value = { "NP_LOAD_OF_KNOWN_NULL_VALUE", "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE" }, justification = "false positive https://github.com/spotbugs/spotbugs/issues/1338")
+    @SuppressFBWarnings(
+            value = {"NP_LOAD_OF_KNOWN_NULL_VALUE", "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"},
+            justification = "false positive https://github.com/spotbugs/spotbugs/issues/1338")
     protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
-        try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(
-                embeddedWarfileName)) {
+        try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(embeddedWarfileName)) {
             if (embeddedWarfile == null) {
                 return;
             }
@@ -535,7 +547,8 @@ public class Launcher implements Runnable {
             try {
                 Files.createDirectories(parentTempWarFile.toPath());
             } catch (Exception ex) {
-                Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), ex);
+                Logger.logDirectMessage(
+                        Level.WARNING, null, "Failed to mkdirs " + parentTempWarFile.getAbsolutePath(), ex);
             }
             tempWarfile.deleteOnExit();
 
@@ -547,8 +560,7 @@ public class Launcher implements Runnable {
                 Logger.logDirectMessage(Level.WARNING, null, "Failed to mkdirs " + tempWebroot.getAbsolutePath(), ex);
             }
 
-            Logger.log(Level.FINER, RESOURCES, "Launcher.CopyingEmbeddedWarfile",
-                    tempWarfile.getAbsolutePath());
+            Logger.log(Level.FINER, RESOURCES, "Launcher.CopyingEmbeddedWarfile", tempWarfile.getAbsolutePath());
             try (OutputStream out = new FileOutputStream(tempWarfile, true)) {
                 // TODO use Files#copy(InputStream,Path,CopyOption...)
                 int read;
@@ -576,8 +588,10 @@ public class Launcher implements Runnable {
             } catch (InvalidPathException e) {
                 throw new IOException(e);
             }
-            OutputStream outputStream = Files.newOutputStream(logPath, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            // TODO: Ideally, should change this to UTF-8, but this could cause problems for Windows users when appending to existing logs.
+            OutputStream outputStream =
+                    Files.newOutputStream(logPath, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            // TODO: Ideally, should change this to UTF-8, but this could cause problems for Windows users when
+            // appending to existing logs.
             PrintStream printStream = new PrintStream(outputStream, false, Charset.defaultCharset());
             System.setOut(printStream);
             System.setErr(printStream);
@@ -589,15 +603,16 @@ public class Launcher implements Runnable {
         // if the caller overrides the usage, use that instead.
         String usage = USAGE;
 
-        String header = RESOURCES.getString("Launcher.UsageInstructions.Header",
-                RESOURCES.getString("ServerVersion"));
+        String header = RESOURCES.getString("Launcher.UsageInstructions.Header", RESOURCES.getString("ServerVersion"));
         String options = RESOURCES.getString("Launcher.UsageInstructions.Options");
         String footer = RESOURCES.getString("Launcher.UsageInstructions.Options");
 
-        if(usage==null) {
-            usage = header+options+footer;
+        if (usage == null) {
+            usage = header + options + footer;
         } else {
-            usage = usage.replace("{HEADER}",header).replace("{OPTIONS}",options).replace("{FOOTER}",footer);
+            usage = usage.replace("{HEADER}", header)
+                    .replace("{OPTIONS}", options)
+                    .replace("{FOOTER}", footer);
         }
         System.out.println(usage);
     }
