@@ -51,7 +51,6 @@ public class HostConfiguration {
     private Map<String, String> args;
     private Map<String, WebAppContext> webapps;
     private ClassLoader commonLibCL;
-    private MimeTypes.Mutable mimeTypes = new MimeTypes.Mutable();
     private final LoginService loginService;
 
     public HostConfiguration(Server server, String hostname, ClassLoader commonLibCL, @NonNull Map<String, String> args)
@@ -83,7 +82,7 @@ public class HostConfiguration {
         }
 
         { // load additional mime types
-            loadBuiltinMimeTypes();
+            loadBuiltinMimeTypes(server);
             String types = Option.MIME_TYPES.get(this.args);
             if (types != null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
@@ -95,12 +94,11 @@ public class HostConfiguration {
                     }
                     String extension = mapping.substring(0, delimPos);
                     String mimeType = mapping.substring(delimPos + 1);
-                    this.mimeTypes.addMimeMapping(extension.toLowerCase(), mimeType);
+                    server.getMimeTypes().addMimeMapping(extension.toLowerCase(), mimeType);
                 }
             }
         }
-        // check this name
-        server.setRequestLog(configureAccessLog("jenkins"));
+        server.setRequestLog(configureAccessLog("webapp"));
         WebAppContext handler = create(getWebRoot(webroot, warfile), prefix, server);
         server.setHandler(handler);
         Logger.log(
@@ -111,12 +109,12 @@ public class HostConfiguration {
                 this.webapps.keySet() + "");
     }
 
-    private void loadBuiltinMimeTypes() {
+    private void loadBuiltinMimeTypes(Server server) {
         try (InputStream in = getClass().getResourceAsStream("mime.properties")) {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
-                mimeTypes.addMimeMapping(e.getKey().toString(), e.getValue().toString());
+                server.getMimeTypes().addMimeMapping(e.getKey().toString(), e.getValue().toString());
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to load the built-in MIME types", e);
@@ -183,9 +181,6 @@ public class HostConfiguration {
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setThrowUnavailableOnStartupException(
                 true); // if boot fails, abort the process instead of letting empty Jetty run
-        mimeTypes
-                .getMimeMap()
-                .forEach((extension, type) -> wac.getServer().getMimeTypes().addMimeMapping(extension, type));
         wac.getSessionHandler().setSessionTrackingModes(Set.of(SessionTrackingMode.COOKIE));
         wac.getSessionHandler().setSessionCookie(WinstoneSession.SESSION_COOKIE_NAME);
         this.webapps.put(wac.getContextPath(), wac);

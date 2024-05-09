@@ -58,6 +58,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             justification = "false positive, webAppName come from command line")
     public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs) throws IOException {
 
+
         // Get pattern
         String patternType = Option.SIMPLE_ACCESS_LOGGER_FORMAT.get(startupArgs);
         if (patternType.equalsIgnoreCase("combined")) {
@@ -107,7 +108,8 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         Request.AuthenticationState authenticationState = Request.getAuthenticationState(request);
         Principal principal = authenticationState == null ? null : authenticationState.getUserPrincipal();
         String remoteUser = principal == null ? "-" : principal.getName();
-
+        // mimic
+        // https://github.com/jetty/jetty.project/blob/3632a57f2796a2ab4fcdbfe62837d494bcd4e94a/jetty-core/jetty-server/src/main/java/org/eclipse/jetty/server/CustomRequestLog.java#L307
         HttpFields httpFields = request.getHeaders();
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
             {"###x-forwarded-for###", nvl(httpFields.get("X-Forwarded-For"))},

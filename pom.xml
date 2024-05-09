@@ -37,7 +37,7 @@
   <properties>
     <revision>7.0</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>12.0.8</jetty.version>
+    <jetty.version>12.0.9</jetty.version>
     <slf4j.version>2.0.13</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
     <maven.compiler.release>17</maven.compiler.release>
