@@ -58,7 +58,6 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
             justification = "false positive, webAppName come from command line")
     public SimpleAccessLogger(String webAppName, Map<String, String> startupArgs) throws IOException {
 
-
         // Get pattern
         String patternType = Option.SIMPLE_ACCESS_LOGGER_FORMAT.get(startupArgs);
         if (patternType.equalsIgnoreCase("combined")) {

@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import javax.servlet.SessionTrackingMode;
 import org.eclipse.jetty.ee8.webapp.WebAppContext;
 import org.eclipse.jetty.ee8.websocket.server.config.JettyWebSocketServletContainerInitializer;
-import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
@@ -82,7 +81,7 @@ public class HostConfiguration {
         }
 
         { // load additional mime types
-            loadBuiltinMimeTypes(server);
+            loadBuiltinMimeTypes();
             String types = Option.MIME_TYPES.get(this.args);
             if (types != null) {
                 StringTokenizer mappingST = new StringTokenizer(types, ":", false);
@@ -109,12 +108,14 @@ public class HostConfiguration {
                 this.webapps.keySet() + "");
     }
 
-    private void loadBuiltinMimeTypes(Server server) {
+    private void loadBuiltinMimeTypes() {
         try (InputStream in = getClass().getResourceAsStream("mime.properties")) {
             Properties props = new Properties();
             props.load(in);
             for (Entry<Object, Object> e : props.entrySet()) {
-                server.getMimeTypes().addMimeMapping(e.getKey().toString(), e.getValue().toString());
+                this.server
+                        .getMimeTypes()
+                        .addMimeMapping(e.getKey().toString(), e.getValue().toString());
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to load the built-in MIME types", e);
