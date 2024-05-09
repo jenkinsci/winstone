@@ -182,6 +182,7 @@ public class HostConfiguration {
                 getSessionHandler().getSessionCache().setEvictionPolicy(sessionEviction);
             }
         };
+        wac.setServer(server);
         JettyWebSocketServletContainerInitializer.configure(wac, null);
         wac.getSecurityHandler().setLoginService(loginService);
         wac.setThrowUnavailableOnStartupException(
