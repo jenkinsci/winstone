@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -97,7 +98,7 @@ public class HostConfiguration {
                 }
             }
         }
-        server.setRequestLog(configureAccessLog("webapp"));
+        Optional.ofNullable(configureAccessLog("webapp")).ifPresent(server::setRequestLog);
         WebAppContext handler = create(getWebRoot(webroot, warfile), prefix);
         server.setHandler(handler);
         Logger.log(
