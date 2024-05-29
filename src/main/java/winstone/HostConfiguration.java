@@ -143,7 +143,7 @@ public class HostConfiguration {
         return null;
     }
 
-    private WebAppContext create(File app, String prefix, Server server) {
+    private WebAppContext create(File app, String prefix) {
         WebAppContext wac = new WebAppContext(app.getAbsolutePath(), prefix) {
             @Override
             public void preConfigure() throws Exception {
