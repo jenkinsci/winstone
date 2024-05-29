@@ -98,7 +98,7 @@ public class HostConfiguration {
             }
         }
         server.setRequestLog(configureAccessLog("webapp"));
-        WebAppContext handler = create(getWebRoot(webroot, warfile), prefix, server);
+        WebAppContext handler = create(getWebRoot(webroot, warfile), prefix);
         server.setHandler(handler);
         Logger.log(
                 Level.FINER,
