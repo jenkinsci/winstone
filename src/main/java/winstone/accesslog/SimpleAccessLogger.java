@@ -103,6 +103,7 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
         synchronized (DF) {
             date = DF.format(new Date());
         }
+        // https://github.com/jetty/jetty.project/blob/c5b2533fdecce21b54c6fbaf36f79bc3ba909775/jetty-core/jetty-server/src/main/java/org/eclipse/jetty/server/CustomRequestLog.java#L1093-L1099
         Request.AuthenticationState authenticationState = Request.getAuthenticationState(request);
         Principal principal = authenticationState == null ? null : authenticationState.getUserPrincipal();
         String remoteUser = principal == null ? "-" : principal.getName();
