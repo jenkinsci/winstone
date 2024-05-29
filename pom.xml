@@ -40,6 +40,7 @@
     <jetty.version>12.0.9</jetty.version>
     <slf4j.version>2.0.13</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
+    <!-- TODO JENKINS-73121 until in parent POM -->
     <maven.compiler.release>17</maven.compiler.release>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
