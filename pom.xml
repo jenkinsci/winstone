@@ -41,6 +41,8 @@
     <slf4j.version>2.0.13</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
+    <!-- TODO until we are ready to ship Winstone 7 with Jetty 12 EE 8 -->
+    <maven.compiler.release>11</maven.compiler.release>
   </properties>
 
   <dependencyManagement>
