@@ -116,7 +116,7 @@ public class HostConfiguration {
                 server.setHandler(handler);
                 break;
             default:
-                throw new IllegalStateException("Unexpected compression scheme: " + compressionScheme);
+                throw new IllegalArgumentException("Unexpected compression scheme: " + compressionScheme);
         }
 
         Logger.log(
