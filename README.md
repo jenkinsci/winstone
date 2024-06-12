@@ -94,6 +94,7 @@ To run locally exploded web archive:
                                "^.*_anon_.*$" 
        --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
     
+       --compression            = set the compression scheme (gzip or none to disable compression). Default is gzip.
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
        --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 180. -1 never evict, 0 evict on exit
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...

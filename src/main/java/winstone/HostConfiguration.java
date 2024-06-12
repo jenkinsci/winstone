@@ -36,8 +36,10 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import winstone.cmdline.CompressionScheme;
 import winstone.cmdline.Option;
 
 /**
@@ -103,7 +105,20 @@ public class HostConfiguration {
             }
         }
 
-        server.setHandler(handler);
+        CompressionScheme compressionScheme = Option.COMPRESSION.get(this.args);
+        switch (compressionScheme) {
+            case GZIP:
+                GzipHandler gzipHandler = new GzipHandler();
+                gzipHandler.setHandler(handler);
+                server.setHandler(gzipHandler);
+                break;
+            case NONE:
+                server.setHandler(handler);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected compression scheme: " + compressionScheme);
+        }
+
         Logger.log(
                 Level.FINER,
                 Launcher.RESOURCES,
