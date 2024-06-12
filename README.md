@@ -56,8 +56,6 @@ To run locally exploded web archive:
        --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
        --commonLibFolder        = folder for additional jar files. Default is ./lib
     
-       --extraLibFolder         = folder for additional jar files to add to Jetty classloader
-    
        --logfile                = redirect log messages to this file
        --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
        --logThrowingThread      = show the thread that logged the message. Default is false

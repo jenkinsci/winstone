@@ -41,7 +41,6 @@ public class Option<T> {
     public static final OString PREFIX = string("prefix", "");
     public static final OFile COMMON_LIB_FOLDER = file("commonLibFolder");
     public static final OFile LOGFILE = file("logfile");
-    public static final OFile EXTRA_LIB_FOLDER = file("extraLibFolder");
     public static final OBoolean LOG_THROWING_LINE_NO = bool("logThrowingLineNo", false);
     public static final OBoolean LOG_THROWING_THREAD = bool("logThrowingThread", false);
     public static final OInt DEBUG = new ODebugInt("debug", 5);
