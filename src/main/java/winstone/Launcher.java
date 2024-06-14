@@ -148,31 +148,10 @@ public class Launcher implements Runnable {
                 Logger.log(Level.FINER, RESOURCES, "Launcher.NoCommonLib");
             }
 
-            File extraLibFolder = Option.EXTRA_LIB_FOLDER.get(args);
-            List<URL> extraJars = new ArrayList<>();
-            if (extraLibFolder != null && extraLibFolder.exists()) {
-                Logger.log(Level.WARNING, RESOURCES, "Launcher.ExtraLibFolder");
-                File[] children = extraLibFolder.listFiles();
-                if (children != null) {
-                    for (File aChildren : children) {
-                        if (aChildren.getName().endsWith(".jar")
-                                || aChildren.getName().endsWith(".zip")) {
-                            extraJars.add(aChildren.toURI().toURL());
-                        }
-                    }
-                }
-            }
-
             ClassLoader commonLibCL =
                     new URLClassLoader(jars.toArray(new URL[0]), getClass().getClassLoader());
 
             Logger.log(Level.ALL, RESOURCES, "Launcher.CLClassLoader", commonLibCL.toString());
-
-            if (!extraJars.isEmpty()) {
-                ClassLoader extraClassLoader = new URLClassLoader(
-                        extraJars.toArray(new URL[0]), getClass().getClassLoader());
-                Thread.currentThread().setContextClassLoader(extraClassLoader);
-            }
 
             int qtpMaxThread = Option.QTP_MAXTHREADS.get(args);
             QueuedThreadPool queuedThreadPool =
