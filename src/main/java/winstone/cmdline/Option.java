@@ -87,6 +87,7 @@ public class Option<T> {
     public static final OInt JETTY_ACCEPTORS = integer("jettyAcceptorsCount", -1);
     public static final OInt JETTY_SELECTORS = integer("jettySelectorsCount", 0);
 
+    public static final OCompression COMPRESSION = new OCompression("compression", CompressionScheme.GZIP);
     public static final OString MIME_TYPES = string("mimeTypes");
     public static final OInt MAX_PARAM_COUNT = integer("maxParamCount", -1);
     public static final OBoolean USAGE = bool("usage", false);
@@ -304,6 +305,31 @@ public class Option<T> {
             }
 
             return c.asSubclass(expectedType);
+        }
+    }
+
+    public static class OCompression extends Option<CompressionScheme> {
+        public OCompression(String name, CompressionScheme defaultValue) {
+            super(name, CompressionScheme.class, defaultValue);
+        }
+
+        public CompressionScheme get(Map<String, String> args) {
+            return get(args, defaultValue);
+        }
+
+        public CompressionScheme get(Map<String, String> args, CompressionScheme defaultValue) {
+            String v = args.get(name);
+            CompressionScheme compressionScheme;
+            if (v == null) {
+                compressionScheme = defaultValue;
+            } else if (v.equalsIgnoreCase("gzip")) {
+                compressionScheme = CompressionScheme.GZIP;
+            } else if (v.equalsIgnoreCase("none")) {
+                compressionScheme = CompressionScheme.NONE;
+            } else {
+                throw new IllegalArgumentException("Unexpected compression scheme: " + v);
+            }
+            return compressionScheme;
         }
     }
 
