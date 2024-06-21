@@ -1,5 +1,6 @@
 package winstone;
 
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 import java.net.HttpURLConnection;
@@ -9,6 +10,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -33,8 +36,12 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
             HttpRequest request = HttpRequest.newBuilder(new URI("http://127.0.0.2:" + port + "/AcceptFormServlet"))
                     .POST(HttpRequest.BodyPublishers.ofString("x=" + ".".repeat(size)))
                     .build();
-            HttpResponse<String> response =
-                    HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Awaitility.await()
+                    .pollInterval(100, TimeUnit.MILLISECONDS)
+                    .atMost(5, TimeUnit.SECONDS)
+                    .until(
+                            () -> HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()),
+                            notNullValue());
             assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
             assertEquals(
                     "correct response at size " + size,
