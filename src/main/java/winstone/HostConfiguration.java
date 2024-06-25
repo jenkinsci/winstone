@@ -177,10 +177,7 @@ public class HostConfiguration {
                 } finally {
                     t.setContextClassLoader(ccl);
                 }
-                int maxParameterCount = Option.MAX_PARAM_COUNT.get(args);
-                if (maxParameterCount > 0) {
-                    setMaxFormKeys(maxParameterCount);
-                }
+                setMaxFormKeys(Option.MAX_PARAM_COUNT.get(args));
                 setMaxFormContentSize(Option.REQUEST_FORM_CONTENT_SIZE.get(args));
             }
 

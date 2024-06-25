@@ -89,7 +89,7 @@ public class Option<T> {
 
     public static final OCompression COMPRESSION = new OCompression("compression", CompressionScheme.GZIP);
     public static final OString MIME_TYPES = string("mimeTypes");
-    public static final OInt MAX_PARAM_COUNT = integer("maxParamCount", -1);
+    public static final OInt MAX_PARAM_COUNT = integer("maxParamCount", 10000);
     public static final OBoolean USAGE = bool("usage", false);
     public static final OInt SESSION_TIMEOUT = integer("sessionTimeout", -1);
     public static final OInt SESSION_EVICTION = integer("sessionEviction", 1800);
