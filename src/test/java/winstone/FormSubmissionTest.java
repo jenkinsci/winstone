@@ -49,4 +49,24 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
                     response.body());
         }
     }
+
+    @Issue("JENKINS-73285")
+    @Test
+    public void duplicateKeys() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        args.put("httpListenAddress", "127.0.0.2");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        String queryString = "foo=bar" + "&foo=bar".repeat(1000);
+        HttpRequest request = HttpRequest.newBuilder(new URI("http://127.0.0.2:" + port + "/AcceptFormServlet"))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(queryString))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
+        assertEquals("received " + queryString.length() + " bytes", response.body());
+    }
 }
