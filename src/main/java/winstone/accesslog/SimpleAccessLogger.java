@@ -16,12 +16,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.StandardOpenOption;
+import java.security.Principal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Level;
-import org.eclipse.jetty.server.Authentication;
+import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Response;
@@ -95,44 +96,41 @@ public class SimpleAccessLogger extends AbstractLifeCycle implements RequestLog 
 
     @Override
     public void log(Request request, Response response) {
-        String uriLine = request.getMethod() + " " + request.getRequestURI() + " " + request.getProtocol();
+        String uriLine = request.getMethod() + " " + request.getHttpURI().getPath() + " "
+                + request.getConnectionMetaData().getProtocol();
         int status = response.getStatus();
-        long size = response.getContentCount();
+        long size = Response.getContentBytesWritten(response);
         String date;
         synchronized (DF) {
             date = DF.format(new Date());
         }
 
         // mimic
-        // https://github.com/eclipse/jetty.project/blob/jetty-9.4.0.v20161208/jetty-server/src/main/java/org/eclipse/jetty/server/AbstractNCSARequestLog.java#L130
-        Authentication authentication = request.getAuthentication();
-        String remoteUser;
-        if (authentication instanceof Authentication.User) {
-            Authentication.User user = (Authentication.User) authentication;
-            remoteUser = user.getUserIdentity().getUserPrincipal().getName();
-        } else {
-            remoteUser = null;
-        }
+        // https://github.com/jetty/jetty.project/blob/c5b2533fdecce21b54c6fbaf36f79bc3ba909775/jetty-core/jetty-server/src/main/java/org/eclipse/jetty/server/CustomRequestLog.java#L1093-L1099
+        Request.AuthenticationState authenticationState = Request.getAuthenticationState(request);
+        Principal principal = authenticationState == null ? null : authenticationState.getUserPrincipal();
+        String remoteUser = principal == null ? "-" : principal.getName();
 
+        HttpFields httpFields = request.getHeaders();
         String logLine = WinstoneResourceBundle.globalReplace(this.pattern, new String[][] {
-            {"###x-forwarded-for###", nvl(request.getHeader("X-Forwarded-For"))},
-            {"###x-forwarded-host###", nvl(request.getHeader("X-Forwarded-Host"))},
-            {"###x-forwarded-proto###", nvl(request.getHeader("X-Forwarded-Proto"))},
-            {"###x-forwarded-protocol###", nvl(request.getHeader("X-Forwarded-Protocol"))},
-            {"###x-forwarded-server###", nvl(request.getHeader("X-Forwarded-Server"))},
-            {"###x-forwarded-ssl###", nvl(request.getHeader("X-Forwarded-Ssl"))},
-            {"###x-requested-with###", nvl(request.getHeader("X-Requested-With"))},
-            {"###x-do-not-track###", nvl(request.getHeader("X-Do-Not-Track"))},
-            {"###dnt###", nvl(request.getHeader("DNT"))},
-            {"###via###", nvl(request.getHeader("Via"))},
-            {"###ip###", request.getRemoteHost()},
+            {"###x-forwarded-for###", nvl(httpFields.get("X-Forwarded-For"))},
+            {"###x-forwarded-host###", nvl(httpFields.get("X-Forwarded-Host"))},
+            {"###x-forwarded-proto###", nvl(httpFields.get("X-Forwarded-Proto"))},
+            {"###x-forwarded-protocol###", nvl(httpFields.get("X-Forwarded-Protocol"))},
+            {"###x-forwarded-server###", nvl(httpFields.get("X-Forwarded-Server"))},
+            {"###x-forwarded-ssl###", nvl(httpFields.get("X-Forwarded-Ssl"))},
+            {"###x-requested-with###", nvl(httpFields.get("X-Requested-With"))},
+            {"###x-do-not-track###", nvl(httpFields.get("X-Do-Not-Track"))},
+            {"###dnt###", nvl(httpFields.get("DNT"))},
+            {"###via###", nvl(httpFields.get("Via"))},
+            {"###ip###", Request.getRemoteAddr(request)},
             {"###user###", nvl(remoteUser)},
             {"###time###", "[" + date + "]"},
             {"###uriLine###", uriLine},
             {"###status###", "" + status},
             {"###size###", "" + size},
-            {"###referer###", nvl(request.getHeader("Referer"))},
-            {"###userAgent###", nvl(request.getHeader("User-Agent"))}
+            {"###referer###", nvl(httpFields.get("Referer"))},
+            {"###userAgent###", nvl(httpFields.get("User-Agent"))}
         });
         this.outWriter.println(logLine);
     }
