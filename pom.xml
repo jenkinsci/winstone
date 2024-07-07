@@ -37,7 +37,7 @@
   <properties>
     <revision>6.22</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>10.0.21</jetty.version>
+    <jetty.version>10.0.22</jetty.version>
     <slf4j.version>2.0.13</slf4j.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
