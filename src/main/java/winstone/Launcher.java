@@ -84,7 +84,7 @@ public class Launcher implements Runnable {
      * available protocol listeners.
      */
     @SuppressFBWarnings(
-            value = "DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED",
+            value = {"DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", "LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE"},
             justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success = false;
@@ -180,6 +180,10 @@ public class Launcher implements Runnable {
                 MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
                 server.addBean(mbeanContainer);
             }
+
+            // JENKINS-73616: Turn down log level of annotation parser
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger("org.eclipse.jetty.ee9.annotations.AnnotationParser");
+            logger.setLevel(Level.SEVERE);
 
             try {
                 server.start();
