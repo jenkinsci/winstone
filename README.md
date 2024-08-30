@@ -16,10 +16,6 @@ we called it Winstone 2.0.
 ## License
 The license of Winstone inherits its original license by Rick.
 
-The Web-App DTD files (everything in the `src/javax/servlet/resources` and
-`src/javax/servlet/jsp/resources` folders) are covered by the licenses
-described at the top of each file (usually as licensed by Sun Microsystems).
-
 As of v0.8.1, all other files are dual-licensed, under either
 the Lesser GNU Public License (LGPL) as described in LICENSE-LGPL.txt,
 or the Common Development and Distribution License (CDDL) as described in
