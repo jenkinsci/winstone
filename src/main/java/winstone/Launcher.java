@@ -39,7 +39,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import org.eclipse.jetty.ee8.annotations.AnnotationParser;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.LowResourceMonitor;
@@ -183,7 +182,8 @@ public class Launcher implements Runnable {
             }
 
             // JENKINS-73616: Turn down log level of annotation parser
-            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AnnotationParser.class.getName());
+            java.util.logging.Logger logger =
+                    java.util.logging.Logger.getLogger("org.eclipse.jetty.ee9.annotations.AnnotationParser");
             logger.setLevel(Level.SEVERE);
 
             try {
