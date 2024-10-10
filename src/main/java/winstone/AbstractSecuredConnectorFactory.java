@@ -49,7 +49,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
 
                 keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 try (InputStream inputStream = new FileInputStream(keyStore)) {
-                    keystore.load(inputStream, this.keystorePassword == null ? null : this.keystorePassword.toCharArray());
+                    keystore.load(
+                            inputStream, this.keystorePassword == null ? null : this.keystorePassword.toCharArray());
                 }
             } else {
                 throw new WinstoneException(MessageFormat.format("Please set --{0}", Option.HTTPS_KEY_STORE));
