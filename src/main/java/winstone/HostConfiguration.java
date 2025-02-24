@@ -177,6 +177,7 @@ public class HostConfiguration {
                 }
                 setMaxFormKeys(Option.MAX_PARAM_COUNT.get(args));
                 setMaxFormContentSize(Option.REQUEST_FORM_CONTENT_SIZE.get(args));
+                // TODO ee10 getServletHandler().setDecodeAmbiguousURIs(true);
             }
 
             @Override

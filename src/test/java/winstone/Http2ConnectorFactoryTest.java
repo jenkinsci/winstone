@@ -7,9 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import javax.net.ssl.SSLContext;
@@ -65,5 +67,28 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
         assertNotNull(lowResourceMonitor);
         assertFalse(lowResourceMonitor.isLowOnResources());
         assertTrue(lowResourceMonitor.isAcceptingInLowResources());
+    }
+
+    @Test
+    public void helloSuspiciousPathCharacters() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "-1");
+        args.put("http2Port", "0");
+        args.put("http2ListenAddress", "localhost");
+        args.put("httpsKeyStore", "src/ssl/wildcard.jks");
+        args.put("httpsKeyStorePassword", "changeit");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+
+        assertEquals(
+                "<html><body>Hello winstone </body></html>\r\n",
+                makeRequest("http://127.0.0.1:" + port + "/hello/winstone"));
+
+        assertEquals(
+                "<html><body>Hello win\\stone </body></html>\r\n",
+                makeRequest("http://127.0.0.1:" + port + "/hello/"
+                        + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8))); // %5C == \
     }
 }

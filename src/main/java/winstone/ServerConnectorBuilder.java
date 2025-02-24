@@ -132,7 +132,7 @@ class ServerConnectorBuilder {
             hc.setSecurePort(secureListenerPort);
         }
         hc.setHttpCompliance(HttpCompliance.RFC7230);
-        hc.setUriCompliance(UriCompliance.LEGACY);
+        hc.setUriCompliance(UriCompliance.LEGACY.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS));
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);
