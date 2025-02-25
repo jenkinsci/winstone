@@ -24,11 +24,11 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
 
     private static final String DISABLE_HOSTNAME_VERIFICATION = "jdk.internal.httpclient.disableHostnameVerification";
 
-    private String request(X509TrustManager tm, int port) throws Exception {
+    private String request(X509TrustManager tm, URI uri) throws Exception {
         String disableHostnameVerification = System.getProperty(DISABLE_HOSTNAME_VERIFICATION);
         try {
             System.setProperty(DISABLE_HOSTNAME_VERIFICATION, Boolean.TRUE.toString());
-            HttpRequest request = HttpRequest.newBuilder(new URI("https://localhost:" + port + "/CountRequestsServlet"))
+            HttpRequest request = HttpRequest.newBuilder(uri)
                     .version(HttpClient.Version.HTTP_2)
                     .GET()
                     .build();
@@ -62,7 +62,7 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
         assertConnectionRefused("127.0.0.2", port);
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                request(new TrustEveryoneManager(), port));
+                request(new TrustEveryoneManager(), new URI("https://localhost:" + port + "/CountRequestsServlet")));
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
         assertFalse(lowResourceMonitor.isLowOnResources());
@@ -84,11 +84,13 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
 
         assertEquals(
                 "<html><body>Hello winstone </body></html>\r\n",
-                makeRequest("http://127.0.0.1:" + port + "/hello/winstone"));
+                request(new TrustEveryoneManager(), new URI("https://127.0.0.1:" + port + "/hello/winstone")));
 
         assertEquals(
                 "<html><body>Hello win\\stone </body></html>\r\n",
-                makeRequest("http://127.0.0.1:" + port + "/hello/"
-                        + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8))); // %5C == \
+                request(
+                        new TrustEveryoneManager(),
+                        new URI("https://127.0.0.1:" + port + "/hello/"
+                                + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8)))); // %5C == \
     }
 }
