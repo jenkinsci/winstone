@@ -8,9 +8,16 @@ import java.net.Socket;
 import java.nio.file.Path;
 import org.eclipse.jetty.client.ContentResponse;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.client.transport.HttpClientConnectionFactory;
 import org.eclipse.jetty.client.transport.HttpClientTransportDynamic;
 import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.http2.client.HTTP2Client;
+import org.eclipse.jetty.http2.client.transport.ClientConnectionFactoryOverHTTP2;
+import org.eclipse.jetty.io.ClientConnectionFactory;
 import org.eclipse.jetty.io.ClientConnector;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 
 /**
@@ -26,24 +33,71 @@ public class AbstractWinstoneTest {
         }
     }
 
-    public String makeRequest(String url) throws Exception {
-        return makeRequest(null, url);
+    enum Protocol {
+        HTTP_1,
+        HTTP_2;
     }
 
+    /**
+     * please use {@link #makeRequest(String, String, Protocol)}
+     */
+    @Deprecated
+    public String makeRequest(String url) throws Exception {
+        return makeRequest(null, url, Protocol.HTTP_1);
+    }
+
+    /**
+     * please use {@link #makeRequest(String, String, Protocol)}
+     */
+    @Deprecated
     public String makeRequest(String path, String url) throws Exception {
+        return makeRequest(path, url, Protocol.HTTP_1);
+    }
+
+    /**
+     *
+     * @param path path to unix domain socket (can be null if not using unix domain socket)
+     * @param url the URL to request
+     * @param protocol see #Protocol
+     * @return the response
+     * @throws Exception
+     */
+    public String makeRequest(String path, String url, Protocol protocol) throws Exception {
 
         HttpClient httpClient;
 
+        ClientConnector connector;
+
         if (path != null) {
             Path unixDomainPath = Path.of(path);
-            ClientConnector clientConnector = ClientConnector.forUnixDomain(unixDomainPath);
-            httpClient = new HttpClient(new HttpClientTransportDynamic(clientConnector));
+            connector = ClientConnector.forUnixDomain(unixDomainPath);
         } else {
-            httpClient = new HttpClient();
+            SslContextFactory.Client sslContextFactory = new SslContextFactory.Client(true);
+            sslContextFactory.setHostnameVerifier((hostname, session) -> true);
+
+            connector = new ClientConnector();
+            connector.setSslContextFactory(sslContextFactory);
         }
+
+        ClientConnectionFactory.Info http1 = HttpClientConnectionFactory.HTTP11;
+
+        HTTP2Client http2Client = new HTTP2Client(connector);
+        ClientConnectionFactoryOverHTTP2.HTTP2 http2 = new ClientConnectionFactoryOverHTTP2.HTTP2(http2Client);
+
+        HttpClientTransportDynamic transport = new HttpClientTransportDynamic(connector, http1, http2);
+        httpClient = new HttpClient(transport);
+
         httpClient.start();
 
-        ContentResponse response = httpClient.GET(url);
+        Request request = httpClient.newRequest(url);
+
+        switch (protocol) {
+            case HTTP_1 -> request.version(HttpVersion.HTTP_1_1);
+            case HTTP_2 -> request.version(HttpVersion.HTTP_2);
+            default -> throw new Exception("Unsupported Http Version: " + protocol);
+        }
+
+        ContentResponse response = request.send();
 
         httpClient.stop();
 
