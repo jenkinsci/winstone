@@ -64,15 +64,8 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             https_config.setSecureScheme("https");
             https_config.setSecurePort(listenPort);
             https_config.setHttpCompliance(HttpCompliance.RFC7230);
-            // https_config.setUriCompliance(UriCompliance.LEGACY);
             https_config.setUriCompliance(
-                    UriCompliance.LEGACY.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS /*,
-                    UriCompliance.Violation.AMBIGUOUS_PATH_SEGMENT,
-                    UriCompliance.Violation.AMBIGUOUS_PATH_SEPARATOR,
-                    UriCompliance.Violation.AMBIGUOUS_PATH_ENCODING,
-                    UriCompliance.Violation.AMBIGUOUS_EMPTY_SEGMENT,
-                    UriCompliance.Violation.UTF16_ENCODINGS,
-                    UriCompliance.Violation.USER_INFO*/));
+                    UriCompliance.LEGACY.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS));
             SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
             secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
             https_config.addCustomizer(secureRequestCustomizer);
