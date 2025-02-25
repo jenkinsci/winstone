@@ -183,7 +183,7 @@ public class Launcher implements Runnable {
 
             // JENKINS-73616: Turn down log level of annotation parser
             java.util.logging.Logger logger =
-                    java.util.logging.Logger.getLogger("org.eclipse.jetty.ee9.annotations.AnnotationParser");
+                    java.util.logging.Logger.getLogger("org.eclipse.jetty.ee10.annotations.AnnotationParser");
             logger.setLevel(Level.SEVERE);
 
             try {
