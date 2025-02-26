@@ -68,6 +68,11 @@
 		</init-param>
 	</servlet>
 
+	<servlet>
+		<servlet-name>HelloServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.HelloRestOfPathServlet</servlet-class>
+	</servlet>
+
   <!-- testing load on startup of a jsp -->
 	<servlet>
 		<servlet-name>loadOnStartupJSP</servlet-name>
@@ -115,6 +120,11 @@
 	<servlet-mapping>
 		<servlet-name>CountRequestsServlet</servlet-name>
 		<url-pattern>/TestWriteAfterServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>HelloServlet</servlet-name>
+		<url-pattern>/hello/*</url-pattern>
 	</servlet-mapping>
 
 	<!-- Test the welcome file processing order -->

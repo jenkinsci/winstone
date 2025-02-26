@@ -20,6 +20,8 @@
 
 package winstone;
 
+import static winstone.ServerConnectorBuilder.DENY_SUSPICIOUS_PATH_CHARACTERS;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -64,7 +66,11 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             https_config.setSecureScheme("https");
             https_config.setSecurePort(listenPort);
             https_config.setHttpCompliance(HttpCompliance.RFC7230);
-            https_config.setUriCompliance(UriCompliance.LEGACY);
+            UriCompliance compliance = UriCompliance.LEGACY;
+            if (!DENY_SUSPICIOUS_PATH_CHARACTERS) {
+                compliance = compliance.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS);
+            }
+            https_config.setUriCompliance(compliance);
             SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
             secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
             https_config.addCustomizer(secureRequestCustomizer);
@@ -92,7 +98,6 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             http2Connector.setHost(listenAddress);
             server.addConnector(http2Connector);
             server.setDumpAfterStart(Boolean.getBoolean("dumpAfterStart"));
-
             return http2Connector;
         } catch (IllegalStateException e) {
             Logger.log(Level.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e);
