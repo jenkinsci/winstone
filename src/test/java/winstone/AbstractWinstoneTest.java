@@ -64,6 +64,25 @@ public class AbstractWinstoneTest {
      */
     public String makeRequest(String path, String url, Protocol protocol) throws Exception {
 
+        HttpClient httpClient = getHttpClient(path);
+
+        Request request = httpClient.newRequest(url);
+
+        switch (protocol) {
+            case HTTP_1 -> request.version(HttpVersion.HTTP_1_1);
+            case HTTP_2 -> request.version(HttpVersion.HTTP_2);
+            default -> throw new Exception("Unsupported Http Version: " + protocol);
+        }
+
+        ContentResponse response = request.send();
+
+        httpClient.stop();
+
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        return response.getContentAsString();
+    }
+
+    protected HttpClient getHttpClient(String path) throws Exception {
         HttpClient httpClient;
 
         ClientConnector connector;
@@ -86,23 +105,9 @@ public class AbstractWinstoneTest {
 
         HttpClientTransportDynamic transport = new HttpClientTransportDynamic(connector, http1, http2);
         httpClient = new HttpClient(transport);
-
+        httpClient.setFollowRedirects(false);
         httpClient.start();
-
-        Request request = httpClient.newRequest(url);
-
-        switch (protocol) {
-            case HTTP_1 -> request.version(HttpVersion.HTTP_1_1);
-            case HTTP_2 -> request.version(HttpVersion.HTTP_2);
-            default -> throw new Exception("Unsupported Http Version: " + protocol);
-        }
-
-        ContentResponse response = request.send();
-
-        httpClient.stop();
-
-        assertEquals(HttpStatus.OK_200, response.getStatus());
-        return response.getContentAsString();
+        return httpClient;
     }
 
     protected void assertConnectionRefused(String host, int port) {
