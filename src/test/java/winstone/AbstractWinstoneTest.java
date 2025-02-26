@@ -63,6 +63,19 @@ public class AbstractWinstoneTest {
      * @throws Exception
      */
     public String makeRequest(String path, String url, Protocol protocol) throws Exception {
+        return makeRequest(path, url, HttpStatus.OK_200, protocol);
+    }
+
+    /**
+     *
+     * @param path path to unix domain socket (can be null if not using unix domain socket)
+     * @param url the URL to request
+     * @param expectedHttpStatus the expected http response code from the server
+     * @param protocol see #Protocol
+     * @return the response
+     * @throws Exception
+     */
+    public String makeRequest(String path, String url, int expectedHttpStatus, Protocol protocol) throws Exception {
 
         HttpClient httpClient = getHttpClient(path);
 
@@ -78,7 +91,7 @@ public class AbstractWinstoneTest {
 
         httpClient.stop();
 
-        assertEquals(HttpStatus.OK_200, response.getStatus());
+        assertEquals(expectedHttpStatus, response.getStatus());
         return response.getContentAsString();
     }
 

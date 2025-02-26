@@ -15,6 +15,9 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 class ServerConnectorBuilder {
 
+    public static boolean DENY_SUSPICIOUS_PATH_CHARACTERS =
+            Boolean.getBoolean("winstone.DENY_SUSPICIOUS_PATH_CHARACTERS");
+
     private int listenerPort;
     private int secureListenerPort;
     private int keepAliveTimeout;
@@ -132,7 +135,11 @@ class ServerConnectorBuilder {
             hc.setSecurePort(secureListenerPort);
         }
         hc.setHttpCompliance(HttpCompliance.RFC7230);
-        hc.setUriCompliance(UriCompliance.LEGACY.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS));
+        UriCompliance compliance = UriCompliance.LEGACY;
+        if (!DENY_SUSPICIOUS_PATH_CHARACTERS) {
+            compliance = compliance.with("winstone", UriCompliance.Violation.SUSPICIOUS_PATH_CHARACTERS);
+        }
+        hc.setUriCompliance(compliance);
         hc.addCustomizer(new ForwardedRequestCustomizer());
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);

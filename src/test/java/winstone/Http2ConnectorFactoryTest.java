@@ -1,5 +1,7 @@
 package winstone;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -9,6 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
@@ -61,5 +64,17 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
                         "https://127.0.0.1:" + port + "/hello/"
                                 + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
                         Protocol.HTTP_2)); // %5C == \
+        // Escape hatch
+        ServerConnectorBuilder.DENY_SUSPICIOUS_PATH_CHARACTERS = true;
+        winstone = new Launcher(args);
+        port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        assertThat(
+                makeRequest(
+                        null,
+                        "https://127.0.0.1:" + port + "/hello/"
+                                + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
+                        HttpStatus.BAD_REQUEST_400,
+                        Protocol.HTTP_2),
+                containsString("HTTP ERROR 400 Suspicious Path Character")); // %5C == \
     }
 }

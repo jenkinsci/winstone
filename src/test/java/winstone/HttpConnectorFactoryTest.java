@@ -1,5 +1,7 @@
 package winstone;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -19,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
@@ -131,5 +134,18 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
                 "<html><body>Hello win\\stone </body></html>\r\n",
                 makeRequest("http://127.0.0.1:" + port + "/hello/"
                         + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8))); // %5C == \
+
+        // Escape hatch
+        ServerConnectorBuilder.DENY_SUSPICIOUS_PATH_CHARACTERS = true;
+        winstone = new Launcher(args);
+        port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        assertThat(
+                makeRequest(
+                        null,
+                        "http://127.0.0.1:" + port + "/hello/"
+                                + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
+                        HttpStatus.BAD_REQUEST_400,
+                        Protocol.HTTP_1),
+                containsString("HTTP ERROR 400 Suspicious Path Character")); // %5C == \
     }
 }
