@@ -83,9 +83,7 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
-    @SuppressFBWarnings(
-            value = {"DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED", "LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE"},
-            justification = "cf. https://github.com/spotbugs/spotbugs/issues/1515")
+    @SuppressFBWarnings(value = "LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE", justification = "TODO needs triage")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success = false;
         /*
@@ -517,9 +515,6 @@ public class Launcher implements Runnable {
         return args;
     }
 
-    @SuppressFBWarnings(
-            value = {"NP_LOAD_OF_KNOWN_NULL_VALUE", "RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"},
-            justification = "false positive https://github.com/spotbugs/spotbugs/issues/1338")
     protected static void deployEmbeddedWarfile(Map<String, String> args) throws IOException {
         String embeddedWarfileName = RESOURCES.getString("Launcher.EmbeddedWarFile");
         try (InputStream embeddedWarfile = Launcher.class.getResourceAsStream(embeddedWarfileName)) {
