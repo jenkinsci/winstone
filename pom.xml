@@ -37,7 +37,7 @@
   <properties>
     <revision>8.5</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>12.0.16</jetty.version>
+    <jetty.version>12.0.17</jetty.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
@@ -143,6 +143,16 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-client-transport</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

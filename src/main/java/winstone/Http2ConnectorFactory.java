@@ -92,7 +92,6 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             http2Connector.setHost(listenAddress);
             server.addConnector(http2Connector);
             server.setDumpAfterStart(Boolean.getBoolean("dumpAfterStart"));
-
             return http2Connector;
         } catch (IllegalStateException e) {
             Logger.log(Level.WARNING, Launcher.RESOURCES, "Http2ConnectorFactory.FailedStart.ALPN", e);

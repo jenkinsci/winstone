@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -111,5 +112,24 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         assertFalse("Port value should not be empty at any time", portFileString.isEmpty());
         assertEquals(Integer.toString(futurePort.get()), portFileString);
         assertNotEquals(8080, futurePort.get().longValue());
+    }
+
+    @Test
+    public void helloSuspiciousPathCharacters() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+
+        assertEquals(
+                "<html><body>Hello winstone </body></html>\r\n",
+                makeRequest("http://127.0.0.1:" + port + "/hello/winstone"));
+
+        assertEquals(
+                "<html><body>Hello win\\stone </body></html>\r\n",
+                makeRequest("http://127.0.0.1:" + port + "/hello/"
+                        + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8))); // %5C == \
     }
 }
