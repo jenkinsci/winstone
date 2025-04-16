@@ -30,7 +30,7 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
         assertConnectionRefused("127.0.0.2", port);
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                makeRequest(null, "https://localhost:" + port + "/CountRequestsServlet", Protocol.HTTP_2));
+                makeRequest("https://localhost:" + port + "/CountRequestsServlet", Protocol.HTTP_2));
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
         assertFalse(lowResourceMonitor.isLowOnResources());
@@ -52,12 +52,11 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
 
         assertEquals(
                 "<html><body>Hello winstone </body></html>\r\n",
-                makeRequest(null, "https://127.0.0.1:" + port + "/hello/winstone", Protocol.HTTP_2));
+                makeRequest("https://127.0.0.1:" + port + "/hello/winstone", Protocol.HTTP_2));
 
         assertEquals(
                 "<html><body>Hello win\\stone </body></html>\r\n",
                 makeRequest(
-                        null,
                         "https://127.0.0.1:" + port + "/hello/"
                                 + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
                         Protocol.HTTP_2)); // %5C == \

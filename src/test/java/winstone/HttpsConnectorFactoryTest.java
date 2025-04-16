@@ -40,7 +40,7 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         assertConnectionRefused("127.0.0.2", port);
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                makeRequest(null, "https://localhost:" + port + "/CountRequestsServlet", Protocol.HTTP_1));
+                makeRequest("https://localhost:" + port + "/CountRequestsServlet", Protocol.HTTP_1));
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
         assertFalse(lowResourceMonitor.isLowOnResources());
@@ -85,11 +85,11 @@ public class HttpsConnectorFactoryTest extends AbstractWinstoneTest {
         // also verify that directly accessing the resource works.
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1002 times</body></html>\r\n",
-                makeRequest(null, "https://localhost:" + httpsPort + "/CountRequestsServlet", Protocol.HTTP_1));
+                makeRequest("https://localhost:" + httpsPort + "/CountRequestsServlet", Protocol.HTTP_1));
     }
 
     private String requestRedirect(int httpPort) throws Exception {
-        HttpClient httpClient = getHttpClient(null);
+        HttpClient httpClient = getHttpClient();
         try {
             ContentResponse contentResponse = httpClient.GET("http://localhost:" + httpPort + "/CountRequestsServlet");
             assertEquals(HttpURLConnection.HTTP_MOVED_TEMP, contentResponse.getStatus());
