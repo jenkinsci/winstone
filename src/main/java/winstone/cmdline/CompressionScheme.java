@@ -5,6 +5,8 @@ package winstone.cmdline;
  * compression schemes is added to Jetty upstream.
  */
 public enum CompressionScheme {
+    BROTLI,
     GZIP,
+    ZSTD,
     NONE,
 }
