@@ -30,12 +30,15 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
+import org.eclipse.jetty.compression.brotli.BrotliCompression;
+import org.eclipse.jetty.compression.gzip.GzipCompression;
+import org.eclipse.jetty.compression.server.CompressionHandler;
+import org.eclipse.jetty.compression.zstandard.ZstandardCompression;
 import org.eclipse.jetty.ee9.webapp.WebAppContext;
 import org.eclipse.jetty.ee9.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import winstone.cmdline.CompressionScheme;
 import winstone.cmdline.Option;
 
@@ -107,10 +110,23 @@ public class HostConfiguration {
 
         CompressionScheme compressionScheme = Option.COMPRESSION.get(this.args);
         switch (compressionScheme) {
+            case BROTLI:
+                CompressionHandler brotliHandler = new CompressionHandler();
+                brotliHandler.putCompression(new BrotliCompression());
+                brotliHandler.setHandler(webAppContext);
+                server.setHandler(brotliHandler);
+                break;
             case GZIP:
-                GzipHandler gzipHandler = new GzipHandler();
+                CompressionHandler gzipHandler = new CompressionHandler();
+                gzipHandler.putCompression(new GzipCompression());
                 gzipHandler.setHandler(webAppContext);
                 server.setHandler(gzipHandler);
+                break;
+            case ZSTD:
+                CompressionHandler zstdHandler = new CompressionHandler();
+                zstdHandler.putCompression(new ZstandardCompression());
+                zstdHandler.setHandler(webAppContext);
+                server.setHandler(zstdHandler);
                 break;
             case NONE:
                 server.setHandler(webAppContext);
