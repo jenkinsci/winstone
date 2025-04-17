@@ -17,6 +17,7 @@ import org.eclipse.jetty.http2.client.HTTP2Client;
 import org.eclipse.jetty.http2.client.transport.ClientConnectionFactoryOverHTTP2;
 import org.eclipse.jetty.io.ClientConnectionFactory;
 import org.eclipse.jetty.io.ClientConnector;
+import org.eclipse.jetty.io.Transport;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.After;
 
@@ -33,25 +34,18 @@ public class AbstractWinstoneTest {
         }
     }
 
-    enum Protocol {
+    public enum Protocol {
         HTTP_1,
         HTTP_2;
     }
 
     /**
-     * please use {@link #makeRequest(String, String, Protocol)}
+     * @param url the URL to request
+     * @param protocol see {@link AbstractWinstoneTest.Protocol}
+     * @return the response
      */
-    @Deprecated
-    public String makeRequest(String url) throws Exception {
-        return makeRequest(null, url, Protocol.HTTP_1);
-    }
-
-    /**
-     * please use {@link #makeRequest(String, String, Protocol)}
-     */
-    @Deprecated
-    public String makeRequest(String path, String url) throws Exception {
-        return makeRequest(path, url, Protocol.HTTP_1);
+    public String makeRequest(String url, Protocol protocol) throws Exception {
+        return makeRequest(null, url, HttpStatus.OK_200, protocol);
     }
 
     /**
@@ -77,9 +71,12 @@ public class AbstractWinstoneTest {
      */
     public String makeRequest(String path, String url, int expectedHttpStatus, Protocol protocol) throws Exception {
 
-        HttpClient httpClient = getHttpClient(path);
+        HttpClient httpClient = getHttpClient();
 
         Request request = httpClient.newRequest(url);
+        if (path != null) {
+            request.transport(new Transport.TCPUnix(Path.of(path)));
+        }
 
         switch (protocol) {
             case HTTP_1 -> request.version(HttpVersion.HTTP_1_1);
@@ -95,21 +92,12 @@ public class AbstractWinstoneTest {
         return response.getContentAsString();
     }
 
-    protected HttpClient getHttpClient(String path) throws Exception {
-        HttpClient httpClient;
+    protected HttpClient getHttpClient() throws Exception {
+        SslContextFactory.Client sslContextFactory = new SslContextFactory.Client(true);
+        sslContextFactory.setHostnameVerifier((hostname, session) -> true);
 
-        ClientConnector connector;
-
-        if (path != null) {
-            Path unixDomainPath = Path.of(path);
-            connector = ClientConnector.forUnixDomain(unixDomainPath);
-        } else {
-            SslContextFactory.Client sslContextFactory = new SslContextFactory.Client(true);
-            sslContextFactory.setHostnameVerifier((hostname, session) -> true);
-
-            connector = new ClientConnector();
-            connector.setSslContextFactory(sslContextFactory);
-        }
+        ClientConnector connector = new ClientConnector();
+        connector.setSslContextFactory(sslContextFactory);
 
         ClientConnectionFactory.Info http1 = HttpClientConnectionFactory.HTTP11;
 
@@ -117,7 +105,7 @@ public class AbstractWinstoneTest {
         ClientConnectionFactoryOverHTTP2.HTTP2 http2 = new ClientConnectionFactoryOverHTTP2.HTTP2(http2Client);
 
         HttpClientTransportDynamic transport = new HttpClientTransportDynamic(connector, http1, http2);
-        httpClient = new HttpClient(transport);
+        HttpClient httpClient = new HttpClient(transport);
         httpClient.setFollowRedirects(false);
         httpClient.start();
         return httpClient;

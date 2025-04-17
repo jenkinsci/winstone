@@ -57,7 +57,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                makeRequest(path, "http://127.0.0.1:80/CountRequestsServlet"));
+                makeRequest(path, "http://127.0.0.1:80/CountRequestsServlet", Protocol.HTTP_1));
 
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
@@ -79,7 +79,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                makeRequest("http://127.0.0.2:" + port + "/CountRequestsServlet"));
+                makeRequest("http://127.0.0.2:" + port + "/CountRequestsServlet", Protocol.HTTP_1));
 
         LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
         assertNotNull(lowResourceMonitor);
@@ -125,11 +125,14 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
         assertEquals(
                 "<html><body>Hello winstone </body></html>\r\n",
-                makeRequest("http://127.0.0.1:" + port + "/hello/winstone"));
+                makeRequest("http://127.0.0.1:" + port + "/hello/winstone", Protocol.HTTP_1));
 
+        // %5C == \
         assertEquals(
                 "<html><body>Hello win\\stone </body></html>\r\n",
-                makeRequest("http://127.0.0.1:" + port + "/hello/"
-                        + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8))); // %5C == \
+                makeRequest(
+                        "http://127.0.0.1:" + port + "/hello/"
+                                + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
+                        Protocol.HTTP_1));
     }
 }

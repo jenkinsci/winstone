@@ -38,8 +38,7 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         // make a request
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                makeRequest("http://localhost:" + port + "/examples/CountRequestsServlet"));
-
+                makeRequest("http://localhost:" + port + "/examples/CountRequestsServlet", Protocol.HTTP_1));
         // check the log file
         // check the log file every 100ms for 5s
         String text = "";
