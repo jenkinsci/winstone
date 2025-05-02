@@ -83,7 +83,6 @@ public class Launcher implements Runnable {
      * Constructor - initialises the web app, object pools, control port and the
      * available protocol listeners.
      */
-    @SuppressFBWarnings(value = "LG_LOST_LOGGER_DUE_TO_WEAK_REFERENCE", justification = "TODO needs triage")
     public Launcher(Map<String, String> args) throws IOException {
         boolean success = false;
         /*
@@ -178,11 +177,6 @@ public class Launcher implements Runnable {
                 MBeanContainer mbeanContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
                 server.addBean(mbeanContainer);
             }
-
-            // JENKINS-73616: Turn down log level of annotation parser
-            java.util.logging.Logger logger =
-                    java.util.logging.Logger.getLogger("org.eclipse.jetty.ee9.annotations.AnnotationParser");
-            logger.setLevel(Level.SEVERE);
 
             try {
                 server.start();

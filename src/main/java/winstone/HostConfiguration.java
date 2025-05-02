@@ -30,8 +30,8 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
-import org.eclipse.jetty.ee9.webapp.WebAppContext;
-import org.eclipse.jetty.ee9.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee10.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.server.RequestLog;
 import org.eclipse.jetty.server.Server;
@@ -177,7 +177,7 @@ public class HostConfiguration {
                 }
                 setMaxFormKeys(Option.MAX_PARAM_COUNT.get(args));
                 setMaxFormContentSize(Option.REQUEST_FORM_CONTENT_SIZE.get(args));
-                // TODO ee10 getServletHandler().setDecodeAmbiguousURIs(true);
+                getServletHandler().setDecodeAmbiguousURIs(true);
             }
 
             @Override
