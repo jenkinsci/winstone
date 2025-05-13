@@ -37,7 +37,7 @@
   <properties>
     <revision>8.9</revision>
     <changelist>-SNAPSHOT</changelist>
-    <jetty.version>12.0.20</jetty.version>
+    <jetty.version>12.0.21</jetty.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
