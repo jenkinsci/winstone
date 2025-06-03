@@ -216,8 +216,8 @@ public class Option<T> {
 
         @Override
         public int get(Map<String, String> args) {
+            // before switching to java.util.Logging, winstone used a (1:9) range for log levels
             switch (super.get(args)) {
-                    // before switching to java.util.Logging, winstone used a (1:9) range for log levels
                 case 1:
                     return Level.OFF.intValue();
                 case 2:
