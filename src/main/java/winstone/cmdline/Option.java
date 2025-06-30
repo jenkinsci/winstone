@@ -322,8 +322,12 @@ public class Option<T> {
             CompressionScheme compressionScheme;
             if (v == null) {
                 compressionScheme = defaultValue;
+            } else if (v.equalsIgnoreCase("brotli")) {
+                compressionScheme = CompressionScheme.BROTLI;
             } else if (v.equalsIgnoreCase("gzip")) {
                 compressionScheme = CompressionScheme.GZIP;
+            } else if (v.equalsIgnoreCase("zstd")) {
+                compressionScheme = CompressionScheme.ZSTD;
             } else if (v.equalsIgnoreCase("none")) {
                 compressionScheme = CompressionScheme.NONE;
             } else {
