@@ -49,7 +49,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
 
                 keystore = KeyStore.getInstance(KeyStore.getDefaultType());
                 try (InputStream inputStream = new FileInputStream(keyStore)) {
-                    keystore.load(inputStream, this.keystorePassword.toCharArray());
+                    keystore.load(
+                            inputStream, this.keystorePassword == null ? null : this.keystorePassword.toCharArray());
                 }
             } else {
                 throw new WinstoneException(MessageFormat.format("Please set --{0}", Option.HTTPS_KEY_STORE));
@@ -84,7 +85,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
 
             // In case the KeyStore password and the KeyPassword are not the same,
             // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
-            kmf.init(keystore, keystorePassword.toCharArray());
+            kmf.init(keystore, keystorePassword == null ? null : keystorePassword.toCharArray());
             Logger.log(Level.FINEST, SSL_RESOURCES, "HttpsListener.KeyCount", keystore.size() + "");
             for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = e.nextElement();
