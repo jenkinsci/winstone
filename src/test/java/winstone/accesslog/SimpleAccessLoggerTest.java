@@ -1,27 +1,29 @@
 package winstone.accesslog;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
+class SimpleAccessLoggerTest extends AbstractWinstoneTest {
     /**
      * Test the simple case of connecting, retrieving and disconnecting
      */
     @Test
-    public void testSimpleConnection() throws Exception {
+    void testSimpleConnection() throws Exception {
         Path logFile = Paths.get("target/test.log");
         Files.deleteIfExists(logFile);
 
@@ -41,14 +43,10 @@ public class SimpleAccessLoggerTest extends AbstractWinstoneTest {
                 makeRequest("http://localhost:" + port + "/examples/CountRequestsServlet", Protocol.HTTP_1));
         // check the log file
         // check the log file every 100ms for 5s
-        String text = "";
-        for (int i = 0; i < 50; ++i) {
-            Thread.sleep(100);
-            text = Files.readString(logFile, StandardCharsets.UTF_8);
-            if (!"".equals(text)) {
-                break;
-            }
-        }
-        assertEquals(String.format("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200%n"), text);
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(logFile)
+                .isNotEmptyFile());
+        assertThat(logFile)
+                .content()
+                .isEqualToIgnoringNewLines("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200");
     }
 }

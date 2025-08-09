@@ -1,7 +1,7 @@
 package winstone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.ConnectException;
 import java.net.Socket;
@@ -19,15 +19,15 @@ import org.eclipse.jetty.io.ClientConnectionFactory;
 import org.eclipse.jetty.io.ClientConnector;
 import org.eclipse.jetty.io.Transport;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class AbstractWinstoneTest {
+public abstract class AbstractWinstoneTest {
     protected Launcher winstone;
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (winstone != null) {
             winstone.shutdown();

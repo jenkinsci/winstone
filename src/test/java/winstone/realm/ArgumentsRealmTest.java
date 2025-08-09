@@ -1,7 +1,7 @@
 package winstone.realm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -13,16 +13,16 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import winstone.AbstractWinstoneTest;
 import winstone.Launcher;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class ArgumentsRealmTest extends AbstractWinstoneTest {
+class ArgumentsRealmTest extends AbstractWinstoneTest {
     @Test
-    public void realm() throws Exception {
+    void realm() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");

@@ -1,9 +1,9 @@
 package winstone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
+class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
-    public void wildcard() throws Exception {
+    void wildcard() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -38,7 +38,7 @@ public class Http2ConnectorFactoryTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void helloSuspiciousPathCharacters() throws Exception {
+    void helloSuspiciousPathCharacters() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");

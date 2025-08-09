@@ -1,7 +1,7 @@
 package winstone;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -13,14 +13,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
-public class FormSubmissionTest extends AbstractWinstoneTest {
+class FormSubmissionTest extends AbstractWinstoneTest {
 
     @Issue("JENKINS-60409")
     @Test
-    public void largeForm() throws Exception {
+    void largeForm() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -44,15 +44,15 @@ public class FormSubmissionTest extends AbstractWinstoneTest {
                             notNullValue());
             assertEquals(HttpURLConnection.HTTP_OK, response.statusCode());
             assertEquals(
-                    "correct response at size " + size,
                     "received " + (size + "x=".length()) + " bytes",
-                    response.body());
+                    response.body(),
+                    "correct response at size " + size);
         }
     }
 
     @Issue("JENKINS-73285")
     @Test
-    public void duplicateKeys() throws Exception {
+    void duplicateKeys() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");

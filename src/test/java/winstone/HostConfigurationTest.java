@@ -5,25 +5,28 @@ import java.io.InputStream;
 import java.util.NavigableMap;
 import java.util.Properties;
 import java.util.TreeMap;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ErrorCollector;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
+import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-public class HostConfigurationTest {
+@ExtendWith(SoftAssertionsExtension.class)
+class HostConfigurationTest {
 
-    @Rule
-    public ErrorCollector errors = new ErrorCollector();
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
-    public void mimeTypes() throws IOException {
+    void mimeTypes() throws IOException {
         NavigableMap<String, String> jetty = loadMimeTypes("/org/eclipse/jetty/http/mime.properties");
         NavigableMap<String, String> winstone = loadMimeTypes("/winstone/mime.properties");
         for (String key : winstone.keySet()) {
-            if (jetty.containsKey(key)) {
-                errors.addError(new AssertionError(String.format(
-                        "Attempting to add %s=%s but Jetty already defines %s=%s",
-                        key, winstone.get(key), key, jetty.get(key))));
-            }
+            softly.assertThat(jetty)
+                    .as(
+                            "Attempting to add %s=%s but Jetty already defines %s=%s",
+                            key, winstone.get(key), key, jetty.get(key))
+                    .doesNotContainKey(key);
         }
     }
 

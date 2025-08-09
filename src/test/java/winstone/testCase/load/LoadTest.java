@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import winstone.Logger;
 import winstone.WinstoneResourceBundle;
 import winstone.cmdline.Option;
@@ -26,9 +26,8 @@ import winstone.cmdline.Option;
  * It uses {@link java.net.http.HttpClient} for the connection.
  *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: LoadTest.java,v 1.2 2006/02/28 07:32:49 rickknowles Exp $
  */
-@Ignore("Intended to be run manually")
+@Disabled("Intended to be run manually")
 public class LoadTest {
     private String url;
     private boolean useKeepAlives;
@@ -75,7 +74,7 @@ public class LoadTest {
     }
 
     @Test
-    public void test() throws InterruptedException {
+    void test() throws InterruptedException {
         HttpClient client = null;
 
         // Loop through in steps
