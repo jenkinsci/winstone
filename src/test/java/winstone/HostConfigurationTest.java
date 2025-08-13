@@ -30,7 +30,7 @@ public class HostConfigurationTest {
             }
         }
 
-        assertAll("winstone mime types must not duplicate jetty mime types", failures);
+        assertAll("Winstone MIME types must not duplicate Jetty MIME types", failures);
     }
 
     private static NavigableMap<String, String> loadMimeTypes(String name) throws IOException {
