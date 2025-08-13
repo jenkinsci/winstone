@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class HostConfigurationTest {
+class HostConfigurationTest {
 
     @Test
     void mimeTypes() throws IOException {
