@@ -1,33 +1,36 @@
 package winstone;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.Properties;
 import java.util.TreeMap;
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 
-@ExtendWith(SoftAssertionsExtension.class)
-class HostConfigurationTest {
-
-    @InjectSoftAssertions
-    private SoftAssertions softly;
+public class HostConfigurationTest {
 
     @Test
     void mimeTypes() throws IOException {
         NavigableMap<String, String> jetty = loadMimeTypes("/org/eclipse/jetty/http/mime.properties");
         NavigableMap<String, String> winstone = loadMimeTypes("/winstone/mime.properties");
+
+        List<Executable> failures = new ArrayList<>();
         for (String key : winstone.keySet()) {
-            softly.assertThat(jetty)
-                    .as(
-                            "Attempting to add %s=%s but Jetty already defines %s=%s",
-                            key, winstone.get(key), key, jetty.get(key))
-                    .doesNotContainKey(key);
+            if (jetty.containsKey(key)) {
+                String message = String.format(
+                        "Attempting to add %s=%s but Jetty already defines %s=%s",
+                        key, winstone.get(key), key, jetty.get(key));
+                failures.add(() -> fail(message));
+            }
         }
+
+        assertAll("winstone mime types must not duplicate jetty mime types", failures);
     }
 
     private static NavigableMap<String, String> loadMimeTypes(String name) throws IOException {

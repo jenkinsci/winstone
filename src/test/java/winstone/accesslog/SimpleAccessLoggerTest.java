@@ -1,15 +1,15 @@
 package winstone.accesslog;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.jupiter.api.Test;
 import winstone.AbstractWinstoneTest;
@@ -41,12 +41,10 @@ class SimpleAccessLoggerTest extends AbstractWinstoneTest {
         assertEquals(
                 "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
                 makeRequest("http://localhost:" + port + "/examples/CountRequestsServlet", Protocol.HTTP_1));
-        // check the log file
-        // check the log file every 100ms for 5s
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(logFile)
-                .isNotEmptyFile());
-        assertThat(logFile)
-                .content()
-                .isEqualToIgnoringNewLines("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200");
+        // check the log file with awaitility
+        String expected = String.format("127.0.0.1 - - GET /examples/CountRequestsServlet HTTP/1.1 200%n");
+        await().atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(100))
+                .untilAsserted(() -> assertEquals(expected, Files.readString(logFile, StandardCharsets.UTF_8)));
     }
 }
