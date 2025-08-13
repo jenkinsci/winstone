@@ -1,10 +1,10 @@
 package winstone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
 
 import java.io.IOException;
@@ -12,7 +12,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -22,20 +21,16 @@ import org.awaitility.Awaitility;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
-
-    @Rule
-    public TemporaryFolder tmp = new TemporaryFolder();
+class HttpConnectorFactoryTest extends AbstractWinstoneTest {
 
     @Test
-    public void testListenUnixDomainPath() throws Exception {
+    void testListenUnixDomainPath() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -66,7 +61,7 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void testListenAddress() throws Exception {
+    void testListenAddress() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -88,8 +83,8 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void writePortInFile() throws Exception {
-        Path portFile = Paths.get(tmp.getRoot().getAbsolutePath(), "subdir/jenkins.port");
+    void writePortInFile(@TempDir Path tmp) throws Exception {
+        Path portFile = tmp.resolve("subdir/jenkins.port");
         Future<Integer> futurePort = Executors.newSingleThreadExecutor().submit(() -> {
             Map<String, String> args = new HashMap<>();
             args.put("warfile", "target/test-classes/test.war");
@@ -109,13 +104,13 @@ public class HttpConnectorFactoryTest extends AbstractWinstoneTest {
                 .atMost(5, TimeUnit.SECONDS)
                 .until(() -> Files.exists(portFile));
         String portFileString = Files.readString(portFile, StandardCharsets.UTF_8);
-        assertFalse("Port value should not be empty at any time", portFileString.isEmpty());
+        assertFalse(portFileString.isEmpty(), "Port value should not be empty at any time");
         assertEquals(Integer.toString(futurePort.get()), portFileString);
         assertNotEquals(8080, futurePort.get().longValue());
     }
 
     @Test
-    public void helloSuspiciousPathCharacters() throws Exception {
+    void helloSuspiciousPathCharacters() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");

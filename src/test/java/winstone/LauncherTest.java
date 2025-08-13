@@ -2,8 +2,8 @@ package winstone;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -16,15 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import org.eclipse.jetty.server.ServerConnector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
 /**
  * @author Kohsuke Kawaguchi
  */
-public class LauncherTest extends AbstractWinstoneTest {
+class LauncherTest extends AbstractWinstoneTest {
     @Test
-    public void implicitGzip() throws Exception {
+    void implicitGzip() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -34,7 +34,7 @@ public class LauncherTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void explicitGzip() throws Exception {
+    void explicitGzip() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -45,7 +45,7 @@ public class LauncherTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void noCompression() throws Exception {
+    void noCompression() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -82,7 +82,7 @@ public class LauncherTest extends AbstractWinstoneTest {
     }
 
     @Test
-    public void mimeType() throws Exception {
+    void mimeType() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");
@@ -101,7 +101,7 @@ public class LauncherTest extends AbstractWinstoneTest {
 
     @Issue("JENKINS-60409")
     @Test
-    public void doubleGzip() throws Exception {
+    void doubleGzip() throws Exception {
         Map<String, String> args = new HashMap<>();
         args.put("warfile", "target/test-classes/test.war");
         args.put("prefix", "/");

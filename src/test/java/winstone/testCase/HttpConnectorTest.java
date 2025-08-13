@@ -6,7 +6,7 @@
  */
 package winstone.testCase;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -18,9 +18,7 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.Test;
 import winstone.Launcher;
 import winstone.Logger;
 
@@ -29,24 +27,13 @@ import winstone.Logger;
  * retrieve case, then a keep-alive connection case.
  *
  * @author mailto: <a href="rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: HttpConnectorTest.java,v 1.8 2007/04/23 15:06:22 rickknowles Exp $
  */
-public class HttpConnectorTest extends TestCase {
-    public static Test suite() {
-        return (new TestSuite(HttpConnectorTest.class));
-    }
-
-    /**
-     * Constructor
-     */
-    public HttpConnectorTest(String name) {
-        super(name);
-    }
-
+class HttpConnectorTest {
     /**
      * Test the simple case of connecting, retrieving and disconnecting
      */
-    public void testSimpleConnection() throws URISyntaxException, IOException, InterruptedException {
+    @Test
+    void testSimpleConnection() throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
         Map<String, String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");
@@ -73,7 +60,8 @@ public class HttpConnectorTest extends TestCase {
     /**
      * Test the keep alive case
      */
-    public void testWriteAfterServlet() throws URISyntaxException, IOException, InterruptedException {
+    @Test
+    void testWriteAfterServlet() throws URISyntaxException, IOException, InterruptedException {
         // Initialise container
         Map<String, String> args = new HashMap<>();
         args.put("webroot", "target/testwebapp");

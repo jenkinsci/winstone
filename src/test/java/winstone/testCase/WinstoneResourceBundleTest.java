@@ -6,34 +6,36 @@
  */
 package winstone.testCase;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import winstone.WinstoneResourceBundle;
 
 /**
  * Simple tests for the string replacer
  *
  * @author <a href="mailto:rick_knowles@hotmail.com">Rick Knowles</a>
- * @version $Id: WinstoneResourceBundleTest.java,v 1.1 2006/11/09 05:39:43 rickknowles Exp $
  */
-public class WinstoneResourceBundleTest extends TestCase {
+class WinstoneResourceBundleTest {
 
-    public void testGlobalReplace() {
+    @Test
+    void testGlobalReplace() {
         assertEquals(
-                "One token",
                 "Foo = bar squared",
-                WinstoneResourceBundle.globalReplace("Foo = [#0] squared", "[#0]", "bar"));
+                WinstoneResourceBundle.globalReplace("Foo = [#0] squared", "[#0]", "bar"),
+                "One token");
         assertEquals(
-                "Repeated token",
                 "Foo = bar bar squared",
-                WinstoneResourceBundle.globalReplace("Foo = [#0] [#0] squared", "[#0]", "bar"));
+                WinstoneResourceBundle.globalReplace("Foo = [#0] [#0] squared", "[#0]", "bar"),
+                "Repeated token");
         assertEquals(
-                "Two tokens",
                 "Foo = blah bar squared",
                 WinstoneResourceBundle.globalReplace(
-                        "Foo = [#1] [#0] squared", new String[][] {{"[#0]", "bar"}, {"[#1]", "blah"}}));
+                        "Foo = [#1] [#0] squared", new String[][] {{"[#0]", "bar"}, {"[#1]", "blah"}}),
+                "Two tokens");
     }
 
-    //    public static void testSpeed() throws Exception {
+    //    static void testSpeed() throws Exception {
     //        String tokens[][] = new String[20][2];
     //        for (int n = 0; n < tokens.length; n++) {
     //            tokens[n] = new String[] {"[#" + n + "]", "token" + n};
