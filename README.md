@@ -90,7 +90,7 @@ To run locally exploded web archive:
     
        --compression            = set the compression scheme (gzip or none to disable compression). Default is gzip.
        --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
-       --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 180. -1 never evict, 0 evict on exit
+       --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 1800 (30 minutes). -1 never evict, 0 evict on exit
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --requestHeaderSize=N    = set the maximum size in bytes of the request header. Default is 8192.
