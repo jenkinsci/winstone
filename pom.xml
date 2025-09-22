@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.139</version>
+    <version>1.140</version>
     <relativePath />
   </parent>
 
@@ -216,7 +216,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <reuseForks>false</reuseForks>
-          <runOrder>alphabetical</runOrder>
           <!--          Uncomment to enable extra logging for debugging          -->
           <!--          <systemPropertyVariables>-->
           <!--            <java.util.logging.config.file>src/test/resources/jul.properties</java.util.logging.config.file>-->
