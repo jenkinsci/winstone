@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>winstone</artifactId>
-  <version>8.14</version>
+  <version>${revision}${changelist}</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
@@ -35,7 +35,7 @@
   </scm>
 
   <properties>
-    <revision>8.14</revision>
+    <revision>8.15</revision>
     <changelist>-SNAPSHOT</changelist>
     <jetty.version>12.1.1</jetty.version>
     <gitHubRepo>jenkinsci/winstone</gitHubRepo>
