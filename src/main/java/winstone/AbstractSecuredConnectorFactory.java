@@ -88,7 +88,7 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             // individual key(s)
             kmf.init(keystore, keystorePassword.toCharArray());
             Logger.log(Level.FINEST, SSL_RESOURCES, "HttpsListener.KeyCount", keystore.size() + "");
-            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements();) {
+            for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements(); ) {
                 String alias = e.nextElement();
                 Logger.log(
                         Level.FINEST,
@@ -106,7 +106,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             ssl.setCertAlias(Option.HTTPS_CERTIFICATE_ALIAS.get(args));
             String excludeProtos = Option.HTTPS_EXCLUDE_PROTOCOLS.get(args);
             if (excludeProtos != null && excludeProtos.length() > 0) {
-                String[] protos = Stream.of(excludeProtos.split(",")).map(String::trim).toArray(String[]::new);
+                String[] protos =
+                        Stream.of(excludeProtos.split(",")).map(String::trim).toArray(String[]::new);
                 ssl.setExcludeProtocols(protos);
             }
             String excludeCiphers = Option.HTTPS_EXCLUDE_CIPHER_SUITES.get(args);
