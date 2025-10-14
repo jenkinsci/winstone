@@ -12,12 +12,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import org.eclipse.jetty.server.ServerConnector;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
+import winstone.cmdline.Option;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -120,5 +122,17 @@ class LauncherTest extends AbstractWinstoneTest {
                 response.headers().firstValue("Content-Type").orElseThrow());
         assertFalse(response.headers().firstValue("Content-Encoding").isPresent());
         assertEquals(1345, response.body().length);
+    }
+
+    @Test
+    void testHttpsKeyStoreTypeOption() {
+        Map<String, String> args = new HashMap<>();
+
+        String defaultType = Option.HTTPS_KEY_STORE_TYPE.get(args, KeyStore.getDefaultType());
+        assertEquals(KeyStore.getDefaultType(), defaultType);
+
+        args.put("httpsKeyStoreType", "PKCS12");
+        String customType = Option.HTTPS_KEY_STORE_TYPE.get(args, KeyStore.getDefaultType());
+        assertEquals("PKCS12", customType);
     }
 }
