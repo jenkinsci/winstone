@@ -71,8 +71,8 @@ public class Launcher implements Runnable {
      * Timeout (in milliseconds) for logging system shutdown after shutdown hooks trigger.
      * Default is 30s, matching Kubernetes `terminationGracePeriodSeconds`.
      */
-    private static int SHUTDOWN_TIMEOUT = Integer.parseInt(
-        System.getProperty("winstone.Launcher.loggingShutdownTimeoutSeconds", "30")) * 1000;
+    private static int SHUTDOWN_TIMEOUT =
+            Integer.parseInt(System.getProperty("winstone.Launcher.loggingShutdownTimeoutSeconds", "30")) * 1000;
 
     private Thread controlThread;
     public static final WinstoneResourceBundle RESOURCES = new WinstoneResourceBundle("winstone.LocalStrings");
