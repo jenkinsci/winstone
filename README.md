@@ -94,7 +94,7 @@ To run locally exploded web archive:
        --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
                                   (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
        --requestHeaderSize=N    = set the maximum size in bytes of the request header. Default is 8192.
-       --responseHeaderSize=N   = set the maximum size in bytes of the response header. Default is 8192.
+       --responseHeaderSize=N   = set the maximum size in bytes of the response header. Default is 32768.
        --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
                                   against hash DoS attack (oCERT #2011-003). Default is 10000.
        --useJmx                 = Enable Jetty Jmx
