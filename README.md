@@ -1,5 +1,5 @@
 # What is Winstone?
-Winstone is a command line interface around Jetty 12.0.x, which implements
+Winstone is a command line interface around Jetty 12.1.x, which implements
 Servlet 5.0 (JakartaEE 9/`jakarta.servlet.*`), WebSocket/JSR-356, and HTTP/2 support. It is used as the default
 embedded servlet container in Jenkins (via the `executable` package in the `war` module)
 and can be used by any other web applications that wants to be self-contained.
