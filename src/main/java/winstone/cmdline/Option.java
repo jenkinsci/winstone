@@ -66,6 +66,7 @@ public class Option<T> {
             integer("https" + _KEEP_ALIVE_TIMEOUT, _KEEP_ALIVE_TIMEOUT.defaultValue);
     public static final OFile HTTPS_KEY_STORE = file("httpsKeyStore");
     public static final OString HTTPS_KEY_STORE_PASSWORD = string("httpsKeyStorePassword");
+    public static final OString HTTPS_KEY_STORE_TYPE = string("httpsKeyStoreType");
     public static final OString HTTPS_PRIVATE_KEY_PASSWORD = string("httpsPrivateKeyPassword");
     public static final OString HTTPS_KEY_MANAGER_TYPE = string("httpsKeyManagerType", "SunX509");
     public static final OString HTTPS_VERIFY_CLIENT = string("httpsVerifyClient", "false");

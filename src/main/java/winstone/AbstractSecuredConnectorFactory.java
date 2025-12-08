@@ -47,7 +47,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
 
                 this.keystorePassword = pwd;
 
-                keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+                String keyStoreType = Option.HTTPS_KEY_STORE_TYPE.get(args, KeyStore.getDefaultType());
+                keystore = KeyStore.getInstance(keyStoreType);
                 try (InputStream inputStream = new FileInputStream(keyStore)) {
                     keystore.load(inputStream, this.keystorePassword.toCharArray());
                 }
@@ -83,7 +84,8 @@ public abstract class AbstractSecuredConnectorFactory implements ConnectorFactor
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(Option.HTTPS_KEY_MANAGER_TYPE.get(args));
 
             // In case the KeyStore password and the KeyPassword are not the same,
-            // the KeyManagerFactory needs the KeyPassword because it will access the individual key(s)
+            // the KeyManagerFactory needs the KeyPassword because it will access the
+            // individual key(s)
             kmf.init(keystore, keystorePassword.toCharArray());
             Logger.log(Level.FINEST, SSL_RESOURCES, "HttpsListener.KeyCount", keystore.size() + "");
             for (Enumeration<String> e = keystore.aliases(); e.hasMoreElements(); ) {

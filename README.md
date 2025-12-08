@@ -66,6 +66,8 @@ To run locally exploded web archive:
        --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms; default 30000)?
        --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
        --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
+       --httpsKeyStoreType      = set the HTTPS keystore type (JKS, PKCS12, BCFKS, etc.). 
+                                  Default is the Java default keystore type.
        --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
        --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
        --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
