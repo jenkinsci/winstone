@@ -159,7 +159,7 @@
     <dependency>
       <groupId>org.jenkins-ci</groupId>
       <artifactId>test-annotations</artifactId>
-      <version>1.5</version>
+      <version>123.vccb_d8e653685</version>
       <scope>test</scope>
     </dependency>
     <dependency>
