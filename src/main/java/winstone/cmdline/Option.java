@@ -97,7 +97,7 @@ public class Option<T> {
     public static final OInt REQUEST_HEADER_SIZE = integer("requestHeaderSize", 8192); // default for jetty 9
     public static final OInt RESPONSE_HEADER_SIZE = integer("responseHeaderSize", 32768);
     public static final OInt REQUEST_FORM_CONTENT_SIZE =
-            integer("requestFormContentSize", -1); // no limit (compat with old winstone)
+            integer("requestFormContentSize", Integer.MAX_VALUE); // no limit (compat with old winstone)
     public static final OBoolean HELP = bool("help", false);
 
     public static final OClass REALM_CLASS_NAME = clazz("realmClassName", ArgumentsRealm.class);
