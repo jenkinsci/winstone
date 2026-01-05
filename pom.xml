@@ -84,7 +84,7 @@
     <dependency>
       <groupId>io.jenkins.lib</groupId>
       <artifactId>support-log-formatter</artifactId>
-      <version>121.v4db_e40a_98359</version>
+      <version>122.vb_e396a_69dc84</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
