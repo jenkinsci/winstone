@@ -40,82 +40,88 @@ To run locally exploded web archive:
 
 ## Command-line options
 
-    Winstone Servlet Engine, (c) 2003-2006 Rick Knowles
-    Usage: java winstone.jar [--option=value] [--option=value] [etc]
-    
-    Required options: either --webroot OR --warfile
-       --webroot                = set document root folder.
-       --warfile                = set location of warfile to extract from.
-    Other options:
-       --javaHome               = Override the JAVA_HOME variable
-       --config                 = load configuration properties from here. Default is ./winstone.properties
-       --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
-       --commonLibFolder        = folder for additional jar files. Default is ./lib
-    
-       --logfile                = redirect log messages to this file
-       --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
-       --logThrowingThread      = show the thread that logged the message. Default is false
-       --debug                  = set the level of Winstone debug msgs (1-9). Default is 5 (INFO level)
-    
-       --httpPort               = set the http listening port. -1 to disable, Default is 8080
-       --httpListenAddress      = set the http listening address. Default is all interfaces
-       --httpUnixDomainPath     = set the http unix domain path. Default is no path
-       --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 30000)?
-       --httpsPort              = set the https listening port. -1 to disable, Default is disabled
-       --httpsListenAddress     = set the https listening address. Default is all interfaces
-       --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms; default 30000)?
-       --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
-       --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
-       --httpsKeyStoreType      = set the HTTPS keystore type (JKS, PKCS12, BCFKS, etc.). 
-                                  Default is the Java default keystore type.
-       --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
-       --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
-       --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
-       --httpsSniHostCheck      = if the SNI Host name must match when there is an SNI certificate. Check disabled per default
-       --httpsSniRequired       = if a SNI certificate is required. Disabled per default
-       --http2ListenAddress     = set the http2 listening address. Default is all interfaces
-       --excludeProtocols       = set protocol versions to exclude. (comma separated list, use blank quote " " to exclude none)
-                                  (default is "SSL", "SSLv2", "SSLv2Hello", "SSLv3")
-       --excludeCipherSuites    = set the ciphers to exclude (comma separated, use blank quote " " to exclude none) (default is 
-                               // Exclude weak / insecure ciphers 
-                               "^.*_(MD5|SHA|SHA1)$", 
-                               // Exclude ciphers that don't support forward secrecy 
-                               "^TLS_RSA_.*$", 
-                               // The following exclusions are present to cleanup known bad cipher 
-                               // suites that may be accidentally included via include patterns. 
-                               // The default enabled cipher list in Java will not include these 
-                               // (but they are available in the supported list). 
-                               "^SSL_.*$", 
-                               "^.*_NULL_.*$", 
-                               "^.*_anon_.*$" 
-       --controlPort            = set the shutdown/control port. -1 to disable, Default disabled
-    
-       --compression            = set the compression scheme (gzip or none to disable compression). Default is gzip.
-       --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
-       --sessionEviction        = set the session eviction timeout for idle sessions in seconds. Default value is 1800 (30 minutes). -1 never evict, 0 evict on exit
-       --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
-                                  (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
-       --requestHeaderSize=N    = set the maximum size in bytes of the request header. Default is 8192.
-       --responseHeaderSize=N   = set the maximum size in bytes of the response header. Default is 32768.
-       --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
-                                  against hash DoS attack (oCERT #2011-003). Default is 10000.
-       --useJmx                 = Enable Jetty Jmx
-       --qtpMaxThreadsCount     = max threads number when using Jetty Queued Thread Pool
-       --jettyAcceptorsCount    = Jetty Acceptors number
-       --jettySelectorsCount    = Jetty Selectors number
-       --usage / --help         = show this message
-     Security options:
-       --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
-    
-       --argumentsRealm.passwd.<user> = Password for user <user>. Only valid for the ArgumentsRealm realm class
-       --argumentsRealm.roles.<user>  = Roles for user <user> (comma separated). Only valid for the ArgumentsRealm realm class
-    
-       --fileRealm.configFile         = File containing users/passwds/roles. Only valid for the FileRealm realm class
-    
-     Access logging:
-       --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
-       --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
-       --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
+```
+Winstone Servlet Engine, (c) 2003-2006 Rick Knowles
+Usage: java winstone.jar [--option=value] [--option=value] [etc]
+
+Required options: either --webroot OR --warfile 
+   --webroot                = set document root folder.
+   --warfile                = set location of warfile to extract from.
+Other options:
+   --javaHome               = Override the JAVA_HOME variable
+   --config                 = load configuration properties from here. Default is ./winstone.properties
+   --prefix                 = add this prefix to all URLs (eg http://localhost:8080/prefix/resource). Default is none
+   --commonLibFolder        = folder for additional jar files. Default is ./lib
+
+   --logfile                = redirect log messages to this file
+   --logThrowingLineNo      = show the line no that logged the message (slow). Default is false
+   --logThrowingThread      = show the thread that logged the message. Default is false
+   --debug                  = set the level of Winstone debug msgs (1-9). Default is 5 (INFO level)
+
+   --httpPort               = set the http listening port. -1 to disable, Default is 8080
+   --httpListenAddress      = set the http listening address. Default is all interfaces
+   --httpUnixDomainPath     = set the http unix domain path. Default is no path
+   --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 30000)?
+   --httpsPort              = set the https listening port. -1 to disable, Default is disabled
+   --httpsListenAddress     = set the https listening address. Default is all interfaces
+   --httpsKeepAliveTimeout  = how long idle HTTPS keep-alive connections are kept around (in ms; default 30000)?
+   --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
+   --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
+   --httpsKeyStoreType      = set the HTTPS keystore type (JKS, PKCS12, BCFKS, etc.).
+                              Default is the Java default keystore type.
+   --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
+   --httpsRedirectHttp      = redirect http requests to https (requires both --httpPort and --httpsPort)
+   --http2Port              = set the http2 listening port. -1 to disable, Default is disabled
+   --httpsSniHostCheck      = if the SNI Host name must match when there is an SNI certificate. Check disabled per default
+   --httpsSniRequired       = if a SNI certificate is required. Disabled per default
+   --http2ListenAddress     = set the http2 listening address. Default is all interfaces
+   --httpsVerifyClient      = if the client needs a certificate. Can be true (clients always needs a certificate),
+                              optional or false.
+   --excludeProtocols       = set protocol versions to exclude. (comma separated list, use blank quote " " to exclude none)
+                              (default is "SSL", "SSLv2", "SSLv2Hello", "SSLv3")
+   --excludeCipherSuites    = set the ciphers to exclude (comma separated, use blank quote " " to exclude none) (default is
+                           // Exclude weak / insecure ciphers 
+                           "^.*_(MD5|SHA|SHA1)$", 
+                           // Exclude ciphers that don't support forward secrecy 
+                           "^TLS_RSA_.*$", 
+                           // The following exclusions are present to cleanup known bad cipher 
+                           // suites that may be accidentally included via include patterns. 
+                           // The default enabled cipher list in Java will not include these 
+                           // (but they are available in the supported list). 
+                           "^SSL_.*$", 
+                           "^.*_NULL_.*$", 
+                           "^.*_anon_.*$" 
+   --controlPort            = set the shutdown/control port. Not intended for production use. There are no security controls,
+                              limit access to the port to trusted hosts. -1 to disable, Default disabled
+
+   --compression            = set the compression scheme (gzip or none to disable compression). Default is gzip.
+   --sessionTimeout         = set the http session timeout value in minutes. Default to what webapp specifies, and then to 60 minutes
+   --sessionEviction        = set the session eviction timeout for idle sessions in seconds.
+                              Default value is 1800 (30 minutes). -1 never evict, 0 evict on exit
+   --mimeTypes=ARG          = define additional MIME type mappings. ARG would be EXT=MIMETYPE:EXT=MIMETYPE:...
+                              (e.g., xls=application/vnd.ms-excel:wmf=application/x-msmetafile)
+   --requestHeaderSize=N    = set the maximum size in bytes of the request header. Default is 8192.
+   --responseHeaderSize=N    = set the maximum size in bytes of the response header. Default is 32768.
+   --maxParamCount=N        = set the max number of parameters allowed in a form submission to protect
+                              against hash DoS attack (oCERT #2011-003). Default is 10000.
+   --useJmx                 = Enable Jetty Jmx
+   --qtpMaxThreadsCount     = max threads number when using Jetty Queued Thread Pool
+   --jettyAcceptorsCount    = Jetty Acceptors number
+   --jettySelectorsCount    = Jetty Selectors number
+   --usage / --help         = show this message
+ Security options:
+   --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
+
+   --argumentsRealm.passwd.<user> = Password for user <user>. Only valid for the ArgumentsRealm realm class
+   --argumentsRealm.roles.<user>  = Roles for user <user> (comma separated). Only valid for the ArgumentsRealm realm class
+
+   --fileRealm.configFile         = File containing users/passwds/roles. Only valid for the FileRealm realm class
+
+ Access logging:
+   --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
+   --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
+   --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
+```
 
 ## Configuration file
 You don't really need a config file, but sometimes it's handy to
