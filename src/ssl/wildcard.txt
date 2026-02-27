@@ -1,0 +1,1 @@
+keytool -genkey -alias server -keyalg RSA -keysize 2048 -keystore wildcard.jks -storepass changeit -keypass changeit -validity 99999 -dname "CN=*.example.com, O=, L=, ST=, C=US"

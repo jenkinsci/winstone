@@ -1,0 +1,133 @@
+package winstone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import org.awaitility.Awaitility;
+import org.eclipse.jetty.server.LowResourceMonitor;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+/**
+ * @author Kohsuke Kawaguchi
+ */
+class HttpConnectorFactoryTest extends AbstractWinstoneTest {
+
+    @Test
+    void testListenUnixDomainPath() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpUnixDomainPath", "target/jetty.socket");
+
+        try {
+            winstone = new Launcher(args);
+        } catch (IOException ioe) {
+            if (ioe.getCause() instanceof UnsupportedOperationException) {
+                /* skip JDKs less than 16 */
+                return;
+            }
+            throw ioe;
+        }
+
+        String path = ((UnixDomainServerConnector) winstone.server.getConnectors()[0])
+                .getUnixDomainPath()
+                .toString();
+
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                makeRequest(path, "http://127.0.0.1:80/CountRequestsServlet", Protocol.HTTP_1));
+
+        LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
+        assertNotNull(lowResourceMonitor);
+        assertFalse(lowResourceMonitor.isLowOnResources());
+        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
+    }
+
+    @Test
+    void testListenAddress() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        // see README development section for getting this to work on macOS
+        args.put("httpListenAddress", "127.0.0.2");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+        assertConnectionRefused("127.0.0.1", port);
+
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                makeRequest("http://127.0.0.2:" + port + "/CountRequestsServlet", Protocol.HTTP_1));
+
+        LowResourceMonitor lowResourceMonitor = winstone.server.getBean(LowResourceMonitor.class);
+        assertNotNull(lowResourceMonitor);
+        assertFalse(lowResourceMonitor.isLowOnResources());
+        assertTrue(lowResourceMonitor.isAcceptingInLowResources());
+    }
+
+    @Test
+    void writePortInFile(@TempDir Path tmp) throws Exception {
+        Path portFile = tmp.resolve("subdir/jenkins.port");
+        Future<Integer> futurePort = Executors.newSingleThreadExecutor().submit(() -> {
+            Map<String, String> args = new HashMap<>();
+            args.put("warfile", "target/test-classes/test.war");
+            args.put("prefix", "/");
+            args.put("httpPort", "0");
+            System.setProperty(WINSTONE_PORT_FILE_NAME_PROPERTY, portFile.toString());
+            try {
+                winstone = new Launcher(args);
+                return ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+            } finally {
+                System.clearProperty(WINSTONE_PORT_FILE_NAME_PROPERTY);
+            }
+        });
+
+        Awaitility.await()
+                .pollInterval(1, TimeUnit.MICROSECONDS)
+                .atMost(5, TimeUnit.SECONDS)
+                .until(() -> Files.exists(portFile));
+        String portFileString = Files.readString(portFile, StandardCharsets.UTF_8);
+        assertFalse(portFileString.isEmpty(), "Port value should not be empty at any time");
+        assertEquals(Integer.toString(futurePort.get()), portFileString);
+        assertNotEquals(8080, futurePort.get().longValue());
+    }
+
+    @Test
+    void helloSuspiciousPathCharacters() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+
+        assertEquals(
+                "<html><body>Hello winstone </body></html>\r\n",
+                makeRequest("http://127.0.0.1:" + port + "/hello/winstone", Protocol.HTTP_1));
+
+        // %5C == \
+        assertEquals(
+                "<html><body>Hello win\\stone </body></html>\r\n",
+                makeRequest(
+                        "http://127.0.0.1:" + port + "/hello/"
+                                + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
+                        Protocol.HTTP_1));
+    }
+}

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app
+		xmlns="http://java.sun.com/xml/ns/javaee"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+		version="2.5">
 
-<web-app>
   <display-name>WinstoneTestWebApp</display-name>
   <description>Designed as an example web application for winstone, and also as a resource for the automated tests</description>
 	<distributable/>
@@ -36,17 +37,22 @@
 
 	<servlet>
 		<servlet-name>CountRequestsServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.CountRequestsServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.CountRequestsServlet</servlet-class>
 		<init-param>
 			<param-name>offset</param-name>
 			<param-value>1000</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
+
+	<servlet>
+		<servlet-name>AcceptFormServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.AcceptFormServlet</servlet-class>
+	</servlet>
+
 	<servlet>
 		<servlet-name>UnavailableAtInitServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>
 		<init-param>
 			<param-name>errorTime</param-name>
 			<param-value>init</param-value>
@@ -55,11 +61,16 @@
 	
 	<servlet>
 		<servlet-name>UnavailableAtGetServlet</servlet-name>
-		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>    
+		<servlet-class>winstone.testApplication.servlets.UnavailableServlet</servlet-class>
 		<init-param>
 			<param-name>errorTime</param-name>
 			<param-value>get</param-value>
 		</init-param>
+	</servlet>
+
+	<servlet>
+		<servlet-name>HelloServlet</servlet-name>
+		<servlet-class>winstone.testApplication.servlets.HelloRestOfPathServlet</servlet-class>
 	</servlet>
 
   <!-- testing load on startup of a jsp -->
@@ -80,6 +91,11 @@
 		<url-pattern>/CountRequestsServlet</url-pattern>
 	</servlet-mapping>
 	
+	<servlet-mapping>
+		<servlet-name>AcceptFormServlet</servlet-name>
+		<url-pattern>/AcceptFormServlet</url-pattern>
+	</servlet-mapping>
+
 	<!-- test that an explicit mapping overrides the default JSP one -->
 	<servlet-mapping>
 		<servlet-name>loadOnStartupJSP</servlet-name>
@@ -104,6 +120,11 @@
 	<servlet-mapping>
 		<servlet-name>CountRequestsServlet</servlet-name>
 		<url-pattern>/TestWriteAfterServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>HelloServlet</servlet-name>
+		<url-pattern>/hello/*</url-pattern>
 	</servlet-mapping>
 
 	<!-- Test the welcome file processing order -->

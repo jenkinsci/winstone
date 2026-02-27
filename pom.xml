@@ -1,67 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jenkins-ci</groupId>
+  <parent>
+    <groupId>org.jenkins-ci</groupId>
+    <artifactId>jenkins</artifactId>
+    <version>1.142</version>
+    <relativePath />
+  </parent>
+
   <artifactId>winstone</artifactId>
-  <version>2.10-SNAPSHOT</version>
+  <version>${revision}.${changelist}</version>
   <packaging>jar</packaging>
 
   <name>Winstone</name>
   <description>Winstone is a command line wrapper around Jetty</description>
+  <url>https://github.com/jenkinsci/${project.artifactId}</url>
 
   <licenses>
     <license>
       <name>GNU Lesser General Public License version 2.1</name>
-      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <url>https://opensource.org/licenses/LGPL-2.1</url>
     </license>
     <license>
       <name>COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</name>
-      <url>http://www.sun.com/cddl/cddl.html</url>
+      <url>https://opensource.org/licenses/CDDL-1.0</url>
     </license>
   </licenses>
 
+  <scm>
+    <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/${gitHubRepo}</url>
+  </scm>
+
+  <properties>
+    <revision>8</revision>
+    <changelist>999999-SNAPSHOT</changelist>
+    <jetty.version>12.1.6</jetty.version>
+    <gitHubRepo>jenkinsci/winstone</gitHubRepo>
+    <spotless.check.skip>false</spotless.check.skip>
+    <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee9</groupId>
+        <artifactId>jetty-ee9-bom</artifactId>
+        <version>${jetty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-bom</artifactId>
+        <version>2.0.17</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.lib</groupId>
+      <artifactId>support-log-formatter</artifactId>
+      <version>121.v4db_e40a_98359</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-java-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jmx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-unixdomain-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee9</groupId>
+      <artifactId>jetty-ee9-servlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee9</groupId>
+      <artifactId>jetty-ee9-webapp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee9.websocket</groupId>
+      <artifactId>jetty-ee9-websocket-jetty-server</artifactId>
+      <!-- or jetty-ee9-websocket-jakarta-server -->
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-hpack</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>jetty-http2-client-transport</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci</groupId>
+      <artifactId>test-annotations</artifactId>
+      <version>123.vccb_d8e653685</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
-    <sourceDirectory>src/java</sourceDirectory>
-
-    <resources>
-      <resource>
-        <directory>src/java</directory>
-        <includes>
-          <include>**/*.properties</include>
-        </includes>
-      </resource>
-    </resources>
-
-    <testSourceDirectory>src/test</testSourceDirectory>
-
-    <testResources>
-      <testResource>
-        <directory>src/test</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
-
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
           <execution>
             <id>prepare-testwebapp</id>
-            <phase>process-test-classes</phase>
             <goals>
               <goal>run</goal>
             </goals>
+            <phase>process-test-classes</phase>
             <configuration>
-              <tasks>
+              <target>
                 <copy overwrite="true" todir="${project.build.directory}">
                   <fileset dir="${basedir}/src" includes="testwebapp/**" />
                 </copy>
@@ -71,22 +206,21 @@
                 <war destfile="${project.build.directory}/test-classes/test.war">
                   <fileset dir="${project.build.directory}/testwebapp" />
                 </war>
-              </tasks>
+              </target>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/*NaughtyTest.java</exclude>
-            <exclude>winstone/testCase/load/LoadTest.java</exclude>
-          </excludes>
+          <reuseForks>false</reuseForks>
+          <!--          Uncomment to enable extra logging for debugging          -->
+          <!--          <systemPropertyVariables>-->
+          <!--            <java.util.logging.config.file>src/test/resources/jul.properties</java.util.logging.config.file>-->
+          <!--          </systemPropertyVariables>-->
         </configuration>
       </plugin>
 
@@ -114,38 +248,38 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>[1.7,)</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.1</version>
+        <version>3.6.1</version>
         <configuration>
           <filters>
             <filter>
-              <artifact>org.eclipse.jetty.orbit:javax.servlet</artifact>
+              <artifact>io.jenkins.lib:support-log-formatter</artifact>
               <excludes>
-                <exclude>META-INF/eclipse.inf</exclude>
-                <exclude>META-INF/ECLIPSEF.*</exclude>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>org.eclipse.jetty*</artifact>
+              <excludes>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+                <exclude>module-info.class</exclude>
+                <exclude>module-info.java</exclude>
+              </excludes>
+            </filter>
+            <filter>
+              <artifact>org.slf4j</artifact>
+              <excludes>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+                <exclude>META-INF/versions/9/module-info.class</exclude>
+                <exclude>META-INF/versions/9/module-info.java</exclude>
               </excludes>
             </filter>
           </filters>
+          <artifactSet>
+            <excludes>
+              <exclude>com.github.spotbugs:spotbugs-annotations</exclude>
+            </excludes>
+          </artifactSet>
           <!-- Jetty uses reflection in various places and that breaks relocation
           <relocations>
             <relocation>
@@ -156,100 +290,77 @@
         </configuration>
         <executions>
           <execution>
-            <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
+              <!-- if changed that please re enable sources plugin -->
               <createSourcesJar>true</createSourcesJar>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+              </transformers>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <configuration>
+          <!-- because shade plugin already produce a sources jar and fail deploy during release -->
+          <skipSource>true</skipSource>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <!-- MNG-5987: anything after package -->
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
 
-  <distributionManagement>
-    <repository>
-      <id>maven.jenkins-ci.org</id>
-      <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
-    </repository>
-  </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>  
-
-  <scm>
-    <connection>scm:git:git://github.com/jenkinsci/winstone.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/winstone.git</developerConnection>
-    <url>http://github.com/jenkinsci/winstone</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <dependencies>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>httpunit</groupId>
-      <artifactId>httpunit</artifactId>
-      <version>1.6</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>8.1.13.v20130916</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
-      <version>8.1.13.v20130916</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-ajp</artifactId>
-      <version>8.1.13.v20130916</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty.spdy</groupId>
-      <artifactId>spdy-jetty-http</artifactId>
-      <version>8.1.13.v20130916</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kohsuke</groupId>
-      <artifactId>ajp-client</artifactId>
-      <version>1.0</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
+  <profiles>
+    <profile>
+      <id>enable-jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.14</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+                <configuration>
+                  <excludes>
+                    <exclude>**/Messages.class</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
-
