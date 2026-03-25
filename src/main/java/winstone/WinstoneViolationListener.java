@@ -38,23 +38,12 @@ public class WinstoneViolationListener implements ComplianceViolation.Listener {
     }
 
     private String determineViolationType(ComplianceViolation violation) {
-        if (violation instanceof HttpCompliance.Violation) {
-            return "HttpCompliance";
-        } else if (violation instanceof UriCompliance.Violation) {
-            return "UriCompliance";
-        } else if (violation instanceof CookieCompliance.Violation) {
-            return "CookieCompliance";
-        } else if (violation instanceof MultiPartCompliance.Violation) {
-            return "MultiPartCompliance";
-        } else {
-            return "ComplianceViolation";
-        }
-        //        return (switch (violation){
-        //            case HttpCompliance.Violation v -> "HttpCompliance";
-        //            case UriCompliance.Violation v -> "UriCompliance";
-        //            case CookieCompliance.Violation v -> "CookieCompliance";
-        //            case MultiPartCompliance.Violation v -> "MultiPartCompliance";
-        //            default -> "ComplianceViolation";
-        //        });
+        return (switch (violation) {
+            case HttpCompliance.Violation v -> "HttpCompliance";
+            case UriCompliance.Violation v -> "UriCompliance";
+            case CookieCompliance.Violation v -> "CookieCompliance";
+            case MultiPartCompliance.Violation v -> "MultiPartCompliance";
+            default -> "ComplianceViolation";
+        });
     }
 }
