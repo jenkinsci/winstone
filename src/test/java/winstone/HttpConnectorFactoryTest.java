@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static winstone.Launcher.WINSTONE_PORT_FILE_NAME_PROPERTY;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,6 +21,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
+import org.eclipse.jetty.client.ContentResponse;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.unixdomain.server.UnixDomainServerConnector;
@@ -129,5 +136,69 @@ class HttpConnectorFactoryTest extends AbstractWinstoneTest {
                         "http://127.0.0.1:" + port + "/hello/"
                                 + URLEncoder.encode("win\\stone", StandardCharsets.UTF_8),
                         Protocol.HTTP_1));
+    }
+
+    @Test
+    void testH2cPriorKnowledge() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+
+        HttpClient httpClient = getHttpClient();
+        ContentResponse response = httpClient
+                .newRequest("http://127.0.0.1:" + port + "/CountRequestsServlet")
+                .version(HttpVersion.HTTP_2)
+                .send();
+        httpClient.stop();
+
+        assertEquals(HttpVersion.HTTP_2, response.getVersion(), "Response should use HTTP/2");
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        assertEquals(
+                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                response.getContentAsString());
+    }
+
+    @Test
+    void testH2cUpgradeWithHeaders() throws Exception {
+        Map<String, String> args = new HashMap<>();
+        args.put("warfile", "target/test-classes/test.war");
+        args.put("prefix", "/");
+        args.put("httpPort", "0");
+        winstone = new Launcher(args);
+        int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
+
+        try (Socket client = new Socket("127.0.0.1", port)) {
+            client.setSoTimeout(5000);
+            OutputStream output = client.getOutputStream();
+            output.write(("GET /CountRequestsServlet HTTP/1.1\r\n" + "Host: 127.0.0.1\r\n"
+                            + "Connection: Upgrade, HTTP2-Settings\r\n"
+                            + "Upgrade: h2c\r\n"
+                            + "HTTP2-Settings: AAEAAEAAAAIAAAABAAMAAABkAAQBAAAAAAUAAEAA\r\n"
+                            + "\r\n")
+                    .getBytes(StandardCharsets.ISO_8859_1));
+            output.flush();
+
+            InputStream input = client.getInputStream();
+            StringBuilder response = new StringBuilder();
+            int crlfs = 0;
+            while (true) {
+                int read = input.read();
+                if (read == '\r' || read == '\n') {
+                    ++crlfs;
+                } else {
+                    crlfs = 0;
+                }
+                response.append((char) read);
+                if (crlfs == 4) {
+                    break;
+                }
+            }
+            assertTrue(
+                    response.toString().startsWith("HTTP/1.1 101 "),
+                    "Expected 101 Switching Protocols but got: " + response);
+        }
     }
 }

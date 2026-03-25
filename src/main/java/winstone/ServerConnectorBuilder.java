@@ -3,6 +3,7 @@ package winstone;
 import java.nio.file.Path;
 import org.eclipse.jetty.http.HttpCompliance;
 import org.eclipse.jetty.http.UriCompliance;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -100,9 +101,9 @@ class ServerConnectorBuilder {
 
         if (listenerUnixDomainPath != null) {
 
-            UnixDomainServerConnector usc;
-
-            usc = new UnixDomainServerConnector(server, acceptors, selectors, new HttpConnectionFactory());
+            HttpConfiguration hc = new HttpConfiguration();
+            UnixDomainServerConnector usc = new UnixDomainServerConnector(
+                    server, acceptors, selectors, new HttpConnectionFactory(hc), new HTTP2CServerConnectionFactory(hc));
 
             usc.setUnixDomainPath(Path.of(listenerUnixDomainPath));
             usc.setIdleTimeout(keepAliveTimeout);
@@ -116,7 +117,13 @@ class ServerConnectorBuilder {
             if (sslContextFactory != null) {
                 sc = new ServerConnector(server, acceptors, selectors, sslContextFactory);
             } else {
-                sc = new ServerConnector(server, acceptors, selectors);
+                HttpConfiguration hc = new HttpConfiguration();
+                sc = new ServerConnector(
+                        server,
+                        acceptors,
+                        selectors,
+                        new HttpConnectionFactory(hc),
+                        new HTTP2CServerConnectionFactory(hc));
             }
 
             sc.setPort(listenerPort);
