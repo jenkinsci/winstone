@@ -147,18 +147,17 @@ class HttpConnectorFactoryTest extends AbstractWinstoneTest {
         winstone = new Launcher(args);
         int port = ((ServerConnector) winstone.server.getConnectors()[0]).getLocalPort();
 
-        HttpClient httpClient = getHttpClient();
-        ContentResponse response = httpClient
-                .newRequest("http://127.0.0.1:" + port + "/CountRequestsServlet")
-                .version(HttpVersion.HTTP_2)
-                .send();
-        httpClient.stop();
-
-        assertEquals(HttpVersion.HTTP_2, response.getVersion(), "Response should use HTTP/2");
-        assertEquals(HttpStatus.OK_200, response.getStatus());
-        assertEquals(
-                "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
-                response.getContentAsString());
+        try (HttpClient httpClient = getHttpClient()) {
+            ContentResponse response = httpClient
+                    .newRequest("http://127.0.0.1:" + port + "/CountRequestsServlet")
+                    .version(HttpVersion.HTTP_2)
+                    .send();
+            assertEquals(HttpVersion.HTTP_2, response.getVersion(), "Response should use HTTP/2");
+            assertEquals(HttpStatus.OK_200, response.getStatus());
+            assertEquals(
+                    "<html><body>This servlet has been accessed via GET 1001 times</body></html>\r\n",
+                    response.getContentAsString());
+        }
     }
 
     @Test
@@ -199,6 +198,14 @@ class HttpConnectorFactoryTest extends AbstractWinstoneTest {
             assertTrue(
                     response.toString().startsWith("HTTP/1.1 101 "),
                     "Expected 101 Switching Protocols but got: " + response);
+
+            assertTrue(
+                    response.toString().contains("Upgrade: h2c"),
+                    "Expected Upgrade: h2c header in response but got: " + response);
+
+            assertTrue(
+                    response.toString().contains("Connection: Upgrade"),
+                    "Expected Connection: Upgrade header in response but got: " + response);
         }
     }
 }
