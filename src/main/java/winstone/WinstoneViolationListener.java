@@ -7,6 +7,7 @@
 package winstone;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.jetty.http.ComplianceViolation;
 import org.eclipse.jetty.http.CookieCompliance;
 import org.eclipse.jetty.http.HttpCompliance;
@@ -20,22 +21,19 @@ import org.eclipse.jetty.http.UriCompliance;
  */
 public class WinstoneViolationListener implements ComplianceViolation.Listener {
 
-    private static final java.util.logging.Logger LOGGER =
-            java.util.logging.Logger.getLogger(WinstoneViolationListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WinstoneViolationListener.class.getName());
 
     @Override
     public void onComplianceViolation(ComplianceViolation.Event event) {
-        String violationType = determineViolationType(event.violation());
-
-        // Format: allowed/forbidden
-        String allowedStatus = event.allowed() ? "allowed" : "forbidden";
-
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(
                     Level.FINE,
-                    String.format(
+                    () -> String.format(
                             "Compliance violation detected: %s - %s (allowed: %s) - details: %s",
-                            violationType, event.violation().getName(), allowedStatus, event.details()));
+                            determineViolationType(event.violation()),
+                            event.violation().getName(),
+                            event.allowed() ? "allowed" : "forbidden",
+                            event.details()));
         }
     }
 
@@ -51,5 +49,12 @@ public class WinstoneViolationListener implements ComplianceViolation.Listener {
         } else {
             return "ComplianceViolation";
         }
+        //        return (switch (violation){
+        //            case HttpCompliance.Violation v -> "HttpCompliance";
+        //            case UriCompliance.Violation v -> "UriCompliance";
+        //            case CookieCompliance.Violation v -> "CookieCompliance";
+        //            case MultiPartCompliance.Violation v -> "MultiPartCompliance";
+        //            default -> "ComplianceViolation";
+        //        });
     }
 }
