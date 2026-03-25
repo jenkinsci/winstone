@@ -256,14 +256,7 @@ class WinstoneViolationListenerTest extends AbstractWinstoneTest {
             // Send raw request
             out.write(rawRequest.getBytes(StandardCharsets.UTF_8));
             out.flush();
-
-            // Read response
-            byte[] buffer = new byte[8192];
-            int bytesRead = in.read(buffer);
-            if (bytesRead > 0) {
-                return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
-            }
-            return "";
+            return new String(in.readAllBytes());
         }
     }
 }
