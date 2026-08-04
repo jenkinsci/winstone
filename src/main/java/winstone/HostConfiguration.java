@@ -229,7 +229,7 @@ public class HostConfiguration {
      */
     @SuppressFBWarnings(
             value = "PATH_TRAVERSAL_IN",
-            justification = "false positive, we're not being called from a webapp")
+            justification = "Symlinks are not followed during recursive deletion; args come from command line")
     protected File getWebRoot(File requestedWebroot, File warfile) throws IOException {
         if (warfile != null) {
             Logger.log(Level.INFO, Launcher.RESOURCES, "HostConfig.BeginningWarExtraction");
@@ -359,7 +359,18 @@ public class HostConfiguration {
         File[] children = dir.listFiles();
         if (children != null) {
             for (File child : children) {
-                deleteRecursive(child);
+                if (Files.isSymbolicLink(child.toPath())) {
+                    // Delete the symlink itself but do not follow it.
+                    // Following symlinks can escape the webroot (e.g. into /proc).
+                    try {
+                        Files.deleteIfExists(child.toPath());
+                    } catch (Exception ex) {
+                        Logger.logDirectMessage(
+                                Level.WARNING, null, "Failed to delete symlink " + child.getAbsolutePath(), ex);
+                    }
+                } else {
+                    deleteRecursive(child);
+                }
             }
         }
         try {
