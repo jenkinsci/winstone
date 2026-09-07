@@ -134,6 +134,7 @@ class ServerConnectorBuilder {
         hc.setHttpCompliance(HttpCompliance.RFC7230);
         hc.setUriCompliance(UriCompliance.LEGACY);
         hc.addCustomizer(new ForwardedRequestCustomizer());
+        hc.addComplianceViolationListener(new WinstoneViolationListener());
         hc.setRequestHeaderSize(requestHeaderSize);
         hc.setResponseHeaderSize(responseHeaderSize);
 

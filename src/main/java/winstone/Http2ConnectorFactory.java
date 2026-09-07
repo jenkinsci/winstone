@@ -68,6 +68,7 @@ public class Http2ConnectorFactory extends AbstractSecuredConnectorFactory imple
             SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
             secureRequestCustomizer.setSniHostCheck(Option.HTTPS_SNI_HOST_CHECK.get(args));
             https_config.addCustomizer(secureRequestCustomizer);
+            https_config.addComplianceViolationListener(new WinstoneViolationListener());
 
             // HTTP/2 Connection Factory
             HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(https_config);
