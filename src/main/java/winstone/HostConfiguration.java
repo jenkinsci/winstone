@@ -356,11 +356,17 @@ public class HostConfiguration {
     }
 
     private void deleteRecursive(File dir) {
-        File[] children = dir.listFiles();
-        if (children != null) {
-            for (File child : children) {
-                deleteRecursive(child);
+        try {
+            if (!Files.isSymbolicLink(dir.toPath())) {
+                File[] children = dir.listFiles();
+                if (children != null) {
+                    for (File child : children) {
+                        deleteRecursive(child);
+                    }
+                }
             }
+        } catch (Exception ex) {
+            // Ignore path exceptions here; they will be handled by deleteIfExists below
         }
         try {
             Files.deleteIfExists(dir.toPath());
