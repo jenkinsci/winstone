@@ -59,6 +59,7 @@ Other options:
    --debug                  = set the level of Winstone debug msgs (1-9). Default is 5 (INFO level)
 
    --httpPort               = set the http listening port. -1 to disable, Default is 8080
+                              Supports h2c (HTTP/2 over cleartext) via upgrade and prior knowledge
    --httpListenAddress      = set the http listening address. Default is all interfaces
    --httpUnixDomainPath     = set the http unix domain path. Default is no path
    --httpKeepAliveTimeout   = how long idle HTTP keep-alive connections are kept around (in ms; default 30000)?
