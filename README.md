@@ -123,6 +123,13 @@ Other options:
    --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
 ```
 
+## HTTP Compliance Monitoring
+
+Winstone automatically monitors HTTP protocol compliance violations detected by Jetty. 
+This feature logs when clients send requests that violate HTTP, URI, or Cookie specifications (such as malformed headers, ambiguous paths, or invalid cookie syntax). 
+Violations are logged at `FINE` level (debug level) and include details about the violation type and whether it was allowed or rejected. 
+This is useful for debugging client integration issues and identifying potential security scanning activity.
+
 ## Configuration file
 You don't really need a config file, but sometimes it's handy to
 be able to use the same settings each time without running through
