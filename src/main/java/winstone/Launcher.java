@@ -507,7 +507,14 @@ public class Launcher implements Runnable {
         args.remove("nonSwitch");
 
         // Check if the non-switch arg is a file or folder, and overwrite the config
-        if (firstNonSwitchArgument != null) {
+        //
+        // Treat an empty string first argument the same as a null first argument to fix
+        // https://github.com/jenkinsci/winstone/issues/554
+        //
+        // Java 25 returns File("").exists() as true (intentionally)
+        // Java 21 returns File("").exists() as false
+        // https://bugs.openjdk.org/browse/JDK-8024695
+        if (firstNonSwitchArgument != null && !firstNonSwitchArgument.isEmpty()) {
             File webapp = new File(firstNonSwitchArgument);
             if (webapp.exists()) {
                 if (webapp.isDirectory()) {
