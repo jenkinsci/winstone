@@ -1,6 +1,10 @@
 package winstone;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,6 +16,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,5 +140,54 @@ class LauncherTest extends AbstractWinstoneTest {
         args.put("httpsKeyStoreType", "PKCS12");
         String customType = Option.HTTPS_KEY_STORE_TYPE.get(args, KeyStore.getDefaultType());
         assertEquals("PKCS12", customType);
+    }
+
+    @Issue("https://github.com/jenkinsci/winstone/issues/554")
+    @Test
+    void testEmptyWebRootArgument() throws Exception {
+        // Check that empty string is handled the same as null
+        //
+        // Treat an empty string first argument the same as a null first argument to fix
+        // https://github.com/jenkinsci/winstone/issues/554
+        //
+        // Java 25 returns File("").exists() as true (intentionally)
+        // Java 21 returns File("").exists() as false
+        // https://bugs.openjdk.org/browse/JDK-8024695
+        String[] argv = {""};
+        Map<String, String> args = Launcher.getArgsFromCommandLine(argv);
+        assertThat(args, is(anEmptyMap()));
+    }
+
+    @Test
+    void testZeroLengthArrayWebRootArgument() throws Exception {
+        String[] argv = {};
+        Map<String, String> args = Launcher.getArgsFromCommandLine(argv);
+        assertThat(args, is(anEmptyMap()));
+    }
+
+    @Test
+    void testBlankWarFileArgument() throws Exception {
+        // Check that a single argument that is an existing file is assigned to the warfile entry in the Map
+        String fileName = "a-file-name";
+        Path spaceFile = Path.of(fileName);
+        Files.createFile(spaceFile);
+        String[] argv = {fileName};
+        Map<String, String> args = Launcher.getArgsFromCommandLine(argv);
+        Files.deleteIfExists(spaceFile); // Delete before assertion to avoid try / catch
+        assertThat(args, is(aMapWithSize(1)));
+        assertThat(args, hasEntry("warfile", fileName));
+    }
+
+    @Test
+    void testBlankWebRootArgument() throws Exception {
+        // Check that a single argument that is an existing directory is assigned to the webroot entry in the Map
+        String dirName = "a-directory-name";
+        Path spaceDirectory = Path.of(dirName);
+        Files.createDirectory(spaceDirectory);
+        String[] argv = {dirName};
+        Map<String, String> args = Launcher.getArgsFromCommandLine(argv);
+        Files.deleteIfExists(spaceDirectory); // Delete before assertion to avoid try / catch
+        assertThat(args, is(aMapWithSize(1)));
+        assertThat(args, hasEntry("webroot", dirName));
     }
 }
